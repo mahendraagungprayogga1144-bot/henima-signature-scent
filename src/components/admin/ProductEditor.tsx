@@ -1,0 +1,325 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import Image from "next/image";
+import type { Product, ProductVariant } from "@/lib/types";
+import { formatRupiah } from "@/lib/format";
+
+type VariantDraft = ProductVariant;
+
+function sortVariants(vs: VariantDraft[]) {
+  return [...vs].sort((a, b) => a.sizeMl - b.sizeMl);
+}
+
+function newVariant(productId: string, sizeMl: 30 | 50 | 100): VariantDraft {
+  return {
+    id: `${productId}-${sizeMl}`,
+    sizeMl,
+    stock: 0,
+    originalPrice: 0,
+    discountPrice: 0,
+    active: true,
+  };
+}
+
+export default function ProductEditor({
+  product,
+  onSaved,
+}: {
+  product: Product;
+  onSaved?: () => void;
+}) {
+  const [name, setName] = useState(product.name);
+  const [description, setDescription] = useState(product.description);
+  const [active, setActive] = useState(product.active);
+  const [originalPrice, setOriginalPrice] = useState(product.originalPrice);
+  const [discountPrice, setDiscountPrice] = useState(product.discountPrice);
+  const [variants, setVariants] = useState<VariantDraft[]>(
+    sortVariants(product.variants)
+  );
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const previewUrl = useMemo(() => {
+    if (!photoFile) return null;
+    return URL.createObjectURL(photoFile);
+  }, [photoFile]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setSaving(true);
+    try {
+      const fd = new FormData();
+      fd.set("name", name);
+      fd.set("description", description);
+      fd.set("active", active ? "on" : "off");
+      fd.set("originalPrice", String(originalPrice));
+      fd.set("discountPrice", String(discountPrice));
+      fd.set("variants", JSON.stringify(variants));
+      if (photoFile) fd.set("photo", photoFile);
+
+      const res = await fetch(`/api/admin/products/${product.id}`, {
+        method: "POST",
+        body: fd,
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        setError(text || "Gagal menyimpan produk");
+        return;
+      }
+      onSaved?.();
+    } catch {
+      setError("Terjadi kesalahan jaringan");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!confirm(`Hapus produk: ${product.name}?`)) return;
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/admin/products/${product.id}/delete`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        setError(text || "Gagal menghapus produk");
+        return;
+      }
+      onSaved?.();
+    } catch {
+      setError("Terjadi kesalahan jaringan");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function upsertVariant(next: VariantDraft) {
+    setVariants((prev) => sortVariants(prev.map((v) => (v.id === next.id ? next : v))));
+  }
+
+  function toggleVariantActive(id: string) {
+    setVariants((prev) =>
+      sortVariants(prev.map((v) => (v.id === id ? { ...v, active: !v.active } : v)))
+    );
+  }
+
+  function addMissingSizes() {
+    setVariants((prev) => {
+      const sizes = new Set(prev.map((v) => v.sizeMl));
+      const next = [...prev];
+      ([30, 50, 100] as const).forEach((s) => {
+        if (!sizes.has(s)) {
+          next.push(
+            newVariant(product.id, s)
+          );
+        }
+      });
+      return sortVariants(next);
+    });
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="card space-y-6">
+      <div className="flex flex-col gap-6 sm:flex-row">
+        <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-2xl border border-ink-800 bg-ink-950/40">
+          <Image
+            src={previewUrl || product.photo}
+            alt={product.name}
+            fill
+            className="object-contain p-4"
+          />
+        </div>
+        <div className="flex-1 space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="label">Nama Produk</label>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="input-field"
+                required
+              />
+            </div>
+            <div>
+              <label className="label">Foto Produk</label>
+              <input
+                type="file"
+                accept="image/*"
+                className="block w-full text-sm text-ink-300 file:mr-4 file:rounded-lg file:border-0 file:bg-ink-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink-50"
+                onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
+              />
+              <p className="mt-1 text-xs text-ink-400">Disimpan ke `public/uploads/products`.</p>
+            </div>
+          </div>
+
+          <div>
+            <label className="label">Deskripsi</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={2}
+              className="input-field"
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="label">Harga Coret (Rp)</label>
+              <input
+                type="number"
+                min={0}
+                step={1000}
+                value={originalPrice}
+                onChange={(e) => setOriginalPrice(Number(e.target.value))}
+                className="input-field"
+                required
+              />
+              <p className="mt-1 text-xs text-ink-400">{formatRupiah(originalPrice)}</p>
+            </div>
+            <div>
+              <label className="label">Harga Diskon (Rp)</label>
+              <input
+                type="number"
+                min={0}
+                step={1000}
+                value={discountPrice}
+                onChange={(e) => setDiscountPrice(Number(e.target.value))}
+                className="input-field"
+                required
+              />
+              <p className="mt-1 text-xs text-ink-400">{formatRupiah(discountPrice)}</p>
+            </div>
+          </div>
+
+          <label className="flex items-center gap-2 text-sm text-ink-200">
+            <input
+              type="checkbox"
+              checked={active}
+              onChange={(e) => setActive(e.target.checked)}
+            />
+            Aktif di katalog
+          </label>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-sm font-semibold text-ink-100">Varian & Stock</h3>
+          <button
+            type="button"
+            className="btn-secondary !py-2"
+            onClick={addMissingSizes}
+            disabled={saving}
+          >
+            Tambah varian 30/50/100ml
+          </button>
+        </div>
+
+        <div className="overflow-x-auto rounded-2xl border border-ink-800">
+          <table className="w-full min-w-[720px] text-left text-sm">
+            <thead className="bg-ink-950/40">
+              <tr className="text-ink-300">
+                <th className="px-4 py-3 font-medium">Size</th>
+                <th className="px-4 py-3 font-medium">Stock</th>
+                <th className="px-4 py-3 font-medium">Harga Coret</th>
+                <th className="px-4 py-3 font-medium">Harga Diskon</th>
+                <th className="px-4 py-3 font-medium">Aktif</th>
+              </tr>
+            </thead>
+            <tbody>
+              {variants.map((v) => (
+                <tr key={v.id} className="border-t border-ink-800">
+                  <td className="px-4 py-3 text-ink-100">{v.sizeMl}ml</td>
+                  <td className="px-4 py-3">
+                    <input
+                      type="number"
+                      min={0}
+                      value={v.stock}
+                      onChange={(e) =>
+                        upsertVariant({ ...v, stock: Number(e.target.value) || 0 })
+                      }
+                      className="input-field w-28"
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <input
+                      type="number"
+                      min={0}
+                      step={1000}
+                      value={v.originalPrice}
+                      onChange={(e) =>
+                        upsertVariant({
+                          ...v,
+                          originalPrice: Number(e.target.value) || 0,
+                        })
+                      }
+                      className="input-field w-40"
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <input
+                      type="number"
+                      min={0}
+                      step={1000}
+                      value={v.discountPrice}
+                      onChange={(e) =>
+                        upsertVariant({
+                          ...v,
+                          discountPrice: Number(e.target.value) || 0,
+                        })
+                      }
+                      className="input-field w-40"
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      type="button"
+                      className={
+                        v.active
+                          ? "badge border-gold-400/30 bg-gold-400/10 text-gold-200"
+                          : "badge"
+                      }
+                      onClick={() => toggleVariantActive(v.id)}
+                      disabled={saving}
+                    >
+                      {v.active ? "Aktif" : "Nonaktif"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {variants.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-6 text-ink-400">
+                    Belum ada varian. Klik “Tambah varian 30/50/100ml”.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {error && <p className="text-sm text-red-200">{error}</p>}
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <button type="submit" className="btn-primary" disabled={saving}>
+          {saving ? "Menyimpan..." : "Simpan Produk"}
+        </button>
+        <button
+          type="button"
+          className="btn-secondary"
+          disabled={saving}
+          onClick={handleDelete}
+        >
+          Hapus Produk
+        </button>
+      </div>
+    </form>
+  );
+}
+

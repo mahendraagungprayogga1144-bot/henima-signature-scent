@@ -1,0 +1,139 @@
+{
+  "products": [
+    {
+      "id": "prod-afternoon",
+      "name": "Afternoon",
+      "description": "Blend kopi dengan rasa lembut dan aroma floral, cocok untuk sore hari.",
+      "photo": "/products/afternoon.svg",
+      "originalPrice": 185000,
+      "discountPrice": 185000,
+      "active": true,
+      "variants": [
+        {
+          "id": "prod-afternoon-30",
+          "sizeMl": 30,
+          "stock": 0,
+          "originalPrice": 185000,
+          "discountPrice": 185000,
+          "active": true
+        },
+        {
+          "id": "prod-afternoon-50",
+          "sizeMl": 50,
+          "stock": 0,
+          "originalPrice": 185000,
+          "discountPrice": 185000,
+          "active": true
+        },
+        {
+          "id": "prod-afternoon-100",
+          "sizeMl": 100,
+          "stock": 0,
+          "originalPrice": 185000,
+          "discountPrice": 185000,
+          "active": true
+        }
+      ]
+    },
+    {
+      "id": "prod-distance",
+      "name": "Distance",
+      "description": "Blend bold dengan notes cokelat dan karamel, untuk penikmat kopi kuat.",
+      "photo": "/products/distance.svg",
+      "originalPrice": 195000,
+      "discountPrice": 195000,
+      "active": true,
+      "variants": [
+        {
+          "id": "prod-distance-30",
+          "sizeMl": 30,
+          "stock": 0,
+          "originalPrice": 195000,
+          "discountPrice": 195000,
+          "active": true
+        },
+        {
+          "id": "prod-distance-50",
+          "sizeMl": 50,
+          "stock": 0,
+          "originalPrice": 195000,
+          "discountPrice": 195000,
+          "active": true
+        },
+        {
+          "id": "prod-distance-100",
+          "sizeMl": 100,
+          "stock": 0,
+          "originalPrice": 195000,
+          "discountPrice": 195000,
+          "active": true
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "user-admin",
+      "email": "admin@toko.local",
+      "passwordHash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+      "name": "Administrator",
+      "phone": "6281234567890",
+      "role": "admin",
+      "storeName": "Toko Pusat",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "user-reseller-1",
+      "email": "reseller@demo.local",
+      "passwordHash": "69ff63ab831a811281d43c71c31fee45924edcb73993179c5c6ca0ece3e62fd2",
+      "name": "Budi Santoso",
+      "phone": "6289876543210",
+      "role": "reseller",
+      "storeName": "Kopi Nusantara",
+      "address": "Jl. Melati No. 12, Bandung",
+      "createdAt": "2025-02-01T00:00:00.000Z",
+      "reseller": {
+        "approved": true,
+        "tier": "Bronze",
+        "commissionPct": 0,
+        "commissionEarned": 0
+      }
+    }
+  ],
+  "orders": [],
+  "settings": {
+    "company": {
+      "name": "Henima Signature Scent",
+      "whatsappNumber": "085190311230",
+      "address": "Sidoarjo Jawa timur",
+      "tagline": "Luxury scent, crafted for your signature.",
+      "vision": "menjadikan bra"
+    },
+    "payment": {
+      "qrisImage": "/uploads/qris/qris-1780405586617.png",
+      "bankAccounts": [
+        {
+          "code": "bca",
+          "bankName": "BCA",
+          "accountNumber": "2712008173",
+          "accountName": "PT Henima Collection Indo",
+          "active": true
+        },
+        {
+          "code": "mandiri",
+          "bankName": "Mandiri",
+          "accountNumber": "0000000000",
+          "accountName": "Henima Signature Scent",
+          "active": false
+        },
+        {
+          "code": "bri",
+          "bankName": "BRI",
+          "accountNumber": "0000000000",
+          "accountName": "Henima Signature Scent",
+          "active": false
+        }
+      ]
+    }
+  }
+}
