@@ -1,361 +1,226 @@
-import { promises as fs } from "fs";
-import path from "path";
-import type { Database } from "./types";
+import { supabase } from "./supabase";
+import type { Database, Product, User, Order, Settings } from "./types";
 
-const DB_PATH = path.join(process.cwd(), "data", "db.json");
+// ---------- Row <-> TypeScript mappers ----------
 
-let writeQueue: Promise<void> = Promise.resolve();
-
-function migrateDatabase(input: any): { db: Database; changed: boolean } {
-  let changed = false;
-
-  const products = Array.isArray(input?.products) ? input.products : [];
-  const users = Array.isArray(input?.users) ? input.users : [];
-  const orders = Array.isArray(input?.orders) ? input.orders : [];
-  const settings = input?.settings ?? {};
-
-  const db: Database = {
-    products: products.map((p: any) => {
-      const photo =
-        typeof p?.photo === "string"
-          ? p.photo
-          : typeof p?.image === "string"
-            ? p.image
-            : "/products/placeholder.svg";
-
-      const originalPrice =
-        typeof p?.originalPrice === "number"
-          ? p.originalPrice
-          : typeof p?.price === "number"
-            ? p.price
-            : 0;
-
-      const discountPrice =
-        typeof p?.discountPrice === "number" ? p.discountPrice : originalPrice;
-
-      const active = typeof p?.active === "boolean" ? p.active : true;
-
-      const variantsRaw = Array.isArray(p?.variants) ? p.variants : null;
-      const variants =
-        variantsRaw && variantsRaw.length > 0
-          ? variantsRaw.map((v: any, idx: number) => ({
-              id:
-                typeof v?.id === "string"
-                  ? v.id
-                  : `${String(p?.id || "prod")}-v${idx + 1}`,
-              sizeMl:
-                v?.sizeMl === 30 || v?.sizeMl === 50 || v?.sizeMl === 100
-                  ? v.sizeMl
-                  : 50,
-              sku: typeof v?.sku === "string" ? v.sku : undefined,
-              stock: typeof v?.stock === "number" ? v.stock : 0,
-              originalPrice:
-                typeof v?.originalPrice === "number" ? v.originalPrice : originalPrice,
-              discountPrice:
-                typeof v?.discountPrice === "number" ? v.discountPrice : discountPrice,
-              active: typeof v?.active === "boolean" ? v.active : true,
-            }))
-          : [
-              {
-                id: `${String(p?.id || "prod")}-30`,
-                sizeMl: 30 as const,
-                stock: typeof p?.stock === "number" ? p.stock : 0,
-                originalPrice,
-                discountPrice,
-                active: true,
-              },
-              {
-                id: `${String(p?.id || "prod")}-50`,
-                sizeMl: 50 as const,
-                stock: typeof p?.stock === "number" ? p.stock : 0,
-                originalPrice,
-                discountPrice,
-                active: true,
-              },
-              {
-                id: `${String(p?.id || "prod")}-100`,
-                sizeMl: 100 as const,
-                stock: typeof p?.stock === "number" ? p.stock : 0,
-                originalPrice,
-                discountPrice,
-                active: true,
-              },
-            ];
-
-      const normalized = {
-        id: String(p?.id || ""),
-        name: String(p?.name || ""),
-        description: String(p?.description || ""),
-        photo,
-        originalPrice,
-        discountPrice,
-        active,
-        variants,
-      };
-
-      if (
-        p?.image !== undefined ||
-        p?.price !== undefined ||
-        p?.originalPrice === undefined ||
-        p?.discountPrice === undefined ||
-        !Array.isArray(p?.variants)
-      ) {
-        changed = true;
-      }
-
-      return normalized;
-    }),
-    users: users.map((u: any) => {
-      const base = {
-        id: String(u?.id || ""),
-        email: String(u?.email || ""),
-        passwordHash: String(u?.passwordHash || ""),
-        name: String(u?.name || ""),
-        phone: String(u?.phone || ""),
-        role: u?.role === "admin" ? "admin" : "reseller",
-        storeName: String(u?.storeName || ""),
-        address: typeof u?.address === "string" ? u.address : undefined,
-        createdAt: String(u?.createdAt || new Date().toISOString()),
-      } as any;
-
-      if (base.role === "reseller") {
-        base.reseller = {
-          approved: u?.reseller?.approved ?? true,
-          tier: u?.reseller?.tier ?? "Bronze",
-          commissionPct:
-            typeof u?.reseller?.commissionPct === "number" ? u.reseller.commissionPct : 0,
-          commissionEarned:
-            typeof u?.reseller?.commissionEarned === "number"
-              ? u.reseller.commissionEarned
-              : 0,
-        };
-        if (!u?.reseller) changed = true;
-      }
-
-      return base;
-    }),
-    orders: orders.map((o: any) => {
-      const legacyShippingAddress = typeof o?.shippingAddress === "string" ? o.shippingAddress : "";
-
-      const shipping =
-        o?.shipping && typeof o.shipping === "object"
-          ? {
-              fullName: String(o.shipping.fullName || o?.resellerName || ""),
-              phone: String(o.shipping.phone || o?.resellerPhone || ""),
-              address: String(o.shipping.address || legacyShippingAddress || ""),
-              city: String(o.shipping.city || ""),
-              province: String(o.shipping.province || ""),
-              postalCode: String(o.shipping.postalCode || ""),
-            }
-          : {
-              fullName: String(o?.resellerName || ""),
-              phone: String(o?.resellerPhone || ""),
-              address: String(legacyShippingAddress || ""),
-              city: "",
-              province: "",
-              postalCode: "",
-            };
-
-      const itemsRaw = Array.isArray(o?.items) ? o.items : [];
-      const items = itemsRaw.map((it: any, idx: number) => ({
-        productId: String(it?.productId || ""),
-        variantId: String(it?.variantId || `${String(it?.productId || "prod")}-50`),
-        productName: String(it?.productName || ""),
-        sizeMl: it?.sizeMl === 30 || it?.sizeMl === 50 || it?.sizeMl === 100 ? it.sizeMl : 50,
-        quantity: Number(it?.quantity || 0),
-        unitPrice: Number(it?.unitPrice || 0),
-        subtotal: Number(it?.subtotal || 0),
-      }));
-
-      const status =
-        o?.status === "pending_payment" ||
-        o?.status === "pending_confirmation" ||
-        o?.status === "confirmed" ||
-        o?.status === "packed" ||
-        o?.status === "shipped" ||
-        o?.status === "delivered"
-          ? o.status
-          : o?.status === "pending"
-            ? "pending_payment"
-            : "pending_payment";
-
-      const paymentMethod =
-        o?.paymentMethod === "qris" || o?.paymentMethod === "bank_transfer"
-          ? o.paymentMethod
-          : o?.paymentMethod === "bca"
-            ? "bank_transfer"
-            : undefined;
-
-      if (o?.shippingAddress !== undefined || o?.status === "pending" || o?.paymentMethod === "bca") {
-        changed = true;
-      }
-
-      return {
-        id: String(o?.id || ""),
-        resellerId: String(o?.resellerId || ""),
-        resellerName: String(o?.resellerName || ""),
-        resellerPhone: String(o?.resellerPhone || ""),
-        storeName: String(o?.storeName || ""),
-        orderType: o?.orderType === "satuan" ? "satuan" : "reseller",
-        shipping,
-        courier:
-          o?.courier === "jne" || o?.courier === "jnt" || o?.courier === "sicepat" || o?.courier === "anteraja"
-            ? o.courier
-            : "jne",
-        items,
-        total: Number(o?.total || 0),
-        status,
-        statusHistory: Array.isArray(o?.statusHistory)
-          ? o.statusHistory.map((h: any) => ({
-              status:
-                h?.status === "pending_payment" ||
-                h?.status === "pending_confirmation" ||
-                h?.status === "confirmed" ||
-                h?.status === "packed" ||
-                h?.status === "shipped" ||
-                h?.status === "delivered"
-                  ? h.status
-                  : h?.status === "pending"
-                    ? "pending_payment"
-                    : "pending_payment",
-              note: typeof h?.note === "string" ? h.note : undefined,
-              at: String(h?.at || new Date().toISOString()),
-            }))
-          : [],
-        paymentMethod,
-        paymentProof: typeof o?.paymentProof === "string" ? o.paymentProof : undefined,
-        paymentBank:
-          o?.paymentBank === "bca" || o?.paymentBank === "mandiri" || o?.paymentBank === "bri"
-            ? o.paymentBank
-            : undefined,
-        paymentConfirmedAt:
-          typeof o?.paymentConfirmedAt === "string" ? o.paymentConfirmedAt : undefined,
-        invoicePdf: typeof o?.invoicePdf === "string" ? o.invoicePdf : undefined,
-        resi: typeof o?.resi === "string" ? o.resi : undefined,
-        notes: typeof o?.notes === "string" ? o.notes : undefined,
-        createdAt: String(o?.createdAt || new Date().toISOString()),
-        updatedAt: String(o?.updatedAt || o?.createdAt || new Date().toISOString()),
-      };
-    }),
-    settings: {
-      company: {
-        name:
-          typeof settings?.company?.name === "string" && settings.company.name.trim()
-            ? settings.company.name.trim()
-            : "Henima Signature Scent",
-        whatsappNumber:
-          typeof settings?.company?.whatsappNumber === "string"
-            ? settings.company.whatsappNumber
-            : undefined,
-        address:
-          typeof settings?.company?.address === "string"
-            ? settings.company.address
-            : undefined,
-        tagline:
-          typeof settings?.company?.tagline === "string"
-            ? settings.company.tagline
-            : "Luxury scent, crafted for your signature.",
-        vision:
-          typeof settings?.company?.vision === "string"
-            ? settings.company.vision
-            : "",
-        mission:
-          typeof settings?.company?.mission === "string"
-            ? settings.company.mission
-            : "",
-        brandStory:
-          typeof settings?.company?.brandStory === "string"
-            ? settings.company.brandStory
-            : "",
-        logo: typeof settings?.company?.logo === "string" ? settings.company.logo : undefined,
-        heroImage:
-          typeof settings?.company?.heroImage === "string"
-            ? settings.company.heroImage
-            : undefined,
-      },
-      payment: {
-        qrisImage:
-          typeof settings?.payment?.qrisImage === "string"
-            ? settings.payment.qrisImage
-            : typeof settings?.qrisImage === "string"
-              ? settings.qrisImage
-              : "/payment/qris-placeholder.svg",
-        bankAccounts: Array.isArray(settings?.payment?.bankAccounts)
-          ? settings.payment.bankAccounts
-          : [
-              {
-                code: "bca",
-                bankName:
-                  typeof settings?.bankName === "string" ? settings.bankName : "BCA",
-                accountNumber:
-                  typeof settings?.bankAccount === "string"
-                    ? settings.bankAccount
-                    : "0000000000",
-                accountName:
-                  typeof settings?.bankAccountName === "string"
-                    ? settings.bankAccountName
-                    : "Henima Signature Scent",
-                active: true,
-              },
-              {
-                code: "mandiri",
-                bankName: "Mandiri",
-                accountNumber: "0000000000",
-                accountName: "Henima Signature Scent",
-                active: false,
-              },
-              {
-                code: "bri",
-                bankName: "BRI",
-                accountNumber: "0000000000",
-                accountName: "Henima Signature Scent",
-                active: false,
-              },
-            ],
-      },
-    },
+function rowToProduct(row: Record<string, unknown>): Product {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    description: (row.description as string) ?? "",
+    photo: (row.photo as string) ?? "/products/placeholder.svg",
+    originalPrice: row.original_price as number,
+    discountPrice: row.discount_price as number,
+    active: row.active as boolean,
+    variants: (row.variants as Product["variants"]) ?? [],
   };
-
-  if (input?.settings?.bankName || input?.settings?.bankAccount || input?.settings?.bankAccountName) {
-    changed = true;
-  }
-  if (!settings?.company || settings?.company?.tagline === undefined) {
-    changed = true;
-  }
-
-  return { db, changed };
 }
 
-async function readDb(): Promise<Database> {
-  const raw = await fs.readFile(DB_PATH, "utf8");
-  const parsed = JSON.parse(raw);
-  const { db, changed } = migrateDatabase(parsed);
-  if (changed) {
-    // Best-effort normalize persisted schema once.
-    await fs.writeFile(DB_PATH, JSON.stringify(db, null, 2), "utf8");
-  }
-  return db;
+function productToRow(p: Product) {
+  return {
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    photo: p.photo,
+    original_price: p.originalPrice,
+    discount_price: p.discountPrice,
+    active: p.active,
+    variants: p.variants,
+  };
 }
 
-async function writeDb(data: Database): Promise<void> {
-  await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2), "utf8");
+function rowToUser(row: Record<string, unknown>): User {
+  return {
+    id: row.id as string,
+    email: row.email as string,
+    passwordHash: row.password_hash as string,
+    name: row.name as string,
+    phone: (row.phone as string) ?? "",
+    role: row.role as User["role"],
+    storeName: (row.store_name as string) ?? "",
+    address: (row.address as string | null) ?? undefined,
+    reseller: (row.reseller as User["reseller"] | null) ?? undefined,
+    createdAt: row.created_at as string,
+  };
 }
+
+function userToRow(u: User) {
+  return {
+    id: u.id,
+    email: u.email,
+    password_hash: u.passwordHash,
+    name: u.name,
+    phone: u.phone,
+    role: u.role,
+    store_name: u.storeName,
+    address: u.address ?? null,
+    reseller: u.reseller ?? null,
+    created_at: u.createdAt,
+  };
+}
+
+function rowToOrder(row: Record<string, unknown>): Order {
+  return {
+    id: row.id as string,
+    resellerId: row.reseller_id as string,
+    resellerName: (row.reseller_name as string) ?? "",
+    resellerPhone: (row.reseller_phone as string) ?? "",
+    storeName: (row.store_name as string) ?? "",
+    orderType: row.order_type as Order["orderType"],
+    shipping: row.shipping as Order["shipping"],
+    courier: row.courier as Order["courier"],
+    items: (row.items as Order["items"]) ?? [],
+    total: row.total as number,
+    status: row.status as Order["status"],
+    statusHistory: (row.status_history as Order["statusHistory"]) ?? [],
+    paymentMethod: (row.payment_method as Order["paymentMethod"] | null) ?? undefined,
+    paymentProof: (row.payment_proof as string | null) ?? undefined,
+    paymentBank: (row.payment_bank as Order["paymentBank"] | null) ?? undefined,
+    paymentConfirmedAt: (row.payment_confirmed_at as string | null) ?? undefined,
+    invoicePdf: (row.invoice_pdf as string | null) ?? undefined,
+    resi: (row.resi as string | null) ?? undefined,
+    notes: (row.notes as string | null) ?? undefined,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
+function orderToRow(o: Order) {
+  return {
+    id: o.id,
+    reseller_id: o.resellerId,
+    reseller_name: o.resellerName,
+    reseller_phone: o.resellerPhone,
+    store_name: o.storeName,
+    order_type: o.orderType,
+    shipping: o.shipping,
+    courier: o.courier,
+    items: o.items,
+    total: o.total,
+    status: o.status,
+    status_history: o.statusHistory,
+    payment_method: o.paymentMethod ?? null,
+    payment_proof: o.paymentProof ?? null,
+    payment_bank: o.paymentBank ?? null,
+    payment_confirmed_at: o.paymentConfirmedAt ?? null,
+    invoice_pdf: o.invoicePdf ?? null,
+    resi: o.resi ?? null,
+    notes: o.notes ?? null,
+    created_at: o.createdAt,
+    updated_at: o.updatedAt,
+  };
+}
+
+const DEFAULT_SETTINGS: Settings = {
+  company: {
+    name: "Henima Signature Scent",
+    tagline: "Luxury scent, crafted for your signature.",
+    vision: "",
+    mission: "",
+    brandStory: "",
+  },
+  payment: {
+    qrisImage: "/payment/qris-placeholder.svg",
+    bankAccounts: [
+      { code: "bca", bankName: "BCA", accountNumber: "0000000000", accountName: "Henima Signature Scent", active: true },
+      { code: "mandiri", bankName: "Mandiri", accountNumber: "0000000000", accountName: "Henima Signature Scent", active: false },
+      { code: "bri", bankName: "BRI", accountNumber: "0000000000", accountName: "Henima Signature Scent", active: false },
+    ],
+  },
+};
+
+// ---------- Public API ----------
 
 export async function getDatabase(): Promise<Database> {
-  return readDb();
+  const [
+    { data: productsData, error: pErr },
+    { data: usersData, error: uErr },
+    { data: ordersData, error: oErr },
+    { data: settingsData },
+  ] = await Promise.all([
+    supabase.from("products").select("*").order("name"),
+    supabase.from("users").select("*").order("created_at"),
+    supabase.from("orders").select("*").order("created_at", { ascending: false }),
+    supabase.from("settings").select("*").eq("id", 1).maybeSingle(),
+  ]);
+
+  if (pErr) throw new Error(`Products fetch failed: ${pErr.message}`);
+  if (uErr) throw new Error(`Users fetch failed: ${uErr.message}`);
+  if (oErr) throw new Error(`Orders fetch failed: ${oErr.message}`);
+
+  const settings: Settings = settingsData
+    ? {
+        company: settingsData.company as Settings["company"],
+        payment: settingsData.payment as Settings["payment"],
+      }
+    : DEFAULT_SETTINGS;
+
+  return {
+    products: (productsData ?? []).map(rowToProduct),
+    users: (usersData ?? []).map(rowToUser),
+    orders: (ordersData ?? []).map(rowToOrder),
+    settings,
+  };
+}
+
+export async function getUserById(id: string): Promise<User | null> {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error || !data) return null;
+  return rowToUser(data as Record<string, unknown>);
 }
 
 export async function updateDatabase(
   updater: (db: Database) => void | Promise<void>
 ): Promise<Database> {
-  let result!: Database;
-  const task = async () => {
-    const db = await readDb();
-    await updater(db);
-    await writeDb(db);
-    result = db;
-  };
-  writeQueue = writeQueue.then(task, task);
-  await writeQueue;
-  return result;
+  const before = await getDatabase();
+  const after: Database = JSON.parse(JSON.stringify(before));
+
+  await updater(after); // may throw — nothing is saved if it does
+
+  await Promise.all([
+    syncArray("products", before.products, after.products, productToRow),
+    syncArray("users", before.users, after.users, userToRow),
+    syncArray("orders", before.orders, after.orders, orderToRow),
+    syncSettings(before.settings, after.settings),
+  ]);
+
+  return after;
+}
+
+// ---------- Internal sync helpers ----------
+
+async function syncArray<T extends { id: string }>(
+  table: string,
+  before: T[],
+  after: T[],
+  toRow: (item: T) => object
+): Promise<void> {
+  const afterIds = new Set(after.map((i) => i.id));
+  const deleted = before.filter((i) => !afterIds.has(i.id));
+  if (deleted.length > 0) {
+    const { error } = await supabase
+      .from(table)
+      .delete()
+      .in("id", deleted.map((i) => i.id));
+    if (error) throw new Error(`Delete from ${table} failed: ${error.message}`);
+  }
+
+  const beforeMap = new Map(before.map((i) => [i.id, JSON.stringify(i)]));
+  const upserted = after.filter((i) => beforeMap.get(i.id) !== JSON.stringify(i));
+  if (upserted.length > 0) {
+    const { error } = await supabase.from(table).upsert(upserted.map(toRow));
+    if (error) throw new Error(`Upsert to ${table} failed: ${error.message}`);
+  }
+}
+
+async function syncSettings(before: Settings, after: Settings): Promise<void> {
+  if (JSON.stringify(before) === JSON.stringify(after)) return;
+  const { error } = await supabase
+    .from("settings")
+    .upsert({ id: 1, company: after.company, payment: after.payment });
+  if (error) throw new Error(`Settings upsert failed: ${error.message}`);
 }

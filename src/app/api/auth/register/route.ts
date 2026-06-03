@@ -41,6 +41,12 @@ export async function POST(request: Request) {
       role: "reseller",
       storeName,
       address: address || undefined,
+      reseller: {
+        approved: true,
+        tier: "Bronze",
+        commissionPct: 0,
+        commissionEarned: 0,
+      },
       createdAt: new Date().toISOString(),
     });
   });
