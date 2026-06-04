@@ -23,7 +23,7 @@ export default function OrderForm({ products, defaultShipping, preselectId }: Pr
   const [orderType, setOrderType] = useState<"reseller" | "satuan">("reseller");
   const [courier, setCourier] = useState("jne");
   const [shipping, setShipping] = useState(defaultShipping);
-  const [selections, setSelections] = useState
+  const [selections, setSelections] = useState<
     Record<string, { variantId: string; sizeMl: 30 | 50 | 100; quantity: number }>
   >(() => {
     const init: Record<string, { variantId: string; sizeMl: 30 | 50 | 100; quantity: number }> = {};
