@@ -1,14 +1,25 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
+import { supabase } from "@/lib/supabase";
 import { updateDatabase } from "@/lib/db";
 import type { BankAccount, BankCode } from "@/lib/types";
-import { promises as fs } from "fs";
-import path from "path";
 
 export const runtime = "nodejs";
 
 function isBankCode(x: any): x is BankCode {
   return x === "bca" || x === "mandiri" || x === "bri";
+}
+
+async function uploadBrandAsset(file: File, prefix: string): Promise<string> {
+  const ext = file.name.split(".").pop() || "jpg";
+  const filename = `${prefix}-${Date.now()}.${ext}`;
+  const bytes = await file.arrayBuffer();
+  const { error } = await supabase.storage
+    .from("brand-assets")
+    .upload(filename, bytes, { contentType: file.type, upsert: true });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from("brand-assets").getPublicUrl(filename);
+  return data.publicUrl;
 }
 
 export async function POST(request: Request) {
@@ -25,10 +36,16 @@ export async function POST(request: Request) {
   const vision = String(form.get("vision") || "").trim();
   const mission = String(form.get("mission") || "").trim();
   const brandStory = String(form.get("brandStory") || "").trim();
+  const foundingYear = String(form.get("foundingYear") || "").trim();
   const bankAccountsRaw = String(form.get("bankAccounts") || "").trim();
-  const qrisImage = form.get("qrisImage") as File | null;
-  const logo = form.get("logo") as File | null;
-  const heroImage = form.get("heroImage") as File | null;
+  const teamRaw = String(form.get("team") || "").trim();
+  const advantagesRaw = String(form.get("advantages") || "").trim();
+  const qrisUrlExisting = form.get("qrisUrl") as string | null;
+  const logoUrlExisting = form.get("logoUrl") as string | null;
+  const heroUrlExisting = form.get("heroUrl") as string | null;
+  const qrisFile = form.get("qrisImage") as File | null;
+  const logoFile = form.get("logo") as File | null;
+  const heroFile = form.get("heroImage") as File | null;
 
   if (!companyName) {
     return new NextResponse("Nama perusahaan wajib diisi", { status: 400 });
@@ -53,37 +70,22 @@ export async function POST(request: Request) {
     }
   }
 
-  let qrisPath: string | undefined;
-  if (qrisImage && qrisImage.size > 0) {
-    const bytes = await qrisImage.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const ext = qrisImage.name.split(".").pop() || "png";
-    const filename = `qris-${Date.now()}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "qris");
-    await fs.mkdir(uploadDir, { recursive: true });
-    await fs.writeFile(path.join(uploadDir, filename), buffer);
-    qrisPath = `/uploads/qris/${filename}`;
-  }
+  let team = null;
+  if (teamRaw) { try { team = JSON.parse(teamRaw); } catch {} }
+  let advantages = null;
+  if (advantagesRaw) { try { advantages = JSON.parse(advantagesRaw); } catch {} }
 
-  async function storeBrandFile(file: File, prefix: string) {
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const ext = file.name.split(".").pop() || "png";
-    const filename = `${prefix}-${Date.now()}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "brand");
-    await fs.mkdir(uploadDir, { recursive: true });
-    await fs.writeFile(path.join(uploadDir, filename), buffer);
-    return `/uploads/brand/${filename}`;
+  let qrisPath = qrisUrlExisting || undefined;
+  if (qrisFile && qrisFile.size > 0) {
+    try { qrisPath = await uploadBrandAsset(qrisFile, "qris"); } catch {}
   }
-
-  let logoPath: string | undefined;
-  if (logo && logo.size > 0) {
-    logoPath = await storeBrandFile(logo, "logo");
+  let logoPath = logoUrlExisting || undefined;
+  if (logoFile && logoFile.size > 0) {
+    try { logoPath = await uploadBrandAsset(logoFile, "logo"); } catch {}
   }
-
-  let heroPath: string | undefined;
-  if (heroImage && heroImage.size > 0) {
-    heroPath = await storeBrandFile(heroImage, "hero");
+  let heroPath = heroUrlExisting || undefined;
+  if (heroFile && heroFile.size > 0) {
+    try { heroPath = await uploadBrandAsset(heroFile, "hero"); } catch {}
   }
 
   await updateDatabase((db) => {
@@ -94,12 +96,14 @@ export async function POST(request: Request) {
     db.settings.company.vision = vision || undefined;
     db.settings.company.mission = mission || undefined;
     db.settings.company.brandStory = brandStory || undefined;
+    (db.settings.company as any).foundingYear = foundingYear || undefined;
     if (logoPath) db.settings.company.logo = logoPath;
     if (heroPath) db.settings.company.heroImage = heroPath;
+    if (team) db.settings.company.team = team;
+    if (advantages) db.settings.company.advantages = advantages;
     if (bankAccounts) db.settings.payment.bankAccounts = bankAccounts;
     if (qrisPath) db.settings.payment.qrisImage = qrisPath;
   });
 
   return NextResponse.json({ ok: true });
 }
-
