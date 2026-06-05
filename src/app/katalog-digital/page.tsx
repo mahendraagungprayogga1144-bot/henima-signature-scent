@@ -22,7 +22,7 @@ export default async function KatalogDigitalPage() {
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           {catalog?.pdfUrl && (
-            
+            <a
               href={catalog.pdfUrl}
               target="_blank"
               rel="noreferrer"
