@@ -28,10 +28,10 @@ export default function ScrollReveal({
   }, [delay]);
 
   const transforms: Record<string, string> = {
-    up: "translateY(40px)",
-    left: "translateX(-40px)",
-    right: "translateX(40px)",
-    fade: "scale(0.96)",
+    up: "translateY(24px)",
+    left: "translateX(-24px)",
+    right: "translateX(24px)",
+    fade: "scale(0.97)",
   };
 
   return (
@@ -40,7 +40,7 @@ export default function ScrollReveal({
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "none" : transforms[direction],
-        transition: `opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1)`,
+        transition: `opacity 1.1s cubic-bezier(0.22,1,0.36,1), transform 1.1s cubic-bezier(0.22,1,0.36,1)`,
       }}
     >
       {children}
