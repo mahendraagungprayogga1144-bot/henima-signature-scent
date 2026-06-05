@@ -29,6 +29,24 @@ export default function ProductCard({ product, children }: Props) {
             {formatRupiah(product.discountPrice)}
           </p>
         </div>
+        {((product as any).topNotes || (product as any).middleNotes || (product as any).baseNotes) && (
+          <div className="mt-3 space-y-1 border-t border-ink-800 pt-3">
+            {(product as any).topNotes && (
+              <p className="text-xs text-ink-400"><span className="text-ink-200 font-medium">Top:</span> {(product as any).topNotes}</p>
+            )}
+            {(product as any).middleNotes && (
+              <p className="text-xs text-ink-400"><span className="text-ink-200 font-medium">Middle:</span> {(product as any).middleNotes}</p>
+            )}
+            {(product as any).baseNotes && (
+              <p className="text-xs text-ink-400"><span className="text-ink-200 font-medium">Base:</span> {(product as any).baseNotes}</p>
+            )}
+          </div>
+        )}
+        {(product as any).inspiration && (
+          <div className="mt-3 rounded-xl bg-ink-900/60 p-3 border-t border-ink-800">
+            <p className="text-xs text-ink-400 italic">"{(product as any).inspiration}"</p>
+          </div>
+        )}
         {children && <div className="mt-4">{children}</div>}
       </div>
     </article>
