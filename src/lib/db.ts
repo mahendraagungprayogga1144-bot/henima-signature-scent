@@ -82,6 +82,7 @@ function rowToOrder(row: Record<string, unknown>): Order {
     notes: (row.notes as string | null) ?? undefined,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
+    shippingCost: (row.shipping_cost as number) ?? 0,
   };
 }
 
@@ -107,6 +108,7 @@ function orderToRow(o: Order) {
     resi: o.resi ?? null,
     notes: o.notes ?? null,
     created_at: o.createdAt,
+    shipping_cost: (o as any).shippingCost ?? 0,
     updated_at: o.updatedAt,
   };
 }
