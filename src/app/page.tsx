@@ -140,15 +140,7 @@ export default async function HomePage() {
             <Link href="/daftar" className="btn-primary px-10 py-3 text-base">
               Daftar Reseller Sekarang
             </Link>
-            
-              href="https://wa.me/6285190311230?text=Halo%2C%20saya%20ingin%20jadi%20reseller%20Henima%20Signature%20Scent"
-              target="_blank"
-              rel="noreferrer"
-              className="btn-secondary px-10 py-3 text-base flex items-center justify-center gap-2"
-            >
-              📱
-              Hubungi via WhatsApp
-            </a>
+            <a href={"https://wa.me/6285190311230"} target="_blank" rel="noreferrer" className="btn-secondary px-10 py-3 text-base">📱 Hubungi via WhatsApp</a>
           </div>
         </div>
       </section>
