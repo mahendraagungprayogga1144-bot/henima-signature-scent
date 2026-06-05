@@ -13,7 +13,6 @@ function ProductZoom({ src, alt, onClose }: { src: string; alt: string; onClose:
         <img src={src} alt={alt} className="h-full w-full object-contain" />
       </div>
       <p className="absolute bottom-8 text-sm text-ink-400">Tap untuk menutup</p>
-    </ScrollReveal>
     </div>
   );
 }
