@@ -70,25 +70,28 @@ export default async function HomePage() {
       </section>
 
       {products.length > 0 && (
-        <ScrollReveal>
-          <section className="mt-16 space-y-6">
+        <section className="mt-20 space-y-8">
+          <ScrollReveal direction="up">
             <div className="flex items-end justify-between">
               <div>
-                <h2 className="text-3xl font-semibold tracking-tight text-ink-50">Produk Kami</h2>
+                <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Koleksi</p>
+                <h2 className="mt-1 text-3xl font-semibold tracking-tight text-ink-50">Produk Kami</h2>
                 <p className="mt-1 text-ink-400">Parfum premium siap jual untuk reseller.</p>
               </div>
               <Link href="/daftar" className="text-sm font-semibold text-gold-300 hover:text-gold-200 hover:underline">Jadi reseller</Link>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((product) => {
-                const variants = product.variants.filter((v) => v.active);
-                const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.discountPrice)) : product.discountPrice;
-                const maxPrice = variants.length > 0 ? Math.max(...variants.map((v) => v.discountPrice)) : product.discountPrice;
-                return (
-                  <div key={product.id} className="group relative overflow-hidden rounded-3xl border border-ink-800 bg-ink-950/50 hover:border-gold-400/40 transition-all duration-300">
-                    <div className="relative h-64 bg-ink-900 overflow-hidden">
+          </ScrollReveal>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {products.map((product, idx) => {
+              const variants = product.variants.filter((v) => v.active);
+              const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.discountPrice)) : product.discountPrice;
+              const maxPrice = variants.length > 0 ? Math.max(...variants.map((v) => v.discountPrice)) : product.discountPrice;
+              return (
+                <ScrollReveal key={product.id} delay={idx * 120} direction="up">
+                  <div className="group relative overflow-hidden rounded-3xl border border-ink-800 bg-ink-950/50 hover:border-gold-400/40 transition-all duration-500">
+                    <div className="relative h-72 bg-ink-900 overflow-hidden">
                       <ProductImageZoom src={product.photo} alt={product.name} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 to-transparent pointer-events-none" />
                     </div>
                     <div className="p-6">
                       <h3 className="text-lg font-semibold text-ink-50">{product.name}</h3>
@@ -112,117 +115,142 @@ export default async function HomePage() {
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </section>
-        </ScrollReveal>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        </section>
       )}
 
-      <ScrollReveal delay={100}>
-        <section className="mt-16">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-semibold text-ink-50">Cara Jadi Reseller</h2>
+      <section className="mt-24">
+        <ScrollReveal direction="fade">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Bergabung</p>
+            <h2 className="mt-1 text-3xl font-semibold text-ink-50">Cara Jadi Reseller</h2>
             <p className="mt-2 text-ink-400">Mulai berjualan dalam 3 langkah mudah.</p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { step: "01", title: "Daftar Gratis", desc: "Buat akun reseller dan langsung akses katalog harga khusus." },
-              { step: "02", title: "Pilih dan Pesan", desc: "Pilih produk, kurir, isi alamat — ongkir otomatis dihitung." },
-              { step: "03", title: "Bayar dan Kirim", desc: "Bayar via QRIS/transfer, upload bukti, pantau status real-time." },
-            ].map((item) => (
-              <div key={item.step} className="relative card p-6 overflow-hidden">
-                <div className="absolute -right-4 -top-4 text-7xl font-black text-ink-800 select-none">{item.step}</div>
+        </ScrollReveal>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[
+            { step: "01", title: "Daftar Gratis", desc: "Buat akun reseller dan langsung akses katalog harga khusus." },
+            { step: "02", title: "Pilih dan Pesan", desc: "Pilih produk, kurir, isi alamat — ongkir otomatis dihitung." },
+            { step: "03", title: "Bayar dan Kirim", desc: "Bayar via QRIS/transfer, upload bukti, pantau status real-time." },
+          ].map((item, idx) => (
+            <ScrollReveal key={item.step} delay={idx * 150} direction="up">
+              <div className="relative card p-8 overflow-hidden hover:border-gold-400/30 transition-all duration-500">
+                <div className="absolute -right-4 -top-4 text-8xl font-black text-ink-800/60 select-none">{item.step}</div>
                 <div className="relative">
+                  <div className="h-10 w-10 rounded-full bg-gold-400/10 border border-gold-400/30 flex items-center justify-center mb-4">
+                    <span className="text-xs font-bold text-gold-300">{item.step}</span>
+                  </div>
                   <h3 className="text-lg font-semibold text-ink-50">{item.title}</h3>
                   <p className="mt-2 text-sm text-ink-400 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
-      </ScrollReveal>
+            </ScrollReveal>
+          ))}
+        </div>
+      </section>
 
       {(company.brandStory || company.vision || company.mission || (company.team && (company.team as any[]).length > 0) || (company.advantages && (company.advantages as any[]).length > 0)) && (
-        <ScrollReveal delay={100}>
-          <section className="mt-16 space-y-12">
+        <section className="mt-24 space-y-16">
+          <ScrollReveal direction="fade">
             <div className="text-center">
-              <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Tentang Kami</p>
+              <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Our Story</p>
               <h2 className="mt-2 text-3xl font-semibold text-ink-50">
                 {company.name}
                 {(company as any).foundingYear && <span className="ml-3 text-lg text-ink-400">est. {(company as any).foundingYear}</span>}
               </h2>
             </div>
-            {company.brandStory && (
-              <div className="mx-auto max-w-3xl rounded-3xl border border-ink-800 bg-ink-950/30 p-8">
-                <p className="text-center text-lg leading-relaxed text-ink-300 italic">"{company.brandStory}"</p>
+          </ScrollReveal>
+
+          {company.brandStory && (
+            <ScrollReveal direction="up" delay={100}>
+              <div className="mx-auto max-w-3xl rounded-3xl border border-gold-400/20 bg-gradient-to-b from-ink-950/60 to-ink-900/30 p-10">
+                <p className="text-center text-xl leading-relaxed text-ink-200 italic font-light">"{company.brandStory}"</p>
               </div>
-            )}
-            {(company.vision || company.mission) && (
-              <div className="grid gap-6 sm:grid-cols-2">
-                {company.vision && (
-                  <div className="card p-6">
-                    <p className="text-xs font-semibold tracking-[0.15em] text-gold-400 uppercase">Visi</p>
-                    <p className="mt-3 text-ink-200 leading-relaxed">{company.vision}</p>
+            </ScrollReveal>
+          )}
+
+          {(company.vision || company.mission) && (
+            <div className="grid gap-6 sm:grid-cols-2">
+              {company.vision && (
+                <ScrollReveal direction="left" delay={0}>
+                  <div className="card p-8 h-full border-l-2 border-l-gold-400/50">
+                    <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Visi</p>
+                    <p className="mt-4 text-ink-200 leading-relaxed text-lg">{company.vision}</p>
                   </div>
-                )}
-                {company.mission && (
-                  <div className="card p-6">
-                    <p className="text-xs font-semibold tracking-[0.15em] text-gold-400 uppercase">Misi</p>
-                    <p className="mt-3 text-ink-200 leading-relaxed">{company.mission}</p>
+                </ScrollReveal>
+              )}
+              {company.mission && (
+                <ScrollReveal direction="right" delay={100}>
+                  <div className="card p-8 h-full border-l-2 border-l-gold-400/50">
+                    <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Misi</p>
+                    <p className="mt-4 text-ink-200 leading-relaxed">{company.mission}</p>
                   </div>
-                )}
-              </div>
-            )}
-            {company.advantages && (company.advantages as any[]).length > 0 && (
-              <div>
-                <h3 className="text-center text-2xl font-semibold text-ink-50 mb-6">Keunggulan Produk</h3>
-                <div className="grid gap-4 sm:grid-cols-3">
-                  {(company.advantages as any[]).map((adv: any) => (
-                    <div key={adv.id} className="card p-6 text-center">
-                      <p className="text-4xl">{adv.icon}</p>
-                      <p className="mt-3 font-semibold text-ink-50">{adv.title}</p>
-                      <p className="mt-1 text-sm text-ink-400">{adv.desc}</p>
+                </ScrollReveal>
+              )}
+            </div>
+          )}
+
+          {company.advantages && (company.advantages as any[]).length > 0 && (
+            <div>
+              <ScrollReveal direction="fade">
+                <h3 className="text-center text-2xl font-semibold text-ink-50 mb-8">Keunggulan Produk</h3>
+              </ScrollReveal>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {(company.advantages as any[]).map((adv: any, idx: number) => (
+                  <ScrollReveal key={adv.id} delay={idx * 120} direction="up">
+                    <div className="card p-8 text-center hover:border-gold-400/30 transition-all duration-500 group">
+                      <p className="text-5xl group-hover:scale-110 transition-transform duration-300">{adv.icon}</p>
+                      <p className="mt-4 font-semibold text-ink-50 text-lg">{adv.title}</p>
+                      <p className="mt-2 text-sm text-ink-400 leading-relaxed">{adv.desc}</p>
                     </div>
-                  ))}
-                </div>
+                  </ScrollReveal>
+                ))}
               </div>
-            )}
-            {company.team && (company.team as any[]).length > 0 && (
-              <div>
-                <h3 className="text-center text-2xl font-semibold text-ink-50 mb-6">Tim Kami</h3>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {(company.team as any[]).map((member: any) => (
-                    <div key={member.id} className="card p-6 text-center">
-                      <div className="relative mx-auto h-24 w-24 overflow-hidden rounded-full border-2 border-gold-400/30 bg-ink-900">
+            </div>
+          )}
+
+          {company.team && (company.team as any[]).length > 0 && (
+            <div>
+              <ScrollReveal direction="fade">
+                <h3 className="text-center text-2xl font-semibold text-ink-50 mb-8">Tim Kami</h3>
+              </ScrollReveal>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {(company.team as any[]).map((member: any, idx: number) => (
+                  <ScrollReveal key={member.id} delay={idx * 120} direction="up">
+                    <div className="card p-8 text-center hover:border-gold-400/30 transition-all duration-500">
+                      <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-full border-2 border-gold-400/30 bg-ink-900">
                         {member.photo
                           ? <Image src={member.photo} alt={member.name} fill className="object-cover" />
-                          : <div className="flex h-full w-full items-center justify-center text-3xl">👤</div>
+                          : <div className="flex h-full w-full items-center justify-center text-4xl">person</div>
                         }
                       </div>
-                      <p className="mt-4 font-semibold text-ink-50">{member.name}</p>
+                      <p className="mt-5 font-semibold text-ink-50 text-lg">{member.name}</p>
                       <p className="text-sm text-gold-300">{member.role}</p>
-                      {member.bio && <p className="mt-2 text-xs text-ink-400 leading-relaxed">{member.bio}</p>}
+                      {member.bio && <p className="mt-3 text-xs text-ink-400 leading-relaxed">{member.bio}</p>}
                     </div>
-                  ))}
-                </div>
+                  </ScrollReveal>
+                ))}
               </div>
-            )}
-          </section>
-        </ScrollReveal>
+            </div>
+          )}
+        </section>
       )}
 
-      <ScrollReveal delay={100}>
-        <section className="mt-16 rounded-[28px] border border-gold-400/20 bg-gradient-to-br from-ink-950 via-ink-900 to-ink-950 p-10 sm:p-14 text-center relative overflow-hidden">
+      <ScrollReveal direction="up" delay={100}>
+        <section className="mt-24 rounded-[28px] border border-gold-400/20 bg-gradient-to-br from-ink-950 via-ink-900 to-ink-950 p-12 sm:p-16 text-center relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full bg-gold-400/10 blur-3xl" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-gold-400/10 blur-[80px]" />
           </div>
           <div className="relative">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-ink-50">Siap mulai berjualan?</h2>
-            <p className="mt-3 text-ink-400 text-lg">Daftar sekarang dan dapatkan akses ke harga reseller eksklusif.</p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/daftar" className="btn-primary px-10 py-3 text-base">Daftar Reseller Sekarang</Link>
-              <a href={"https://wa.me/6285190311230"} target="_blank" rel="noreferrer" className="btn-secondary px-10 py-3 text-base">Hubungi via WhatsApp</a>
+            <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Bergabung Sekarang</p>
+            <h2 className="mt-3 text-3xl sm:text-5xl font-semibold text-ink-50">Siap mulai berjualan?</h2>
+            <p className="mt-4 text-ink-400 text-lg max-w-xl mx-auto">Daftar sekarang dan dapatkan akses ke harga reseller eksklusif.</p>
+            <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/daftar" className="btn-primary px-10 py-4 text-base">Daftar Reseller Sekarang</Link>
+              <a href={"https://wa.me/6285190311230"} target="_blank" rel="noreferrer" className="btn-secondary px-10 py-4 text-base">Hubungi via WhatsApp</a>
             </div>
           </div>
         </section>
