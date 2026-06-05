@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import type { Product } from "@/lib/types";
 import { formatRupiah } from "@/lib/format";
+import { COURIERS, PROVINCES, calculateShipping } from "@/lib/shipping";
 
 interface Props {
   products: Product[];
@@ -21,9 +22,9 @@ interface Props {
 export default function OrderForm({ products, defaultShipping, preselectId }: Props) {
   const router = useRouter();
   const [orderType, setOrderType] = useState<"reseller" | "satuan">("reseller");
-  const [courier, setCourier] = useState("jne");
+  const [courierCode, setCourierCode] = useState("jne");
   const [shipping, setShipping] = useState(defaultShipping);
-  const [selections, setSelections] = useState<
+  const [selections, setSelections] = useState
     Record<string, { variantId: string; sizeMl: 30 | 50 | 100; quantity: number }>
   >(() => {
     const init: Record<string, { variantId: string; sizeMl: 30 | 50 | 100; quantity: number }> = {};
@@ -52,6 +53,14 @@ export default function OrderForm({ products, defaultShipping, preselectId }: Pr
 
   const totalItems = products.reduce((s, p) => s + (selections[p.id]?.quantity || 0), 0);
 
+  const shippingCost = useMemo(() => {
+    if (!shipping.province || totalItems === 0) return 0;
+    return calculateShipping(shipping.province, courierCode, totalItems);
+  }, [shipping.province, courierCode, totalItems]);
+
+  const grandTotal = total + shippingCost;
+  const selectedCourier = COURIERS.find((c) => c.code === courierCode);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -66,15 +75,22 @@ export default function OrderForm({ products, defaultShipping, preselectId }: Pr
     if (!shipping.fullName.trim()) return setError("Nama lengkap wajib diisi");
     if (!shipping.phone.trim()) return setError("Nomor HP wajib diisi");
     if (!shipping.address.trim()) return setError("Alamat lengkap wajib diisi");
+    if (!shipping.province) return setError("Pilih provinsi tujuan");
     if (!shipping.city.trim()) return setError("Kota wajib diisi");
-    if (!shipping.province.trim()) return setError("Provinsi wajib diisi");
 
     setLoading(true);
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderType, courier, shipping, items, notes }),
+        body: JSON.stringify({
+          orderType,
+          courier: { code: courierCode, name: selectedCourier?.name ?? courierCode },
+          shipping,
+          items,
+          notes,
+          shippingCost,
+        }),
       });
       const data = await res.json();
       if (!res.ok) return setError(data.error || "Gagal membuat pesanan");
@@ -147,7 +163,7 @@ export default function OrderForm({ products, defaultShipping, preselectId }: Pr
         })}
         <div className="flex items-center justify-between border-t border-ink-800 pt-4">
           <p className="text-sm text-ink-300">Total item: <span className="font-semibold text-ink-50">{totalItems}</span></p>
-          <p className="text-right text-lg font-bold text-gold-200">Total: {formatRupiah(total)}</p>
+          <p className="text-right font-bold text-gold-200">Subtotal: {formatRupiah(total)}</p>
         </div>
       </div>
 
@@ -170,12 +186,15 @@ export default function OrderForm({ products, defaultShipping, preselectId }: Pr
             <textarea className="input-field" rows={3} value={shipping.address} onChange={(e) => setShipping((s) => ({ ...s, address: e.target.value }))} required />
           </div>
           <div>
-            <label className="label">Kota / Kabupaten</label>
-            <input className="input-field" value={shipping.city} onChange={(e) => setShipping((s) => ({ ...s, city: e.target.value }))} required />
+            <label className="label">Provinsi Tujuan</label>
+            <select className="input-field" value={shipping.province} onChange={(e) => setShipping((s) => ({ ...s, province: e.target.value }))} required>
+              <option value="">-- Pilih Provinsi --</option>
+              {PROVINCES.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
           </div>
           <div>
-            <label className="label">Provinsi</label>
-            <input className="input-field" value={shipping.province} onChange={(e) => setShipping((s) => ({ ...s, province: e.target.value }))} required />
+            <label className="label">Kota / Kabupaten</label>
+            <input className="input-field" value={shipping.city} onChange={(e) => setShipping((s) => ({ ...s, city: e.target.value }))} required />
           </div>
           <div>
             <label className="label">Kode Pos</label>
@@ -183,18 +202,10 @@ export default function OrderForm({ products, defaultShipping, preselectId }: Pr
           </div>
           <div>
             <label className="label">Kurir</label>
-            <select className="input-field" value={courier} onChange={(e) => setCourier(e.target.value)}>
-              <option value="jne">JNE</option>
-              <option value="jnt">J&T Express</option>
-              <option value="sicepat">SiCepat</option>
-              <option value="anteraja">Anteraja</option>
-              <option value="pos">Pos Indonesia</option>
-              <option value="wahana">Wahana</option>
+            <select className="input-field" value={courierCode} onChange={(e) => setCourierCode(e.target.value)}>
+              {COURIERS.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
             </select>
           </div>
-        </div>
-        <div className="rounded-xl bg-ink-900 border border-ink-700 px-4 py-3 text-sm text-ink-300">
-          💡 Ongkos kirim akan dikonfirmasi oleh admin setelah pesanan masuk.
         </div>
         <div>
           <label className="label">Catatan (opsional)</label>
@@ -202,7 +213,25 @@ export default function OrderForm({ products, defaultShipping, preselectId }: Pr
         </div>
       </div>
 
-      <button type="submit" disabled={loading || total === 0} className="btn-primary w-full">
+      {shipping.province && totalItems > 0 && (
+        <div className="card space-y-2">
+          <h2 className="font-semibold">Ringkasan Biaya</h2>
+          <div className="flex justify-between text-sm text-ink-300">
+            <span>Subtotal produk ({totalItems} item)</span>
+            <span>{formatRupiah(total)}</span>
+          </div>
+          <div className="flex justify-between text-sm text-ink-300">
+            <span>Ongkir {selectedCourier?.name} ke {shipping.province}</span>
+            <span>{formatRupiah(shippingCost)}</span>
+          </div>
+          <div className="flex justify-between border-t border-ink-800 pt-2 text-lg font-bold text-gold-200">
+            <span>Total</span>
+            <span>{formatRupiah(grandTotal)}</span>
+          </div>
+        </div>
+      )}
+
+      <button type="submit" disabled={loading || total === 0 || !shipping.province} className="btn-primary w-full">
         {loading ? "Memproses..." : "Lanjut ke Pembayaran"}
       </button>
     </form>
