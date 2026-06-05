@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import ProductImageZoom from "@/components/ProductImageZoom";
-import ScrollReveal from "@/components/ScrollReveal";
 import { getCurrentUserSafe } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { getDatabase } from "@/lib/db";
@@ -83,8 +82,7 @@ export default async function HomePage() {
       </section>
 
       {products.length > 0 && (
-        <ScrollReveal>
-        <section className="mt-16 space-y-6">
+                <section className="mt-16 space-y-6">
           <div className="flex items-end justify-between">
             <div>
               <h2 className="text-3xl font-semibold tracking-tight text-ink-50">Produk Kami</h2>
@@ -131,9 +129,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      </ScrollReveal>
-      <ScrollReveal delay={100}>
-      <section className="mt-16">
+            <section className="mt-16">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-semibold text-ink-50">Cara Jadi Reseller</h2>
           <p className="mt-2 text-ink-400">Mulai berjualan dalam 3 langkah mudah.</p>
@@ -156,9 +152,7 @@ export default async function HomePage() {
       </section>
 
       {/* TENTANG KAMI */}
-      </ScrollReveal>
-      <ScrollReveal delay={200}>
-      {(company.brandStory || company.vision || company.mission || (company.team && company.team.length > 0) || (company.advantages && company.advantages.length > 0)) && (
+            {(company.brandStory || company.vision || company.mission || (company.team && company.team.length > 0) || (company.advantages && company.advantages.length > 0)) && (
         <section className="mt-16 space-y-12">
           <div className="text-center">
             <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Tentang Kami</p>
@@ -229,9 +223,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      </ScrollReveal>
-      <ScrollReveal delay={100}>
-      <section className="mt-16 rounded-[28px] border border-gold-400/20 bg-gradient-to-br from-ink-950 via-ink-900 to-ink-950 p-10 sm:p-14 text-center relative overflow-hidden">
+            <section className="mt-16 rounded-[28px] border border-gold-400/20 bg-gradient-to-br from-ink-950 via-ink-900 to-ink-950 p-10 sm:p-14 text-center relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full bg-gold-400/10 blur-3xl" />
         </div>
@@ -247,7 +239,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-    </ScrollReveal>
     </div>
   );
 }
