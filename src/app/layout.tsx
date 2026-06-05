@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "Henima Signature Scent",
   description:
     "Luxury fragrance reseller portal — katalog, pesanan, pembayaran, dan pelacakan untuk Henima Signature Scent.",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
