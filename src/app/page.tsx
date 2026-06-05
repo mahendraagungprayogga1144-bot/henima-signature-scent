@@ -178,7 +178,7 @@ export default async function HomePage() {
                 <ScrollReveal direction="left" delay={0}>
                   <div className="rounded-3xl border border-ink-700 bg-ink-900 p-8 h-full border-l-4 border-l-gold-400">
                     <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Visi</p>
-                    <p className="mt-4 text-ink-800 leading-relaxed text-lg">{company.vision}</p>
+                    <p className="mt-4 text-ink-50 leading-relaxed text-base">{company.vision}</p>
                   </div>
                 </ScrollReveal>
               )}
@@ -186,7 +186,7 @@ export default async function HomePage() {
                 <ScrollReveal direction="right" delay={100}>
                   <div className="rounded-3xl border border-ink-700 bg-ink-900 p-8 h-full border-l-4 border-l-gold-400">
                     <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Misi</p>
-                    <p className="mt-4 text-ink-800 leading-relaxed">{company.mission}</p>
+                    <p className="mt-4 text-ink-50 leading-relaxed text-sm">{company.mission}</p>
                   </div>
                 </ScrollReveal>
               )}
