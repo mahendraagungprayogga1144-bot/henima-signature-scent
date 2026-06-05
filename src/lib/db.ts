@@ -17,6 +17,7 @@ function rowToProduct(row: Record<string, unknown>): Product {
     middleNotes: (row.middle_notes as string) ?? undefined,
     baseNotes: (row.base_notes as string) ?? undefined,
     inspiration: (row.inspiration as string) ?? undefined,
+    comingSoon: (row.coming_soon as boolean) ?? false,
   };
 }
 
@@ -34,6 +35,7 @@ function productToRow(p: Product) {
     middle_notes: p.middleNotes ?? null,
     base_notes: p.baseNotes ?? null,
     inspiration: p.inspiration ?? null,
+    coming_soon: (p as any).comingSoon ?? false,
   };
 }
 
