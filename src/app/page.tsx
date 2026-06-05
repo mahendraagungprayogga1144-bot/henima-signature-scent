@@ -167,7 +167,7 @@ export default async function HomePage() {
           {company.brandStory && (
             <ScrollReveal direction="up" delay={100}>
               <div className="mx-auto max-w-3xl rounded-3xl border border-gold-400/20 bg-gradient-to-b from-ink-950/60 to-ink-900/30 p-10">
-                <p className="text-center text-xl leading-relaxed text-ink-200 italic font-light">"{company.brandStory}"</p>
+                <p className="text-center text-xl leading-relaxed text-ink-50 italic font-light">"{company.brandStory}"</p>
               </div>
             </ScrollReveal>
           )}
