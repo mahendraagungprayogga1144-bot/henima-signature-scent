@@ -68,8 +68,10 @@ export default async function OrderDetailPage({
             </li>
           ))}
         </ul>
+        <p className="border-t border-ink-800 pt-3 text-right text-sm text-ink-300">Subtotal: {formatRupiah(order.total)}</p>
+        {(order as any).shippingCost > 0 && <p className="text-right text-sm text-ink-300">Ongkir: {formatRupiah((order as any).shippingCost)}</p>}
         <p className="border-t border-ink-800 pt-3 text-right text-lg font-bold">
-          Total: {formatRupiah(order.total)}
+          Total: {formatRupiah(order.total + ((order as any).shippingCost ?? 0))}
         </p>
       </div>
 
