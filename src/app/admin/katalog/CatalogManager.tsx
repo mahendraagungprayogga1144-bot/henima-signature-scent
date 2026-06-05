@@ -18,14 +18,20 @@ export default function CatalogManager({ catalog }: { catalog: any }) {
     setUploading(true);
     setMsg("");
     try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const sb = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
       for (const file of files) {
-        const fd = new FormData();
-        fd.set("action", "upload");
-        fd.set("file", file);
-        const res = await fetch("/api/admin/catalog", { method: "POST", body: fd });
-        const data = await res.json();
-        if (data.url) setImages((prev) => [...prev, data.url]);
-        else setMsg('Error: ' + (data.error || 'Unknown'));
+        const ext = file.name.split(".").pop() || "jpg";
+        const filename = `catalog-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { data, error } = await sb.storage
+          .from("brand-assets")
+          .upload(`catalog/${filename}`, file, { contentType: file.type, upsert: true });
+        if (error) { setMsg("Error: " + error.message); continue; }
+        const { data: urlData } = sb.storage.from("brand-assets").getPublicUrl(`catalog/${filename}`);
+        setImages((prev) => [...prev, urlData.publicUrl]);
       }
       setMsg(files.length + " gambar berhasil diupload!");
     } catch(e: any) { setMsg("Gagal upload: " + (e?.message || String(e))); }
