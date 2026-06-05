@@ -52,7 +52,6 @@ export default async function LoginPage({
         </button>
       </form>
       <p className="mt-4 text-center text-xs text-stone-500">
-        Demo: reseller@demo.local / reseller123
       </p>
     </div>
   );
