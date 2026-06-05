@@ -97,6 +97,10 @@ export default async function AdminDashboardPage() {
               Katalog Digital
             </Link>
             <Link
+              href="/admin/ganti-password">
+              Ganti Password
+            </Link>
+            <Link
               href="/admin/pengaturan" className="card text-center hover:bg-brand-50">
           <span className="text-lg font-semibold">Pengaturan</span>
         </Link>
