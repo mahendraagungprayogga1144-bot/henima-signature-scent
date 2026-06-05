@@ -22,8 +22,8 @@ export default function RootLayout({
       <body className="min-h-screen font-sans antialiased selection:bg-gold-400/30 selection:text-ink-50">
         <Navbar />
         <main className="container-page py-10">{children}</main>
-        <footer className="border-t border-ink-800 mt-10 py-6">
-          <div className="container-page text-center text-sm text-ink-400">
+        <footer className="border-t border-ink-200 mt-10 py-6 bg-white">
+          <div className="container-page text-center text-sm text-ink-500">
             © {new Date().getFullYear()} Henima Signature Scent. All rights reserved.
           </div>
         </footer>

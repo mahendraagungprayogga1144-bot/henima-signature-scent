@@ -9,50 +9,32 @@ export default async function LoginPage({
 
   return (
     <div className="mx-auto max-w-md">
-      <h1 className="text-2xl font-bold">Masuk</h1>
-      <p className="mt-1 text-sm text-stone-600">
-        Belum punya akun?{" "}
-        <Link href="/daftar" className="font-medium text-brand-700 hover:underline">
-          Daftar di sini
-        </Link>
-      </p>
+      <div className="text-center mb-8">
+        <p className="text-xs font-semibold tracking-[0.2em] text-gold-600 uppercase">Henima Signature Scent</p>
+        <h1 className="mt-2 text-3xl font-semibold text-ink-900">Selamat Datang</h1>
+        <p className="mt-2 text-sm text-ink-600">
+          Belum punya akun?{" "}
+          <Link href="/daftar" className="font-semibold text-ink-900 hover:underline">Daftar di sini</Link>
+        </p>
+      </div>
       {error && (
-        <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
           {decodeURIComponent(error)}
         </p>
       )}
-      <form action="/api/auth/login" method="POST" className="card mt-6 space-y-4">
-        <div>
-          <label htmlFor="email" className="label">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            className="input-field"
-            placeholder="nama@toko.com"
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className="label">
-            Kata Sandi
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            className="input-field"
-          />
-        </div>
-        <button type="submit" className="btn-primary w-full">
-          Masuk
-        </button>
-      </form>
-      <p className="mt-4 text-center text-xs text-stone-500">
-      </p>
+      <div className="rounded-3xl border border-ink-200 bg-white p-8 shadow-sm">
+        <form action="/api/auth/login" method="POST" className="space-y-5">
+          <div>
+            <label htmlFor="email" className="label">Email</label>
+            <input id="email" name="email" type="email" required className="input-field" placeholder="nama@toko.com" />
+          </div>
+          <div>
+            <label htmlFor="password" className="label">Kata Sandi</label>
+            <input id="password" name="password" type="password" required className="input-field" />
+          </div>
+          <button type="submit" className="btn-primary w-full py-3 text-base">Masuk</button>
+        </form>
+      </div>
     </div>
   );
 }

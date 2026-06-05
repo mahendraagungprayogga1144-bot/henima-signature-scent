@@ -18,7 +18,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
 
-      <section className="relative overflow-hidden rounded-[28px] border border-ink-800 bg-ink-950 min-h-[80vh] flex items-center">
+      <section className="relative overflow-hidden rounded-[28px] border border-ink-200 bg-gradient-to-br from-ink-900 via-ink-800 to-ink-900 min-h-[80vh] flex items-center">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-gold-400/10 blur-[100px]" />
           <div className="absolute bottom-0 right-1/4 h-80 w-80 rounded-full bg-brand-400/10 blur-[80px]" />
@@ -54,7 +54,7 @@ export default async function HomePage() {
           {products.length > 0 && (
             <div className="hidden lg:grid grid-cols-2 gap-4">
               {products.slice(0, 2).map((product, i) => (
-                <div key={product.id} className={"relative overflow-hidden rounded-3xl border border-ink-700 bg-ink-900 aspect-[3/4] " + (i === 1 ? "mt-8" : "")}>
+                <div key={product.id} className={"relative overflow-hidden rounded-3xl border border-ink-600 bg-ink-800 aspect-[3/4] " + (i === 1 ? "mt-8" : "")}>
                   <ProductImageZoom src={product.photo} alt={product.name} />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-ink-950/90 to-transparent p-4">
                     <p className="font-semibold text-ink-50 text-sm">{product.name}</p>
@@ -89,7 +89,7 @@ export default async function HomePage() {
               return (
                 <ScrollReveal key={product.id} delay={idx * 120} direction="up">
                   <div className="group relative overflow-hidden rounded-3xl border border-ink-800 bg-ink-950/50 hover:border-gold-400/40 transition-all duration-500">
-                    <div className="relative h-72 bg-ink-900 overflow-hidden">
+                    <div className="relative h-72 bg-ink-100 overflow-hidden">
                       <ProductImageZoom src={product.photo} alt={product.name} />
                       <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 to-transparent pointer-events-none" />
                     </div>
@@ -137,8 +137,8 @@ export default async function HomePage() {
             { step: "03", title: "Bayar dan Kirim", desc: "Bayar via QRIS/transfer, upload bukti, pantau status real-time." },
           ].map((item, idx) => (
             <ScrollReveal key={item.step} delay={idx * 150} direction="up">
-              <div className="relative card p-8 overflow-hidden hover:border-gold-400/30 transition-all duration-500">
-                <div className="absolute -right-4 -top-4 text-8xl font-black text-ink-800/60 select-none">{item.step}</div>
+              <div className="relative rounded-3xl border border-ink-200 bg-white p-8 overflow-hidden hover:border-ink-400 hover:shadow-md transition-all duration-500">
+                <div className="absolute -right-4 -top-4 text-8xl font-black text-ink-100 select-none">{item.step}</div>
                 <div className="relative">
                   <div className="h-10 w-10 rounded-full bg-gold-400/10 border border-gold-400/30 flex items-center justify-center mb-4">
                     <span className="text-xs font-bold text-gold-300">{item.step}</span>
@@ -166,7 +166,7 @@ export default async function HomePage() {
 
           {company.brandStory && (
             <ScrollReveal direction="up" delay={100}>
-              <div className="mx-auto max-w-3xl rounded-3xl border border-gold-400/20 bg-gradient-to-b from-ink-950/60 to-ink-900/30 p-10">
+              <div className="mx-auto max-w-3xl rounded-3xl border border-gold-300 bg-gradient-to-b from-amber-50 to-white p-10 shadow-sm">
                 <p className="text-center text-xl leading-relaxed text-ink-800 italic font-light">"{company.brandStory}"</p>
               </div>
             </ScrollReveal>
@@ -176,7 +176,7 @@ export default async function HomePage() {
             <div className="grid gap-6 sm:grid-cols-2">
               {company.vision && (
                 <ScrollReveal direction="left" delay={0}>
-                  <div className="card p-8 h-full border-l-2 border-l-gold-400/50">
+                  <div className="rounded-3xl border border-ink-200 bg-white p-8 h-full border-l-4 border-l-gold-500 shadow-sm">
                     <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Visi</p>
                     <p className="mt-4 text-ink-800 leading-relaxed text-lg">{company.vision}</p>
                   </div>
@@ -184,7 +184,7 @@ export default async function HomePage() {
               )}
               {company.mission && (
                 <ScrollReveal direction="right" delay={100}>
-                  <div className="card p-8 h-full border-l-2 border-l-gold-400/50">
+                  <div className="rounded-3xl border border-ink-200 bg-white p-8 h-full border-l-4 border-l-gold-500 shadow-sm">
                     <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Misi</p>
                     <p className="mt-4 text-ink-800 leading-relaxed">{company.mission}</p>
                   </div>
@@ -201,7 +201,7 @@ export default async function HomePage() {
               <div className="grid gap-4 sm:grid-cols-3">
                 {(company.advantages as any[]).map((adv: any, idx: number) => (
                   <ScrollReveal key={adv.id} delay={idx * 120} direction="up">
-                    <div className="card p-8 text-center hover:border-gold-400/30 transition-all duration-500 group">
+                    <div className="rounded-3xl border border-ink-200 bg-white p-8 text-center hover:border-gold-400 hover:shadow-md transition-all duration-500 group">
                       <p className="text-5xl group-hover:scale-110 transition-transform duration-300">{adv.icon}</p>
                       <p className="mt-4 font-semibold text-ink-50 text-lg">{adv.title}</p>
                       <p className="mt-2 text-sm text-ink-600 leading-relaxed">{adv.desc}</p>
@@ -220,8 +220,8 @@ export default async function HomePage() {
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {(company.team as any[]).map((member: any, idx: number) => (
                   <ScrollReveal key={member.id} delay={idx * 120} direction="up">
-                    <div className="card p-8 text-center hover:border-gold-400/30 transition-all duration-500">
-                      <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-full border-2 border-gold-400/30 bg-ink-900">
+                    <div className="rounded-3xl border border-ink-200 bg-white p-8 text-center hover:border-gold-400 hover:shadow-md transition-all duration-500">
+                      <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-full border-2 border-gold-400 bg-ink-100">
                         {member.photo
                           ? <Image src={member.photo} alt={member.name} fill className="object-cover" />
                           : <div className="flex h-full w-full items-center justify-center text-4xl">person</div>
@@ -240,7 +240,7 @@ export default async function HomePage() {
       )}
 
       <ScrollReveal direction="up" delay={100}>
-        <section className="mt-24 rounded-[28px] border border-gold-400/20 bg-gradient-to-br from-ink-950 via-ink-900 to-ink-950 p-12 sm:p-16 text-center relative overflow-hidden">
+        <section className="mt-24 rounded-[28px] border border-ink-200 bg-gradient-to-br from-ink-900 via-ink-800 to-ink-900 p-12 sm:p-16 text-center relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-gold-400/10 blur-[80px]" />
           </div>
