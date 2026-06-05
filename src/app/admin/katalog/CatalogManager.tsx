@@ -25,6 +25,7 @@ export default function CatalogManager({ catalog }: { catalog: any }) {
         const res = await fetch("/api/admin/catalog", { method: "POST", body: fd });
         const data = await res.json();
         if (data.url) setImages((prev) => [...prev, data.url]);
+        else setMsg('Error: ' + (data.error || 'Unknown'));
       }
       setMsg(files.length + " gambar berhasil diupload!");
     } catch { setMsg("Gagal upload."); }
