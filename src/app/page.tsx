@@ -129,6 +129,78 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* TENTANG KAMI */}
+      {(company.brandStory || company.vision || company.mission || (company.team && company.team.length > 0) || (company.advantages && company.advantages.length > 0)) && (
+        <section className="mt-16 space-y-12">
+          <div className="text-center">
+            <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Tentang Kami</p>
+            <h2 className="mt-2 text-3xl font-semibold text-ink-50">
+              {company.name}
+              {(company as any).foundingYear && <span className="ml-2 text-lg text-ink-400">est. {(company as any).foundingYear}</span>}
+            </h2>
+          </div>
+
+          {company.brandStory && (
+            <div className="mx-auto max-w-3xl rounded-3xl border border-ink-800 bg-ink-950/30 p-8">
+              <p className="text-center text-lg leading-relaxed text-ink-300 italic">"{company.brandStory}"</p>
+            </div>
+          )}
+
+          {(company.vision || company.mission) && (
+            <div className="grid gap-6 sm:grid-cols-2">
+              {company.vision && (
+                <div className="card p-6">
+                  <p className="text-xs font-semibold tracking-[0.15em] text-gold-400 uppercase">Visi</p>
+                  <p className="mt-3 text-ink-200 leading-relaxed">{company.vision}</p>
+                </div>
+              )}
+              {company.mission && (
+                <div className="card p-6">
+                  <p className="text-xs font-semibold tracking-[0.15em] text-gold-400 uppercase">Misi</p>
+                  <p className="mt-3 text-ink-200 leading-relaxed">{company.mission}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {company.advantages && company.advantages.length > 0 && (
+            <div>
+              <h3 className="text-center text-2xl font-semibold text-ink-50 mb-6">Keunggulan Produk</h3>
+              <div className="grid gap-4 sm:grid-cols-3">
+                {company.advantages.map((adv) => (
+                  <div key={adv.id} className="card p-6 text-center">
+                    <p className="text-4xl">{adv.icon}</p>
+                    <p className="mt-3 font-semibold text-ink-50">{adv.title}</p>
+                    <p className="mt-1 text-sm text-ink-400">{adv.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {company.team && company.team.length > 0 && (
+            <div>
+              <h3 className="text-center text-2xl font-semibold text-ink-50 mb-6">Tim Kami</h3>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {company.team.map((member) => (
+                  <div key={member.id} className="card p-6 text-center">
+                    <div className="relative mx-auto h-24 w-24 overflow-hidden rounded-full border-2 border-gold-400/30 bg-ink-900">
+                      {member.photo
+                        ? <Image src={member.photo} alt={member.name} fill className="object-cover" />
+                        : <div className="flex h-full w-full items-center justify-center text-3xl">👤</div>
+                      }
+                    </div>
+                    <p className="mt-4 font-semibold text-ink-50">{member.name}</p>
+                    <p className="text-sm text-gold-300">{member.role}</p>
+                    {member.bio && <p className="mt-2 text-xs text-ink-400 leading-relaxed">{member.bio}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
       <section className="mt-16 rounded-[28px] border border-gold-400/20 bg-gradient-to-br from-ink-950 via-ink-900 to-ink-950 p-10 sm:p-14 text-center relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full bg-gold-400/10 blur-3xl" />
