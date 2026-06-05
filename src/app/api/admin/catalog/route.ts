@@ -41,9 +41,11 @@ export async function POST(req: NextRequest) {
     const pdfUrl = form.get("pdfUrl") as string || "";
     const title = form.get("title") as string || "Katalog Produk";
 
-    await updateDatabase((db) => {
-      (db.settings as any).catalog = { images, pdfUrl, title };
-    });
+    const { error } = await supabase
+      .from("settings")
+      .update({ catalog: { images, pdfUrl, title } })
+      .eq("id", 1);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     return NextResponse.json({ ok: true });
   }

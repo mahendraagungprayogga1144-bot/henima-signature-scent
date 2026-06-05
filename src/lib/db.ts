@@ -154,6 +154,7 @@ export async function getDatabase(): Promise<Database> {
     ? {
         company: settingsData.company as Settings["company"],
         payment: settingsData.payment as Settings["payment"],
+        catalog: settingsData.catalog as any,
       }
     : DEFAULT_SETTINGS;
 
