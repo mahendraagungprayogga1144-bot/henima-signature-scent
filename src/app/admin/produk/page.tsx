@@ -40,7 +40,7 @@ export default async function AdminProductsPage({
 
       <div className="mt-8 space-y-8">
         {db.products.map((product) => (
-          <ProductEditor key={product.id} product={product} onSaved={() => window.location.reload()} />
+          <ProductEditor key={product.id} product={product} />
         ))}
       </div>
     </div>

@@ -61,7 +61,8 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
 
       const res = await fetch(`/api/admin/products/${product.id}`, { method: "POST", body: fd });
       if (!res.ok) { const text = await res.text(); setError(text || "Gagal menyimpan produk"); return; }
-      onSaved?.();
+      window.location.reload();
+      
     } catch { setError("Terjadi kesalahan jaringan"); }
     finally { setSaving(false); }
   }
@@ -73,7 +74,7 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
     try {
       const res = await fetch(`/api/admin/products/${product.id}/delete`, { method: "POST" });
       if (!res.ok) { const text = await res.text(); setError(text || "Gagal menghapus produk"); return; }
-      onSaved?.();
+      
     } catch { setError("Terjadi kesalahan jaringan"); }
     finally { setSaving(false); }
   }
