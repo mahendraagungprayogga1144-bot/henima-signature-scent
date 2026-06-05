@@ -89,7 +89,11 @@ export default async function AdminDashboardPage() {
         <Link href="/admin/reseller" className="card text-center hover:bg-brand-50">
           <span className="text-lg font-semibold">Kelola Reseller</span>
         </Link>
-        <Link href="/admin/galeri">
+        <Link href="/admin/blog">
+              Blog
+            </Link>
+            <Link
+              href="/admin/galeri">
               Galeri
             </Link>
             <Link
