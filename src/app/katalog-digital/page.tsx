@@ -31,7 +31,7 @@ export default async function KatalogDigitalPage() {
               ⬇️ Download Katalog PDF
             </a>
           )}
-          
+          <a
             href={"https://wa.me/" + waNumber}
             target="_blank"
             rel="noreferrer"
@@ -69,7 +69,7 @@ export default async function KatalogDigitalPage() {
           <p className="mt-2 text-ink-400">
             Admin sedang mempersiapkan katalog digital. Hubungi kami untuk info produk.
           </p>
-          
+          <a
             href={"https://wa.me/" + waNumber}
             target="_blank"
             rel="noreferrer"
