@@ -28,7 +28,7 @@ export default function CatalogManager({ catalog }: { catalog: any }) {
         else setMsg('Error: ' + (data.error || 'Unknown'));
       }
       setMsg(files.length + " gambar berhasil diupload!");
-    } catch { setMsg("Gagal upload."); }
+    } catch(e: any) { setMsg("Gagal upload: " + (e?.message || String(e))); }
     finally { setUploading(false); }
   }
 
