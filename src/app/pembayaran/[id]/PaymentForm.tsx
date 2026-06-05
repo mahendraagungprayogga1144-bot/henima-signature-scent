@@ -23,6 +23,7 @@ export default function PaymentForm({
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [qrisZoom, setQrisZoom] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -79,10 +80,20 @@ export default function PaymentForm({
             checked={paymentMethod === "qris"} onChange={() => setPaymentMethod("qris")} />
           <div className="flex-1">
             <p className="font-medium">QRIS</p>
-            <div className="relative mt-3 mx-auto h-48 w-48">
-              <Image src={qrisImage} alt="QRIS" fill className="object-contain" />
+            <div className="mt-3 text-center">
+              <button type="button" onClick={() => setQrisZoom(true)} className="relative mx-auto block h-48 w-48 cursor-zoom-in overflow-hidden rounded-2xl border border-ink-700 hover:border-gold-400 transition-all">
+                <Image src={qrisImage} alt="QRIS" fill className="object-contain p-2" />
+              </button>
+              <p className="mt-2 text-xs text-ink-400">Tap untuk perbesar • Scan QRIS untuk membayar {formatRupiah(total)}</p>
             </div>
-            <p className="mt-2 text-center text-xs text-ink-400">Scan QRIS untuk membayar {formatRupiah(total)}</p>
+            {qrisZoom && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setQrisZoom(false)}>
+                <div className="relative h-[80vw] w-[80vw] max-h-[500px] max-w-[500px]">
+                  <Image src={qrisImage} alt="QRIS" fill className="object-contain" />
+                </div>
+                <p className="absolute bottom-8 text-sm text-ink-400">Tap untuk menutup</p>
+              </div>
+            )}
           </div>
         </label>
       </div>
