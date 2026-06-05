@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { getDatabase, updateDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import type { BankCode, PaymentMethod } from "@/lib/types";
-import { promises as fs } from "fs";
-import path from "path";
 
 export async function POST(
   request: Request,
@@ -11,9 +9,7 @@ export async function POST(
 ) {
   const { id } = await params;
   const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const form = await request.formData();
   const paymentMethod = form.get("paymentMethod") as PaymentMethod;
@@ -21,30 +17,30 @@ export async function POST(
   const file = form.get("proof") as File | null;
 
   if (!paymentMethod || !["bank_transfer", "qris"].includes(paymentMethod)) {
-    return NextResponse.redirect(
-      new URL(`/pembayaran/${id}?error=Metode pembayaran tidak valid`, request.url)
-    );
+    return NextResponse.redirect(new URL(`/pembayaran/${id}?error=Metode pembayaran tidak valid`, request.url));
   }
 
   const db = await getDatabase();
   const order = db.orders.find((o) => o.id === id);
-  if (!order) {
-    return NextResponse.json({ error: "Pesanan tidak ditemukan" }, { status: 404 });
-  }
-  if (user.role === "reseller" && order.resellerId !== user.id) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  if (!order) return NextResponse.json({ error: "Pesanan tidak ditemukan" }, { status: 404 });
+  if (user.role === "reseller" && order.resellerId !== user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   let paymentProof: string | undefined;
   if (file && file.size > 0) {
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const ext = file.name.split(".").pop() || "jpg";
-    const filename = `${id}-${Date.now()}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await fs.mkdir(uploadDir, { recursive: true });
-    await fs.writeFile(path.join(uploadDir, filename), buffer);
-    paymentProof = `/uploads/${filename}`;
+    try {
+      const { supabase } = await import("@/lib/supabase");
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const ext = file.name.split(".").pop() || "jpg";
+      const filename = `${id}-${Date.now()}.${ext}`;
+      const { data, error } = await supabase.storage
+        .from("payment-proofs")
+        .upload(filename, buffer, { contentType: file.type || "image/jpeg" });
+      if (!error && data) {
+        const { data: urlData } = supabase.storage.from("payment-proofs").getPublicUrl(filename);
+        paymentProof = urlData.publicUrl;
+      }
+    } catch { /* skip */ }
   }
 
   await updateDatabase((data) => {
@@ -52,12 +48,8 @@ export async function POST(
     if (o) {
       o.paymentMethod = paymentMethod;
       if (paymentMethod === "bank_transfer") {
-        if (paymentBank && ["bca", "mandiri", "bri"].includes(paymentBank)) {
-          o.paymentBank = paymentBank;
-        }
-      } else {
-        o.paymentBank = undefined;
-      }
+        if (paymentBank && ["bca", "mandiri", "bri"].includes(paymentBank)) o.paymentBank = paymentBank;
+      } else { o.paymentBank = undefined; }
       if (paymentProof) o.paymentProof = paymentProof;
       if (o.status === "pending_payment") {
         o.status = "pending_confirmation";
