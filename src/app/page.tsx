@@ -38,14 +38,14 @@ export default async function HomePage() {
             <h1 className="mt-6 text-5xl sm:text-6xl font-semibold tracking-tight text-ink-50 leading-tight">
               {company.tagline || "Luxury scent, crafted for your signature."}
             </h1>
-            <p className="mt-5 text-lg leading-relaxed text-ink-300 max-w-lg">
+            <p className="mt-5 text-lg leading-relaxed text-ink-700 max-w-lg">
               Portal reseller resmi <span className="text-gold-300 font-medium">{company.name}</span> — harga khusus grosir, pengiriman ke seluruh Indonesia, status real-time.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/masuk" className="btn-primary px-8 py-3 text-base">Masuk Reseller</Link>
               <Link href="/daftar" className="btn-secondary px-8 py-3 text-base">Daftar Gratis</Link>
             </div>
-            <div className="mt-8 flex flex-wrap gap-4 text-sm text-ink-400">
+            <div className="mt-8 flex flex-wrap gap-4 text-sm text-ink-600">
               <span>Harga grosir khusus reseller</span>
               <span>Kirim ke seluruh Indonesia</span>
               <span>QRIS dan Transfer Bank</span>
@@ -76,7 +76,7 @@ export default async function HomePage() {
               <div>
                 <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Koleksi</p>
                 <h2 className="mt-1 text-3xl font-semibold tracking-tight text-ink-50">Produk Kami</h2>
-                <p className="mt-1 text-ink-400">Parfum premium siap jual untuk reseller.</p>
+                <p className="mt-1 text-ink-600">Parfum premium siap jual untuk reseller.</p>
               </div>
               <Link href="/daftar" className="text-sm font-semibold text-gold-300 hover:text-gold-200 hover:underline">Jadi reseller</Link>
             </div>
@@ -95,10 +95,10 @@ export default async function HomePage() {
                     </div>
                     <div className="p-6">
                       <h3 className="text-lg font-semibold text-ink-50">{product.name}</h3>
-                      <p className="mt-1 text-sm text-ink-400 line-clamp-2">{product.description}</p>
+                      <p className="mt-1 text-sm text-ink-600 line-clamp-2">{product.description}</p>
                       <div className="mt-4 flex items-center justify-between">
                         <div>
-                          <p className="text-xs text-ink-500">Harga reseller</p>
+                          <p className="text-xs text-ink-600">Harga reseller</p>
                           {(product as any).comingSoon ? (
                             <span className="inline-block rounded-full bg-gold-400/10 border border-gold-400/30 px-3 py-1 text-xs font-semibold text-gold-300">Coming Soon</span>
                           ) : (
@@ -109,7 +109,7 @@ export default async function HomePage() {
                         </div>
                         <div className="flex gap-1">
                           {variants.map((v) => (
-                            <span key={v.id} className="rounded-full border border-ink-700 bg-ink-900 px-2 py-0.5 text-xs text-ink-300">{v.sizeMl}ml</span>
+                            <span key={v.id} className="rounded-full border border-ink-700 bg-ink-900 px-2 py-0.5 text-xs text-ink-700">{v.sizeMl}ml</span>
                           ))}
                         </div>
                       </div>
@@ -127,7 +127,7 @@ export default async function HomePage() {
           <div className="text-center mb-12">
             <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Bergabung</p>
             <h2 className="mt-1 text-3xl font-semibold text-ink-50">Cara Jadi Reseller</h2>
-            <p className="mt-2 text-ink-400">Mulai berjualan dalam 3 langkah mudah.</p>
+            <p className="mt-2 text-ink-600">Mulai berjualan dalam 3 langkah mudah.</p>
           </div>
         </ScrollReveal>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -144,7 +144,7 @@ export default async function HomePage() {
                     <span className="text-xs font-bold text-gold-300">{item.step}</span>
                   </div>
                   <h3 className="text-lg font-semibold text-ink-50">{item.title}</h3>
-                  <p className="mt-2 text-sm text-ink-400 leading-relaxed">{item.desc}</p>
+                  <p className="mt-2 text-sm text-ink-600 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             </ScrollReveal>
@@ -159,7 +159,7 @@ export default async function HomePage() {
               <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Our Story</p>
               <h2 className="mt-2 text-3xl font-semibold text-ink-50">
                 {company.name}
-                {(company as any).foundingYear && <span className="ml-3 text-lg text-ink-400">est. {(company as any).foundingYear}</span>}
+                {(company as any).foundingYear && <span className="ml-3 text-lg text-ink-600">est. {(company as any).foundingYear}</span>}
               </h2>
             </div>
           </ScrollReveal>
@@ -167,7 +167,7 @@ export default async function HomePage() {
           {company.brandStory && (
             <ScrollReveal direction="up" delay={100}>
               <div className="mx-auto max-w-3xl rounded-3xl border border-gold-400/20 bg-gradient-to-b from-ink-950/60 to-ink-900/30 p-10">
-                <p className="text-center text-xl leading-relaxed text-ink-200 italic font-light">"{company.brandStory}"</p>
+                <p className="text-center text-xl leading-relaxed text-ink-800 italic font-light">"{company.brandStory}"</p>
               </div>
             </ScrollReveal>
           )}
@@ -178,7 +178,7 @@ export default async function HomePage() {
                 <ScrollReveal direction="left" delay={0}>
                   <div className="card p-8 h-full border-l-2 border-l-gold-400/50">
                     <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Visi</p>
-                    <p className="mt-4 text-ink-200 leading-relaxed text-lg">{company.vision}</p>
+                    <p className="mt-4 text-ink-800 leading-relaxed text-lg">{company.vision}</p>
                   </div>
                 </ScrollReveal>
               )}
@@ -186,7 +186,7 @@ export default async function HomePage() {
                 <ScrollReveal direction="right" delay={100}>
                   <div className="card p-8 h-full border-l-2 border-l-gold-400/50">
                     <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Misi</p>
-                    <p className="mt-4 text-ink-200 leading-relaxed">{company.mission}</p>
+                    <p className="mt-4 text-ink-800 leading-relaxed">{company.mission}</p>
                   </div>
                 </ScrollReveal>
               )}
@@ -204,7 +204,7 @@ export default async function HomePage() {
                     <div className="card p-8 text-center hover:border-gold-400/30 transition-all duration-500 group">
                       <p className="text-5xl group-hover:scale-110 transition-transform duration-300">{adv.icon}</p>
                       <p className="mt-4 font-semibold text-ink-50 text-lg">{adv.title}</p>
-                      <p className="mt-2 text-sm text-ink-400 leading-relaxed">{adv.desc}</p>
+                      <p className="mt-2 text-sm text-ink-600 leading-relaxed">{adv.desc}</p>
                     </div>
                   </ScrollReveal>
                 ))}
@@ -229,7 +229,7 @@ export default async function HomePage() {
                       </div>
                       <p className="mt-5 font-semibold text-ink-50 text-lg">{member.name}</p>
                       <p className="text-sm text-gold-300">{member.role}</p>
-                      {member.bio && <p className="mt-3 text-xs text-ink-400 leading-relaxed">{member.bio}</p>}
+                      {member.bio && <p className="mt-3 text-xs text-ink-600 leading-relaxed">{member.bio}</p>}
                     </div>
                   </ScrollReveal>
                 ))}
@@ -247,7 +247,7 @@ export default async function HomePage() {
           <div className="relative">
             <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Bergabung Sekarang</p>
             <h2 className="mt-3 text-3xl sm:text-5xl font-semibold text-ink-50">Siap mulai berjualan?</h2>
-            <p className="mt-4 text-ink-400 text-lg max-w-xl mx-auto">Daftar sekarang dan dapatkan akses ke harga reseller eksklusif.</p>
+            <p className="mt-4 text-ink-600 text-lg max-w-xl mx-auto">Daftar sekarang dan dapatkan akses ke harga reseller eksklusif.</p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/daftar" className="btn-primary px-10 py-4 text-base">Daftar Reseller Sekarang</Link>
               <a href={"https://wa.me/6285190311230"} target="_blank" rel="noreferrer" className="btn-secondary px-10 py-4 text-base">Hubungi via WhatsApp</a>

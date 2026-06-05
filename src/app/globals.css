@@ -34,7 +34,7 @@
   }
 
   .text-muted {
-    @apply text-ink-500;
+    @apply text-ink-600;
   }
 }
 
