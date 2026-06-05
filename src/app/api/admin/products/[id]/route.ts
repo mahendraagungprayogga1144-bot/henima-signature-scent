@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { updateDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import type { ProductVariant } from "@/lib/types";
-import { promises as fs } from "fs";
-import path from "path";
 
 export const runtime = "nodejs";
 
@@ -19,33 +17,15 @@ export async function POST(
 
   const form = await request.formData();
   const name = String(form.get("name") || "").trim();
-  const originalPrice =
-    Number(form.get("originalPrice")) || Number(form.get("price")) || 0;
-  const discountPrice =
-    Number(form.get("discountPrice")) ||
-    Number(form.get("price")) ||
-    originalPrice;
+  const originalPrice = Number(form.get("originalPrice")) || 0;
+  const discountPrice = Number(form.get("discountPrice")) || originalPrice;
   const description = String(form.get("description") || "").trim();
   const active = form.get("active") === "on";
   const variantsRaw = form.get("variants");
-  const photo = form.get("photo") as File | null;
+  const photoUrl = form.get("photoUrl") as string | null;
 
   if (originalPrice < 0 || discountPrice < 0) {
-    return NextResponse.redirect(
-      new URL("/admin/produk?error=Harga tidak valid", request.url)
-    );
-  }
-
-  let photoPath: string | undefined;
-  if (photo && photo.size > 0) {
-    const bytes = await photo.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const ext = photo.name.split(".").pop() || "jpg";
-    const filename = `${id}-${Date.now()}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
-    await fs.mkdir(uploadDir, { recursive: true });
-    await fs.writeFile(path.join(uploadDir, filename), buffer);
-    photoPath = `/uploads/products/${filename}`;
+    return NextResponse.json({ error: "Harga tidak valid" }, { status: 400 });
   }
 
   let variants: ProductVariant[] | undefined;
@@ -76,7 +56,7 @@ export async function POST(
       product.discountPrice = discountPrice;
       product.description = description || product.description;
       product.active = active;
-      if (photoPath) product.photo = photoPath;
+      if (photoUrl && photoUrl.startsWith("http")) product.photo = photoUrl;
       if (variants) product.variants = variants;
     }
   });
