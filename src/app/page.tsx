@@ -57,7 +57,7 @@ export default async function HomePage() {
             <div className="hidden lg:grid grid-cols-2 gap-4">
               {products.slice(0, 2).map((product, i) => (
                 <div key={product.id} className={`relative overflow-hidden rounded-3xl border border-ink-700 bg-ink-900 aspect-[3/4] ${i === 1 ? "mt-8" : ""}`}>
-                  <Image src={product.photo} alt={product.name} fill className="object-contain p-6" />
+                  <Image src={product.photo} alt={product.name} fill className="object-cover" />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-ink-950/90 to-transparent p-4">
                     <p className="font-semibold text-ink-50 text-sm">{product.name}</p>
                     <p className="text-xs text-gold-300">Rp {product.discountPrice.toLocaleString("id-ID")} / unit</p>
@@ -86,7 +86,7 @@ export default async function HomePage() {
               return (
                 <div key={product.id} className="group relative overflow-hidden rounded-3xl border border-ink-800 bg-ink-950/50 hover:border-gold-400/40 transition-all duration-300">
                   <div className="relative h-64 bg-ink-900 overflow-hidden">
-                    <Image src={product.photo} alt={product.name} fill className="object-contain p-8 group-hover:scale-105 transition-transform duration-500" />
+                    <Image src={product.photo} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 to-transparent" />
                   </div>
                   <div className="p-6">
