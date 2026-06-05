@@ -13,6 +13,7 @@ export default function GalleryManager({ gallery }: { gallery: any }) {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const [unsaved, setUnsaved] = useState(false);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
@@ -30,7 +31,7 @@ export default function GalleryManager({ gallery }: { gallery: any }) {
         const { error } = await sb.storage.from("gallery").upload(filename, file, { contentType: file.type, upsert: true });
         if (error) { setMsg("Error: " + error.message); continue; }
         const { data: urlData } = sb.storage.from("gallery").getPublicUrl(filename);
-        setImages((prev) => [...prev, { url: urlData.publicUrl, caption: "" }]);
+        setImages((prev) => { setUnsaved(true); return [...prev, { url: urlData.publicUrl, caption: "" }]; });
       }
       setMsg(files.length + " foto berhasil diupload!");
     } catch(e: any) { setMsg("Gagal: " + e.message); }
@@ -47,7 +48,7 @@ export default function GalleryManager({ gallery }: { gallery: any }) {
       fd.set("title", title);
       const res = await fetch("/api/admin/gallery", { method: "POST", body: fd });
       if (!res.ok) { setMsg("Gagal menyimpan"); return; }
-      setMsg("Galeri berhasil disimpan! ✅");
+      setMsg("Galeri berhasil disimpan! ✅"); setUnsaved(false);
       router.refresh();
     } catch { setMsg("Gagal menyimpan."); }
     finally { setSaving(false); }
@@ -103,6 +104,7 @@ export default function GalleryManager({ gallery }: { gallery: any }) {
         </div>
       )}
 
+      {unsaved && <p className="rounded-lg bg-yellow-950/50 border border-yellow-700/30 px-3 py-2 text-sm text-yellow-300">⚠️ Ada foto yang belum disimpan! Klik Simpan Galeri.</p>}
       {msg && <p className="text-sm text-gold-300">{msg}</p>}
       <button onClick={handleSave} disabled={saving} className="btn-primary w-full">
         {saving ? "Menyimpan..." : "Simpan Galeri"}
