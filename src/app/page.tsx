@@ -95,9 +95,13 @@ export default async function HomePage() {
                     <div className="mt-4 flex items-center justify-between">
                       <div>
                         <p className="text-xs text-ink-500">Harga reseller</p>
-                        <p className="text-lg font-bold text-gold-300">
-                          Rp {minPrice.toLocaleString("id-ID")}{maxPrice > minPrice && ` – ${maxPrice.toLocaleString("id-ID")}`}
-                        </p>
+                        {(product as any).comingSoon ? (
+                          <span className="inline-block rounded-full bg-gold-400/10 border border-gold-400/30 px-3 py-1 text-xs font-semibold text-gold-300">Coming Soon</span>
+                        ) : (
+                          <p className="text-lg font-bold text-gold-300">
+                            Rp {minPrice.toLocaleString("id-ID")}{maxPrice > minPrice && ` – ${maxPrice.toLocaleString("id-ID")}`}
+                          </p>
+                        )}
                       </div>
                       <div className="flex gap-1">
                         {variants.map((v) => (
