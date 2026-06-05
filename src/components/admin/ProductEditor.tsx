@@ -25,6 +25,7 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   const [variants, setVariants] = useState<VariantDraft[]>(sortVariants(product.variants));
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [topNotes, setTopNotes] = useState((product as any).topNotes || "");
+  const [comingSoon, setComingSoon] = useState((product as any).comingSoon || false);
   const [middleNotes, setMiddleNotes] = useState((product as any).middleNotes || "");
   const [baseNotes, setBaseNotes] = useState((product as any).baseNotes || "");
   const [inspiration, setInspiration] = useState((product as any).inspiration || "");
@@ -62,6 +63,7 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
       fd.set("discountPrice", String(discountPrice));
       fd.set("variants", JSON.stringify(variants));
       fd.set("topNotes", topNotes);
+      fd.set("comingSoon", String(comingSoon));
       fd.set("middleNotes", middleNotes);
       fd.set("baseNotes", baseNotes);
       fd.set("inspiration", inspiration);
@@ -142,6 +144,10 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
           <label className="flex items-center gap-2 text-sm text-ink-200">
             <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
             Aktif di katalog
+          </label>
+          <label className="flex items-center gap-2 text-sm text-ink-200">
+            <input type="checkbox" checked={comingSoon} onChange={(e) => setComingSoon(e.target.checked)} />
+            Coming Soon (sembunyikan harga)
           </label>
           <div className="grid gap-4 sm:grid-cols-3 sm:col-span-2">
             <div>

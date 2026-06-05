@@ -41,6 +41,7 @@ export interface Product {
   middleNotes?: string;
   baseNotes?: string;
   inspiration?: string;
+  comingSoon?: boolean;
 }
 
 export interface User {
