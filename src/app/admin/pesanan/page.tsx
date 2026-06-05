@@ -107,7 +107,16 @@ export default async function AdminOrdersPage({
                       >
                         <p className="text-sm font-semibold text-ink-50">Pembayaran</p>
                         <p className="mt-1 text-xs text-ink-300">
-                          Bukti bayar sudah diunggah.
+                          Bukti bayar sudah diunggah.</p><a href={order.paymentProof} target="_blank" rel="noreferrer" className="mt-2 block text-xs text-gold-300 hover:underline">👁 Lihat Bukti Pembayaran</a><p className="hidden">
+                        </p>
+                        <a href={order.paymentProof} target="_blank" rel="noreferrer" className="mt-2 inline-block rounded-lg border border-gold-400/30 bg-gold-400/10 px-3 py-1 text-xs font-semibold text-gold-300 hover:bg-gold-400/20">
+                          👁 Lihat Bukti Pembayaran
+                        </a>
+                        <p className="hidden">x</p>
+                        <a href={order.paymentProof} target="_blank" rel="noreferrer" className="mt-2 inline-block rounded-lg border border-gold-400/30 bg-gold-400/10 px-3 py-1 text-xs font-semibold text-gold-300 hover:bg-gold-400/20">
+                          👁 Lihat Bukti Pembayaran
+                        </a>
+                        <p className="hidden"
                         </p>
                         <button type="submit" className="btn-primary mt-3 w-full">
                           Konfirmasi Pembayaran
