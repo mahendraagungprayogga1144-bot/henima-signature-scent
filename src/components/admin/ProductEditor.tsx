@@ -143,6 +143,24 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
             <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
             Aktif di katalog
           </label>
+          <div className="grid gap-4 sm:grid-cols-3 sm:col-span-2">
+            <div>
+              <label className="label">Top Notes</label>
+              <input className="input-field" value={topNotes} onChange={(e) => setTopNotes(e.target.value)} placeholder="Citrus, Bergamot..." />
+            </div>
+            <div>
+              <label className="label">Middle Notes</label>
+              <input className="input-field" value={middleNotes} onChange={(e) => setMiddleNotes(e.target.value)} placeholder="Rose, Jasmine..." />
+            </div>
+            <div>
+              <label className="label">Base Notes</label>
+              <input className="input-field" value={baseNotes} onChange={(e) => setBaseNotes(e.target.value)} placeholder="Vanilla, Musk..." />
+            </div>
+          </div>
+          <div className="sm:col-span-2">
+            <label className="label">Kisah / Inspirasi Produk</label>
+            <textarea className="input-field" rows={3} value={inspiration} onChange={(e) => setInspiration(e.target.value)} placeholder="Cerita di balik nama dan konsep parfum ini..." />
+          </div>
         </div>
       </div>
 
