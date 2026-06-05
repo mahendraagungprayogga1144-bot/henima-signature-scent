@@ -24,6 +24,10 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   const [discountPrice, setDiscountPrice] = useState(product.discountPrice);
   const [variants, setVariants] = useState<VariantDraft[]>(sortVariants(product.variants));
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [topNotes, setTopNotes] = useState((product as any).topNotes || "");
+  const [middleNotes, setMiddleNotes] = useState((product as any).middleNotes || "");
+  const [baseNotes, setBaseNotes] = useState((product as any).baseNotes || "");
+  const [inspiration, setInspiration] = useState((product as any).inspiration || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -57,6 +61,10 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
       fd.set("originalPrice", String(originalPrice));
       fd.set("discountPrice", String(discountPrice));
       fd.set("variants", JSON.stringify(variants));
+      fd.set("topNotes", topNotes);
+      fd.set("middleNotes", middleNotes);
+      fd.set("baseNotes", baseNotes);
+      fd.set("inspiration", inspiration);
       fd.set("photoUrl", photoUrl);
 
       const res = await fetch(`/api/admin/products/${product.id}`, { method: "POST", body: fd });

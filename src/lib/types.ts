@@ -37,6 +37,10 @@ export interface Product {
   discountPrice: number;
   active: boolean;
   variants: ProductVariant[];
+  topNotes?: string;
+  middleNotes?: string;
+  baseNotes?: string;
+  inspiration?: string;
 }
 
 export interface User {

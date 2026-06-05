@@ -23,6 +23,10 @@ export async function POST(
   const active = form.get("active") === "on";
   const variantsRaw = form.get("variants");
   const photoUrl = form.get("photoUrl") as string | null;
+  const topNotes = form.get("topNotes") as string || null;
+  const middleNotes = form.get("middleNotes") as string || null;
+  const baseNotes = form.get("baseNotes") as string || null;
+  const inspiration = form.get("inspiration") as string || null;
 
   if (originalPrice < 0 || discountPrice < 0) {
     return NextResponse.json({ error: "Harga tidak valid" }, { status: 400 });
@@ -57,6 +61,10 @@ export async function POST(
       product.description = description || product.description;
       product.active = active;
       if (photoUrl && photoUrl.startsWith("http")) product.photo = photoUrl;
+      if (topNotes !== null) (product as any).topNotes = topNotes;
+      if (middleNotes !== null) (product as any).middleNotes = middleNotes;
+      if (baseNotes !== null) (product as any).baseNotes = baseNotes;
+      if (inspiration !== null) (product as any).inspiration = inspiration;
       if (variants) product.variants = variants;
     }
   });

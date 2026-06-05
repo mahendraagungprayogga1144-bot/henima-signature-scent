@@ -13,6 +13,10 @@ function rowToProduct(row: Record<string, unknown>): Product {
     discountPrice: row.discount_price as number,
     active: row.active as boolean,
     variants: (row.variants as Product["variants"]) ?? [],
+    topNotes: (row.top_notes as string) ?? undefined,
+    middleNotes: (row.middle_notes as string) ?? undefined,
+    baseNotes: (row.base_notes as string) ?? undefined,
+    inspiration: (row.inspiration as string) ?? undefined,
   };
 }
 
@@ -26,6 +30,10 @@ function productToRow(p: Product) {
     discount_price: p.discountPrice,
     active: p.active,
     variants: p.variants,
+    top_notes: p.topNotes ?? null,
+    middle_notes: p.middleNotes ?? null,
+    base_notes: p.baseNotes ?? null,
+    inspiration: p.inspiration ?? null,
   };
 }
 
