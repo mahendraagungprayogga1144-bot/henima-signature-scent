@@ -1,20 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import ProductImageZoom from "@/components/ProductImageZoom";
+import ScrollReveal from "@/components/ScrollReveal";
 import { getCurrentUserSafe } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { getDatabase } from "@/lib/db";
-
-function ProductZoom({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4" onClick={onClose}>
-      <div className="relative h-[90vw] w-[90vw] max-h-[600px] max-w-[600px]">
-        <img src={src} alt={alt} className="h-full w-full object-contain" />
-      </div>
-      <p className="absolute bottom-8 text-sm text-ink-400">Tap untuk menutup</p>
-    </div>
-  );
-}
 
 export default async function HomePage() {
   const user = await getCurrentUserSafe();
@@ -29,16 +19,16 @@ export default async function HomePage() {
     <div className="min-h-screen">
 
       <section className="relative overflow-hidden rounded-[28px] border border-ink-800 bg-ink-950 min-h-[80vh] flex items-center">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-gold-400/10 blur-[100px]" />
+          <div className="absolute bottom-0 right-1/4 h-80 w-80 rounded-full bg-brand-400/10 blur-[80px]" />
+        </div>
         {company.heroImage && (
           <div className="absolute inset-0">
             <Image src={company.heroImage} alt="Hero Background" fill className="object-cover" />
             <div className="absolute inset-0 bg-ink-950/70" />
           </div>
         )}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-gold-400/10 blur-[100px]" />
-          <div className="absolute bottom-0 right-1/4 h-80 w-80 rounded-full bg-brand-400/10 blur-[80px]" />
-        </div>
         <div className="relative w-full grid lg:grid-cols-2 gap-12 items-center px-8 sm:px-12 py-16">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-gold-400/30 bg-gold-400/10 px-4 py-2 text-xs font-semibold tracking-[0.2em] text-gold-300">
@@ -52,27 +42,25 @@ export default async function HomePage() {
               Portal reseller resmi <span className="text-gold-300 font-medium">{company.name}</span> — harga khusus grosir, pengiriman ke seluruh Indonesia, status real-time.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/masuk" className="btn-primary px-8 py-3 text-base">
-                Masuk Reseller
-              </Link>
-              <Link href="/daftar" className="btn-secondary px-8 py-3 text-base">
-                Daftar Gratis
-              </Link>
+              <Link href="/masuk" className="btn-primary px-8 py-3 text-base">Masuk Reseller</Link>
+              <Link href="/daftar" className="btn-secondary px-8 py-3 text-base">Daftar Gratis</Link>
             </div>
             <div className="mt-8 flex flex-wrap gap-4 text-sm text-ink-400">
-              <span>✓ Harga grosir khusus reseller</span>
-              <span>✓ Kirim ke seluruh Indonesia</span>
-              <span>✓ QRIS & Transfer Bank</span>
+              <span>Harga grosir khusus reseller</span>
+              <span>Kirim ke seluruh Indonesia</span>
+              <span>QRIS dan Transfer Bank</span>
             </div>
           </div>
           {products.length > 0 && (
             <div className="hidden lg:grid grid-cols-2 gap-4">
               {products.slice(0, 2).map((product, i) => (
-                <div key={product.id} className={`relative overflow-hidden rounded-3xl border border-ink-700 bg-ink-900 aspect-[3/4] ${i === 1 ? "mt-8" : ""}`}>
+                <div key={product.id} className={"relative overflow-hidden rounded-3xl border border-ink-700 bg-ink-900 aspect-[3/4] " + (i === 1 ? "mt-8" : "")}>
                   <ProductImageZoom src={product.photo} alt={product.name} />
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-ink-950/90 to-transparent p-4">
                     <p className="font-semibold text-ink-50 text-sm">{product.name}</p>
-                    <p className="text-xs text-gold-300">Rp {product.discountPrice.toLocaleString("id-ID")} / unit</p>
+                    <p className="text-xs text-gold-300">
+                      {(product as any).comingSoon ? "Coming Soon" : ("Rp " + product.discountPrice.toLocaleString("id-ID") + " / unit")}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -82,162 +70,163 @@ export default async function HomePage() {
       </section>
 
       {products.length > 0 && (
-                <section className="mt-16 space-y-6">
-          <div className="flex items-end justify-between">
-            <div>
-              <h2 className="text-3xl font-semibold tracking-tight text-ink-50">Produk Kami</h2>
-              <p className="mt-1 text-ink-400">Parfum premium siap jual untuk reseller.</p>
+        <ScrollReveal>
+          <section className="mt-16 space-y-6">
+            <div className="flex items-end justify-between">
+              <div>
+                <h2 className="text-3xl font-semibold tracking-tight text-ink-50">Produk Kami</h2>
+                <p className="mt-1 text-ink-400">Parfum premium siap jual untuk reseller.</p>
+              </div>
+              <Link href="/daftar" className="text-sm font-semibold text-gold-300 hover:text-gold-200 hover:underline">Jadi reseller</Link>
             </div>
-            <Link href="/daftar" className="text-sm font-semibold text-gold-300 hover:text-gold-200 hover:underline">Jadi reseller →</Link>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => {
-              const variants = product.variants.filter((v) => v.active);
-              const minPrice = Math.min(...variants.map((v) => v.discountPrice));
-              const maxPrice = Math.max(...variants.map((v) => v.discountPrice));
-              return (
-                <div key={product.id} className="group relative overflow-hidden rounded-3xl border border-ink-800 bg-ink-950/50 hover:border-gold-400/40 transition-all duration-300">
-                  <div className="relative h-64 bg-ink-900 overflow-hidden">
-                    <ProductImageZoom src={product.photo} alt={product.name} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 to-transparent" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-ink-50">{product.name}</h3>
-                    <p className="mt-1 text-sm text-ink-400 line-clamp-2">{product.description}</p>
-                    <div className="mt-4 flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-ink-500">Harga reseller</p>
-                        {(product as any).comingSoon ? (
-                          <span className="inline-block rounded-full bg-gold-400/10 border border-gold-400/30 px-3 py-1 text-xs font-semibold text-gold-300">Coming Soon</span>
-                        ) : (
-                          <p className="text-lg font-bold text-gold-300">
-                            Rp {minPrice.toLocaleString("id-ID")}{maxPrice > minPrice && ` – ${maxPrice.toLocaleString("id-ID")}`}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex gap-1">
-                        {variants.map((v) => (
-                          <span key={v.id} className="rounded-full border border-ink-700 bg-ink-900 px-2 py-0.5 text-xs text-ink-300">{v.sizeMl}ml</span>
-                        ))}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {products.map((product) => {
+                const variants = product.variants.filter((v) => v.active);
+                const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.discountPrice)) : product.discountPrice;
+                const maxPrice = variants.length > 0 ? Math.max(...variants.map((v) => v.discountPrice)) : product.discountPrice;
+                return (
+                  <div key={product.id} className="group relative overflow-hidden rounded-3xl border border-ink-800 bg-ink-950/50 hover:border-gold-400/40 transition-all duration-300">
+                    <div className="relative h-64 bg-ink-900 overflow-hidden">
+                      <ProductImageZoom src={product.photo} alt={product.name} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 to-transparent pointer-events-none" />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold text-ink-50">{product.name}</h3>
+                      <p className="mt-1 text-sm text-ink-400 line-clamp-2">{product.description}</p>
+                      <div className="mt-4 flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-ink-500">Harga reseller</p>
+                          {(product as any).comingSoon ? (
+                            <span className="inline-block rounded-full bg-gold-400/10 border border-gold-400/30 px-3 py-1 text-xs font-semibold text-gold-300">Coming Soon</span>
+                          ) : (
+                            <p className="text-lg font-bold text-gold-300">
+                              {"Rp " + minPrice.toLocaleString("id-ID") + (maxPrice > minPrice ? " - " + maxPrice.toLocaleString("id-ID") : "")}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-1">
+                          {variants.map((v) => (
+                            <span key={v.id} className="rounded-full border border-ink-700 bg-ink-900 px-2 py-0.5 text-xs text-ink-300">{v.sizeMl}ml</span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+                );
+              })}
+            </div>
+          </section>
+        </ScrollReveal>
       )}
 
-            <section className="mt-16">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-semibold text-ink-50">Cara Jadi Reseller</h2>
-          <p className="mt-2 text-ink-400">Mulai berjualan dalam 3 langkah mudah.</p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {[
-            { step: "01", title: "Daftar Gratis", desc: "Buat akun reseller dan langsung akses katalog harga khusus." },
-            { step: "02", title: "Pilih & Pesan", desc: "Pilih produk, kurir, isi alamat — ongkir otomatis dihitung." },
-            { step: "03", title: "Bayar & Kirim", desc: "Bayar via QRIS/transfer, upload bukti, pantau status real-time." },
-          ].map((item) => (
-            <div key={item.step} className="relative card p-6 overflow-hidden">
-              <div className="absolute -right-4 -top-4 text-7xl font-black text-ink-800 select-none">{item.step}</div>
-              <div className="relative">
-                <h3 className="text-lg font-semibold text-ink-50">{item.title}</h3>
-                <p className="mt-2 text-sm text-ink-400 leading-relaxed">{item.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* TENTANG KAMI */}
-            {(company.brandStory || company.vision || company.mission || (company.team && company.team.length > 0) || (company.advantages && company.advantages.length > 0)) && (
-        <section className="mt-16 space-y-12">
-          <div className="text-center">
-            <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Tentang Kami</p>
-            <h2 className="mt-2 text-3xl font-semibold text-ink-50">
-              {company.name}
-              {(company as any).foundingYear && <span className="ml-2 text-lg text-ink-400">est. {(company as any).foundingYear}</span>}
-            </h2>
+      <ScrollReveal delay={100}>
+        <section className="mt-16">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-semibold text-ink-50">Cara Jadi Reseller</h2>
+            <p className="mt-2 text-ink-400">Mulai berjualan dalam 3 langkah mudah.</p>
           </div>
-
-          {company.brandStory && (
-            <div className="mx-auto max-w-3xl rounded-3xl border border-ink-800 bg-ink-950/30 p-8">
-              <p className="text-center text-lg leading-relaxed text-ink-300 italic">"{company.brandStory}"</p>
-            </div>
-          )}
-
-          {(company.vision || company.mission) && (
-            <div className="grid gap-6 sm:grid-cols-2">
-              {company.vision && (
-                <div className="card p-6">
-                  <p className="text-xs font-semibold tracking-[0.15em] text-gold-400 uppercase">Visi</p>
-                  <p className="mt-3 text-ink-200 leading-relaxed">{company.vision}</p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              { step: "01", title: "Daftar Gratis", desc: "Buat akun reseller dan langsung akses katalog harga khusus." },
+              { step: "02", title: "Pilih dan Pesan", desc: "Pilih produk, kurir, isi alamat — ongkir otomatis dihitung." },
+              { step: "03", title: "Bayar dan Kirim", desc: "Bayar via QRIS/transfer, upload bukti, pantau status real-time." },
+            ].map((item) => (
+              <div key={item.step} className="relative card p-6 overflow-hidden">
+                <div className="absolute -right-4 -top-4 text-7xl font-black text-ink-800 select-none">{item.step}</div>
+                <div className="relative">
+                  <h3 className="text-lg font-semibold text-ink-50">{item.title}</h3>
+                  <p className="mt-2 text-sm text-ink-400 leading-relaxed">{item.desc}</p>
                 </div>
-              )}
-              {company.mission && (
-                <div className="card p-6">
-                  <p className="text-xs font-semibold tracking-[0.15em] text-gold-400 uppercase">Misi</p>
-                  <p className="mt-3 text-ink-200 leading-relaxed">{company.mission}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {company.advantages && company.advantages.length > 0 && (
-            <div>
-              <h3 className="text-center text-2xl font-semibold text-ink-50 mb-6">Keunggulan Produk</h3>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {company.advantages.map((adv) => (
-                  <div key={adv.id} className="card p-6 text-center">
-                    <p className="text-4xl">{adv.icon}</p>
-                    <p className="mt-3 font-semibold text-ink-50">{adv.title}</p>
-                    <p className="mt-1 text-sm text-ink-400">{adv.desc}</p>
-                  </div>
-                ))}
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        </section>
+      </ScrollReveal>
 
-          {company.team && company.team.length > 0 && (
-            <div>
-              <h3 className="text-center text-2xl font-semibold text-ink-50 mb-6">Tim Kami</h3>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {company.team.map((member) => (
-                  <div key={member.id} className="card p-6 text-center">
-                    <div className="relative mx-auto h-24 w-24 overflow-hidden rounded-full border-2 border-gold-400/30 bg-ink-900">
-                      {member.photo
-                        ? <Image src={member.photo} alt={member.name} fill className="object-cover" />
-                        : <div className="flex h-full w-full items-center justify-center text-3xl">👤</div>
-                      }
+      {(company.brandStory || company.vision || company.mission || (company.team && (company.team as any[]).length > 0) || (company.advantages && (company.advantages as any[]).length > 0)) && (
+        <ScrollReveal delay={100}>
+          <section className="mt-16 space-y-12">
+            <div className="text-center">
+              <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Tentang Kami</p>
+              <h2 className="mt-2 text-3xl font-semibold text-ink-50">
+                {company.name}
+                {(company as any).foundingYear && <span className="ml-3 text-lg text-ink-400">est. {(company as any).foundingYear}</span>}
+              </h2>
+            </div>
+            {company.brandStory && (
+              <div className="mx-auto max-w-3xl rounded-3xl border border-ink-800 bg-ink-950/30 p-8">
+                <p className="text-center text-lg leading-relaxed text-ink-300 italic">"{company.brandStory}"</p>
+              </div>
+            )}
+            {(company.vision || company.mission) && (
+              <div className="grid gap-6 sm:grid-cols-2">
+                {company.vision && (
+                  <div className="card p-6">
+                    <p className="text-xs font-semibold tracking-[0.15em] text-gold-400 uppercase">Visi</p>
+                    <p className="mt-3 text-ink-200 leading-relaxed">{company.vision}</p>
+                  </div>
+                )}
+                {company.mission && (
+                  <div className="card p-6">
+                    <p className="text-xs font-semibold tracking-[0.15em] text-gold-400 uppercase">Misi</p>
+                    <p className="mt-3 text-ink-200 leading-relaxed">{company.mission}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            {company.advantages && (company.advantages as any[]).length > 0 && (
+              <div>
+                <h3 className="text-center text-2xl font-semibold text-ink-50 mb-6">Keunggulan Produk</h3>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {(company.advantages as any[]).map((adv: any) => (
+                    <div key={adv.id} className="card p-6 text-center">
+                      <p className="text-4xl">{adv.icon}</p>
+                      <p className="mt-3 font-semibold text-ink-50">{adv.title}</p>
+                      <p className="mt-1 text-sm text-ink-400">{adv.desc}</p>
                     </div>
-                    <p className="mt-4 font-semibold text-ink-50">{member.name}</p>
-                    <p className="text-sm text-gold-300">{member.role}</p>
-                    {member.bio && <p className="mt-2 text-xs text-ink-400 leading-relaxed">{member.bio}</p>}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </section>
+            )}
+            {company.team && (company.team as any[]).length > 0 && (
+              <div>
+                <h3 className="text-center text-2xl font-semibold text-ink-50 mb-6">Tim Kami</h3>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {(company.team as any[]).map((member: any) => (
+                    <div key={member.id} className="card p-6 text-center">
+                      <div className="relative mx-auto h-24 w-24 overflow-hidden rounded-full border-2 border-gold-400/30 bg-ink-900">
+                        {member.photo
+                          ? <Image src={member.photo} alt={member.name} fill className="object-cover" />
+                          : <div className="flex h-full w-full items-center justify-center text-3xl">👤</div>
+                        }
+                      </div>
+                      <p className="mt-4 font-semibold text-ink-50">{member.name}</p>
+                      <p className="text-sm text-gold-300">{member.role}</p>
+                      {member.bio && <p className="mt-2 text-xs text-ink-400 leading-relaxed">{member.bio}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        </ScrollReveal>
       )}
 
-            <section className="mt-16 rounded-[28px] border border-gold-400/20 bg-gradient-to-br from-ink-950 via-ink-900 to-ink-950 p-10 sm:p-14 text-center relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full bg-gold-400/10 blur-3xl" />
-        </div>
-        <div className="relative">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-ink-50">Siap mulai berjualan?</h2>
-          <p className="mt-3 text-ink-400 text-lg">Daftar sekarang dan dapatkan akses ke harga reseller eksklusif.</p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/daftar" className="btn-primary px-10 py-3 text-base">
-              Daftar Reseller Sekarang
-            </Link>
-            <a href={"https://wa.me/6285190311230"} target="_blank" rel="noreferrer" className="btn-secondary px-10 py-3 text-base">📱 Hubungi via WhatsApp</a>
+      <ScrollReveal delay={100}>
+        <section className="mt-16 rounded-[28px] border border-gold-400/20 bg-gradient-to-br from-ink-950 via-ink-900 to-ink-950 p-10 sm:p-14 text-center relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-64 w-64 rounded-full bg-gold-400/10 blur-3xl" />
           </div>
-        </div>
-      </section>
+          <div className="relative">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-ink-50">Siap mulai berjualan?</h2>
+            <p className="mt-3 text-ink-400 text-lg">Daftar sekarang dan dapatkan akses ke harga reseller eksklusif.</p>
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/daftar" className="btn-primary px-10 py-3 text-base">Daftar Reseller Sekarang</Link>
+              <a href={"https://wa.me/6285190311230"} target="_blank" rel="noreferrer" className="btn-secondary px-10 py-3 text-base">Hubungi via WhatsApp</a>
+            </div>
+          </div>
+        </section>
+      </ScrollReveal>
 
     </div>
   );
