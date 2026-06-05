@@ -46,9 +46,9 @@ export default async function HomePage() {
               <Link href="/daftar" className="btn-secondary px-8 py-3 text-base">Daftar Gratis</Link>
             </div>
             <div className="mt-8 flex flex-wrap gap-4 text-sm text-ink-600">
-              <span>Harga grosir khusus reseller</span>
-              <span>Kirim ke seluruh Indonesia</span>
-              <span>QRIS dan Transfer Bank</span>
+              <span className="text-ink-200">✓ Harga grosir khusus reseller</span>
+              <span className="text-ink-200">✓ Kirim ke seluruh Indonesia</span>
+              <span className="text-ink-200">✓ QRIS dan Transfer Bank</span>
             </div>
           </div>
           {products.length > 0 && (
@@ -176,7 +176,7 @@ export default async function HomePage() {
             <div className="grid gap-6 sm:grid-cols-2">
               {company.vision && (
                 <ScrollReveal direction="left" delay={0}>
-                  <div className="card p-8 h-full border-l-2 border-l-gold-400/50">
+                  <div className="rounded-3xl border border-ink-700 bg-ink-900 p-8 h-full border-l-4 border-l-gold-400">
                     <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Visi</p>
                     <p className="mt-4 text-ink-800 leading-relaxed text-lg">{company.vision}</p>
                   </div>
@@ -184,7 +184,7 @@ export default async function HomePage() {
               )}
               {company.mission && (
                 <ScrollReveal direction="right" delay={100}>
-                  <div className="card p-8 h-full border-l-2 border-l-gold-400/50">
+                  <div className="rounded-3xl border border-ink-700 bg-ink-900 p-8 h-full border-l-4 border-l-gold-400">
                     <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Misi</p>
                     <p className="mt-4 text-ink-800 leading-relaxed">{company.mission}</p>
                   </div>
