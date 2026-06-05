@@ -64,6 +64,12 @@ export default async function Navbar() {
           ) : (
             <>
               <Link
+                href="/katalog-digital"
+                className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50"
+              >
+                Katalog
+              </Link>
+              <Link
                 href="/masuk"
                 className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50"
               >

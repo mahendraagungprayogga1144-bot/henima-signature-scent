@@ -114,6 +114,21 @@ export interface BankAccount {
   active: boolean;
 }
 
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  photo?: string;
+  bio?: string;
+}
+
+export interface Advantage {
+  id: string;
+  title: string;
+  desc: string;
+  icon?: string;
+}
+
 export interface CompanySettings {
   name: string;
   whatsappNumber?: string;
@@ -122,8 +137,17 @@ export interface CompanySettings {
   vision?: string;
   mission?: string;
   brandStory?: string;
+  foundingYear?: string;
   logo?: string;
   heroImage?: string;
+  team?: TeamMember[];
+  advantages?: Advantage[];
+}
+
+export interface CatalogSettings {
+  images: string[];
+  pdfUrl?: string;
+  title?: string;
 }
 
 export interface PaymentSettings {
@@ -134,6 +158,7 @@ export interface PaymentSettings {
 export interface Settings {
   company: CompanySettings;
   payment: PaymentSettings;
+  catalog?: CatalogSettings;
 }
 
 export interface Database {
