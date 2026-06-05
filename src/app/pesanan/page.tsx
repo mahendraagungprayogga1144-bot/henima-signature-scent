@@ -27,28 +27,32 @@ export default async function OrdersListPage() {
         <ul className="mt-6 space-y-4">
           {orders.map((order, idx) => {
             const productNames = order.items
-              .map((item) => `${item.productName} ${item.sizeMl}ml`)
+              .map((item) => `${item.productName} ${item.sizeMl}ml × ${item.quantity}`)
               .join(", ");
             const shippingCost = (order as any).shippingCost ?? 0;
             const grandTotal = order.total + shippingCost;
+            const shortId = order.id.slice(0, 10);
             return (
               <li key={order.id}>
                 <Link
                   href={`/pesanan/${order.id}`}
                   className="card block transition hover:border-gold-400/40 hover:shadow-md"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-semibold text-ink-50">
-                      Pesanan #{orders.length - idx}
-                    </span>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <p className="font-bold text-ink-50">Pesanan #{orders.length - idx}</p>
+                      <p className="text-sm font-medium text-gold-300">{order.resellerName} — {order.storeName}</p>
+                      <p className="mt-1 text-sm text-ink-300">{productNames}</p>
+                      <p className="mt-1 text-xs text-ink-400">
+                        📅 {formatDate(order.createdAt)} • <span className="font-mono">#{shortId}</span>
+                      </p>
+                    </div>
                     <span className="rounded-full border border-ink-800 bg-ink-950/40 px-3 py-1 text-xs font-semibold text-ink-100">
                       {ORDER_STATUS_LABELS[order.status]}
                     </span>
                   </div>
-                  <p className="mt-1 text-sm text-ink-300">{productNames}</p>
-                  <p className="mt-1 text-xs text-ink-400">{formatDate(order.createdAt)}</p>
-                  <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-semibold text-gold-200">{formatRupiah(grandTotal)}</p>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-ink-800 pt-3">
+                    <p className="font-bold text-gold-200">{formatRupiah(grandTotal)}</p>
                     {order.invoicePdf && (
                       <span className="text-xs font-semibold text-gold-300">Invoice ready</span>
                     )}
