@@ -77,7 +77,8 @@ export default async function ShopPage() {
                     )}
                   </div>
                   
-                    href={"https://wa.me/" + waNumber + "?text=" + waText}
+                  <a
+                  href={"https://wa.me/" + waNumber + "?text=" + waText}
                     target="_blank"
                     rel="noreferrer"
                     className="btn-primary !py-2 !px-4 text-sm"
