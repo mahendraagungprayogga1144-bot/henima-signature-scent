@@ -11,7 +11,7 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
-import Navbar from "@/components/Navbar";
+import NavbarWrapper from "@/components/NavbarWrapper";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import "./globals.css";
 
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className={`min-h-screen font-sans antialiased selection:bg-gold-400/30 selection:text-ink-50 ${inter.variable} ${playfair.variable}`}>
-        <Navbar />
+        <NavbarWrapper />
         <AnnouncementBar />
         <main className="container-page py-10">{children}</main>
         <footer className="border-t border-ink-200 mt-10 py-6 bg-white">
