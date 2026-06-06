@@ -35,7 +35,7 @@ export default async function HomePage() {
               <span className="h-1.5 w-1.5 rounded-full bg-gold-400 animate-pulse" />
               {company.name.toUpperCase()}
             </p>
-            <h1 className="mt-6 text-5xl sm:text-6xl font-semibold tracking-tight text-ink-50 leading-tight">
+            <h1 className="mt-6 text-5xl sm:text-6xl font-semibold tracking-tight text-ink-50 leading-tight font-display">
               {company.tagline || "Luxury scent, crafted for your signature."}
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-ink-100 max-w-lg">
@@ -75,7 +75,7 @@ export default async function HomePage() {
             <div className="flex items-end justify-between">
               <div>
                 <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Koleksi</p>
-                <h2 className="mt-1 text-3xl font-semibold tracking-tight text-ink-50">Produk Kami</h2>
+                <h2 className="mt-1 text-3xl font-semibold tracking-tight text-ink-50 font-display">Produk Kami</h2>
                 <p className="mt-1 text-ink-200">Parfum premium siap jual untuk reseller.</p>
               </div>
               <Link href="/daftar" className="text-sm font-semibold text-gold-300 hover:text-gold-200 hover:underline">Jadi reseller</Link>
@@ -126,7 +126,7 @@ export default async function HomePage() {
         <ScrollReveal direction="fade">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Bergabung</p>
-            <h2 className="mt-1 text-3xl font-semibold text-ink-50">Cara Jadi Reseller</h2>
+            <h2 className="mt-1 text-3xl font-semibold text-ink-50 font-display">Cara Jadi Reseller</h2>
             <p className="mt-2 text-ink-200">Mulai berjualan dalam 3 langkah mudah.</p>
           </div>
         </ScrollReveal>
@@ -157,7 +157,7 @@ export default async function HomePage() {
           <ScrollReveal direction="fade">
             <div className="text-center">
               <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Our Story</p>
-              <h2 className="mt-2 text-3xl font-semibold text-ink-50">
+              <h2 className="mt-2 text-3xl font-semibold text-ink-50 font-display">
                 {company.name}
                 {(company as any).foundingYear && <span className="ml-3 text-lg text-ink-300">est. {(company as any).foundingYear}</span>}
               </h2>
@@ -167,7 +167,7 @@ export default async function HomePage() {
           {company.brandStory && (
             <ScrollReveal direction="up" delay={100}>
               <div className="mx-auto max-w-3xl rounded-3xl border border-gold-400/20 bg-gradient-to-b from-ink-950/60 to-ink-900/30 p-10">
-                <p className="text-center text-xl leading-relaxed text-ink-50 italic font-light">"{company.brandStory}"</p>
+                <p className="text-center text-2xl leading-relaxed text-ink-50 italic font-light font-display">"{company.brandStory}"</p>
               </div>
             </ScrollReveal>
           )}
@@ -246,7 +246,7 @@ export default async function HomePage() {
           </div>
           <div className="relative">
             <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Bergabung Sekarang</p>
-            <h2 className="mt-3 text-3xl sm:text-5xl font-semibold text-ink-50">Siap mulai berjualan?</h2>
+            <h2 className="mt-3 text-3xl sm:text-5xl font-semibold text-ink-50 font-display">Siap mulai berjualan?</h2>
             <p className="mt-4 text-ink-200 text-lg max-w-xl mx-auto">Daftar sekarang dan dapatkan akses ke harga reseller eksklusif.</p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/daftar" className="btn-primary px-10 py-4 text-base">Daftar Reseller Sekarang</Link>
