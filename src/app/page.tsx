@@ -6,6 +6,8 @@ import { getCurrentUserSafe } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { getDatabase } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const user = await getCurrentUserSafe();
   if (user?.role === "admin") redirect("/admin");
