@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     "Luxury fragrance reseller portal — katalog, pesanan, pembayaran, dan pelacakan untuk Henima Signature Scent.",
   icons: {
     icon: "/favicon.png",
+    shortcut: "/favicon.png",
     apple: "/favicon.png",
   },
 };
