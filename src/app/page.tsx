@@ -141,9 +141,6 @@ export default async function HomePage() {
               <div className="relative card p-8 overflow-hidden hover:border-gold-400/30 transition-all duration-500">
                 <div className="absolute -right-4 -top-4 text-8xl font-black text-ink-800/60 select-none">{item.step}</div>
                 <div className="relative">
-                  <div className="h-10 w-10 rounded-full bg-gold-400/10 border border-gold-400/30 flex items-center justify-center mb-4">
-                    <span className="text-xs font-bold text-gold-300">{item.step}</span>
-                  </div>
                   <h3 className="text-lg font-semibold text-ink-50">{item.title}</h3>
                   <p className="mt-2 text-sm text-ink-200 leading-relaxed">{item.desc}</p>
                 </div>
