@@ -1,47 +1,128 @@
+"use client";
 import Link from "next/link";
-import { getCurrentUserSafe } from "@/lib/session";
+import { useState, useEffect } from "react";
 
-export default async function Navbar() {
-  const user = await getCurrentUserSafe();
+export default function Navbar({ user }: { user?: any }) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-ink-800 bg-ink-950/70 backdrop-blur">
       <div className="container-page flex items-center justify-between py-4">
         <Link href="/" className="text-base font-semibold tracking-wide text-ink-50 sm:text-lg">
           <span className="text-gold-400">Henima</span>{" "}
-          <span className="text-ink-100">Signature</span>{" "}
-          <span className="text-ink-200">Scent</span>
+          <span className="text-ink-100 hidden sm:inline">Signature</span>{" "}
+          <span className="text-ink-200 hidden sm:inline">Scent</span>
         </Link>
-        <nav className="flex items-center gap-3 text-sm font-medium">
-          {user ? (
-            <>
+
+        {user ? (
+          <>
+            {/* Logged in - desktop */}
+            <nav className="hidden md:flex items-center gap-2 text-sm font-medium">
               {user.role === "reseller" && (
                 <>
-                  <Link href="/katalog" className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Katalog</Link>
-                  <Link href="/pesanan" className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Pesanan Saya</Link>
-                  <Link href="/profil" className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Profil</Link>
-                  <Link href="/leaderboard" className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Leaderboard</Link>
+                  <Link href="/katalog" className="rounded-lg px-3 py-2 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Katalog</Link>
+                  <Link href="/pesanan" className="rounded-lg px-3 py-2 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Pesanan</Link>
+                  <Link href="/profil" className="rounded-lg px-3 py-2 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Profil</Link>
+                  <Link href="/leaderboard" className="rounded-lg px-3 py-2 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Leaderboard</Link>
                 </>
               )}
               {user.role === "admin" && (
-                <Link href="/admin" className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Dashboard Admin</Link>
+                <Link href="/admin" className="rounded-lg px-3 py-2 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Dashboard Admin</Link>
               )}
-              <span className="hidden text-ink-400 sm:inline">{user.name}</span>
+              <span className="px-2 text-ink-400 text-sm">{user.name}</span>
               <form action="/api/auth/logout" method="POST">
-                <button type="submit" className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-red-300">Keluar</button>
+                <button type="submit" className="rounded-lg px-3 py-2 text-ink-200 hover:bg-ink-900/60 hover:text-red-300">Keluar</button>
               </form>
-            </>
-          ) : (
-            <>
-              <Link href="/katalog-digital" className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Katalog</Link>
-              <Link href="/galeri" className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Galeri</Link>
-              <Link href="/blog" className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Blog</Link>
-              <Link href="/masuk" className="rounded-lg px-2 py-1 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Masuk</Link>
-              <Link href="/daftar" className="btn-primary !py-2 !px-3">Daftar</Link>
-            </>
-          )}
-        </nav>
+            </nav>
+            {/* Logged in - mobile hamburger */}
+            <button
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg border border-ink-800 bg-ink-900/60 text-ink-200"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </>
+        ) : (
+          <>
+            {/* Not logged in - hamburger for Katalog/Galeri/Blog + Masuk/Daftar always visible */}
+            <nav className="flex items-center gap-2 text-sm font-medium">
+              {/* Katalog Galeri Blog - hidden on mobile, show on desktop */}
+              <div className="hidden md:flex items-center gap-1">
+                <Link href="/katalog-digital" className="rounded-lg px-3 py-2 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Katalog</Link>
+                <Link href="/galeri" className="rounded-lg px-3 py-2 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Galeri</Link>
+                <Link href="/blog" className="rounded-lg px-3 py-2 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Blog</Link>
+              </div>
+              {/* Hamburger for mobile - only Katalog/Galeri/Blog */}
+              <button
+                className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg border border-ink-800 bg-ink-900/60 text-ink-200"
+                onClick={() => setOpen(!open)}
+              >
+                {open ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
+              {/* Masuk & Daftar - always visible */}
+              <Link href="/masuk" className="rounded-lg px-3 py-2 text-ink-200 hover:bg-ink-900/60 hover:text-ink-50">Masuk</Link>
+              <Link href="/daftar" className="btn-primary !py-2 !px-3 text-xs sm:text-sm">Daftar</Link>
+            </nav>
+          </>
+        )}
       </div>
+
+      {/* Mobile dropdown menu */}
+      {open && (
+        <div className="md:hidden border-t border-ink-800 bg-ink-950 px-4 py-3">
+          <nav className="flex flex-col gap-1 text-sm font-medium">
+            {user ? (
+              <>
+                {user.role === "reseller" && (
+                  <>
+                    <Link href="/katalog" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-ink-200 hover:bg-ink-900/60">Katalog</Link>
+                    <Link href="/pesanan" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-ink-200 hover:bg-ink-900/60">Pesanan</Link>
+                    <Link href="/profil" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-ink-200 hover:bg-ink-900/60">Profil</Link>
+                    <Link href="/leaderboard" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-ink-200 hover:bg-ink-900/60">Leaderboard</Link>
+                  </>
+                )}
+                {user.role === "admin" && (
+                  <Link href="/admin" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-ink-200 hover:bg-ink-900/60">Dashboard Admin</Link>
+                )}
+                <div className="border-t border-ink-800 mt-2 pt-2">
+                  <span className="px-3 py-2 text-ink-400 text-xs block">{user.name}</span>
+                  <form action="/api/auth/logout" method="POST">
+                    <button type="submit" className="w-full text-left rounded-lg px-3 py-2.5 text-red-300 hover:bg-ink-900/60">Keluar</button>
+                  </form>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link href="/katalog-digital" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-ink-200 hover:bg-ink-900/60">Katalog</Link>
+                <Link href="/galeri" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-ink-200 hover:bg-ink-900/60">Galeri</Link>
+                <Link href="/blog" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2.5 text-ink-200 hover:bg-ink-900/60">Blog</Link>
+              </>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
