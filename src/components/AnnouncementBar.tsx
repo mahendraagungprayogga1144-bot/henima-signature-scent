@@ -1,14 +1,24 @@
 export default function AnnouncementBar() {
-  const text = "✦ HENIMA SIGNATURE SCENT ✦ Luxury Scent, Crafted For Your Signature ✦ FREE ONGKIR untuk reseller baru ✦ HENIMA SIGNATURE SCENT ✦ Luxury Scent, Crafted For Your Signature ✦ FREE ONGKIR untuk reseller baru ✦";
+  const items = ["Henima", "Signature of Your Story", "Afternoon", "The Distance", "Luxury Scent", "Crafted For You"];
 
   return (
-    <div className="bg-ink-950 border-b border-ink-800 overflow-hidden py-2">
+    <div className="overflow-hidden bg-ink-900 border-b border-ink-800 py-2.5">
       <div className="flex whitespace-nowrap">
-        <div className="animate-marquee flex gap-8 text-xs font-semibold tracking-[0.15em] text-gold-300">
-          {text}
+        <div className="animate-marquee flex items-center shrink-0">
+          {items.map((text, i) => (
+            <span key={i} className="mx-8 text-xs font-medium tracking-[0.25em] uppercase text-ink-300">
+              {text}
+              {i < items.length - 1 && <span className="ml-8 text-gold-500">·</span>}
+            </span>
+          ))}
         </div>
-        <div className="animate-marquee flex gap-8 text-xs font-semibold tracking-[0.15em] text-gold-300 ml-8" aria-hidden>
-          {text}
+        <div className="animate-marquee flex items-center shrink-0" aria-hidden>
+          {items.map((text, i) => (
+            <span key={i} className="mx-8 text-xs font-medium tracking-[0.25em] uppercase text-ink-300">
+              {text}
+              {i < items.length - 1 && <span className="ml-8 text-gold-500">·</span>}
+            </span>
+          ))}
         </div>
       </div>
     </div>
