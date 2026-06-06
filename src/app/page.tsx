@@ -29,26 +29,6 @@ export default async function HomePage() {
             <div className="absolute inset-0 bg-ink-950/70" />
           </div>
         )}
-        <div className="relative w-full overflow-hidden py-8 border-b border-white/10">
-          <div className="flex whitespace-nowrap">
-            <div className="animate-marquee-hero flex items-center gap-12 text-5xl sm:text-7xl font-bold tracking-widest text-white/20 uppercase select-none">
-              <span>Henima Signature Scent</span>
-              <span className="text-gold-400/40">✦</span>
-              <span>Luxury Scent</span>
-              <span className="text-gold-400/40">✦</span>
-              <span>Crafted For Your Signature</span>
-              <span className="text-gold-400/40">✦</span>
-            </div>
-            <div className="animate-marquee-hero flex items-center gap-12 text-5xl sm:text-7xl font-bold tracking-widest text-white/20 uppercase select-none ml-12" aria-hidden>
-              <span>Henima Signature Scent</span>
-              <span className="text-gold-400/40">✦</span>
-              <span>Luxury Scent</span>
-              <span className="text-gold-400/40">✦</span>
-              <span>Crafted For Your Signature</span>
-              <span className="text-gold-400/40">✦</span>
-            </div>
-          </div>
-        </div>
         <div className="relative w-full grid lg:grid-cols-2 gap-12 items-center px-8 sm:px-12 py-16">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-gold-400/30 bg-gold-400/10 px-4 py-2 text-xs font-semibold tracking-[0.2em] text-gold-300">
@@ -71,7 +51,23 @@ export default async function HomePage() {
               <span className="text-ink-200">✓ QRIS dan Transfer Bank</span>
             </div>
           </div>
-          {products.length > 0 && (
+          {/* MARQUEE BAND */}
+      <div className="overflow-hidden bg-ink-950 border-y border-ink-800 py-5 -mx-4 sm:-mx-6 lg:-mx-8">
+        <div className="flex whitespace-nowrap">
+          <div className="animate-marquee-hero flex items-center shrink-0">
+            {["HENIMA SIGNATURE SCENT", "✦", "LUXURY SCENT", "✦", "CRAFTED FOR YOUR SIGNATURE", "✦", "AFTERNOON", "✦", "THE DISTANCE", "✦"].map((text, i) => (
+              <span key={i} className={`mx-6 text-3xl sm:text-4xl font-bold tracking-[0.2em] uppercase ${text === "✦" ? "text-gold-400" : "text-ink-50"} font-display`}>{text}</span>
+            ))}
+          </div>
+          <div className="animate-marquee-hero flex items-center shrink-0" aria-hidden>
+            {["HENIMA SIGNATURE SCENT", "✦", "LUXURY SCENT", "✦", "CRAFTED FOR YOUR SIGNATURE", "✦", "AFTERNOON", "✦", "THE DISTANCE", "✦"].map((text, i) => (
+              <span key={i} className={`mx-6 text-3xl sm:text-4xl font-bold tracking-[0.2em] uppercase ${text === "✦" ? "text-gold-400" : "text-ink-50"} font-display`}>{text}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {products.length > 0 && (
             <div className="hidden lg:grid grid-cols-2 gap-4">
               {products.slice(0, 2).map((product, i) => (
                 <div key={product.id} className={"relative overflow-hidden rounded-3xl border border-ink-700 bg-ink-900 aspect-[3/4] " + (i === 1 ? "mt-8" : "")}>
@@ -88,6 +84,22 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      {/* MARQUEE BAND */}
+      <div className="overflow-hidden bg-ink-950 border-y border-ink-800 py-5 -mx-4 sm:-mx-6 lg:-mx-8">
+        <div className="flex whitespace-nowrap">
+          <div className="animate-marquee-hero flex items-center shrink-0">
+            {["HENIMA SIGNATURE SCENT", "✦", "LUXURY SCENT", "✦", "CRAFTED FOR YOUR SIGNATURE", "✦", "AFTERNOON", "✦", "THE DISTANCE", "✦"].map((text, i) => (
+              <span key={i} className={`mx-6 text-3xl sm:text-4xl font-bold tracking-[0.2em] uppercase ${text === "✦" ? "text-gold-400" : "text-ink-50"} font-display`}>{text}</span>
+            ))}
+          </div>
+          <div className="animate-marquee-hero flex items-center shrink-0" aria-hidden>
+            {["HENIMA SIGNATURE SCENT", "✦", "LUXURY SCENT", "✦", "CRAFTED FOR YOUR SIGNATURE", "✦", "AFTERNOON", "✦", "THE DISTANCE", "✦"].map((text, i) => (
+              <span key={i} className={`mx-6 text-3xl sm:text-4xl font-bold tracking-[0.2em] uppercase ${text === "✦" ? "text-gold-400" : "text-ink-50"} font-display`}>{text}</span>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {products.length > 0 && (
         <section className="mt-20 space-y-8">
