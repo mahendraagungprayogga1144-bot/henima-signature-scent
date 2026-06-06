@@ -29,6 +29,26 @@ export default async function HomePage() {
             <div className="absolute inset-0 bg-ink-950/70" />
           </div>
         )}
+        <div className="relative w-full overflow-hidden py-8 border-b border-white/10">
+          <div className="flex whitespace-nowrap">
+            <div className="animate-marquee-hero flex items-center gap-12 text-5xl sm:text-7xl font-bold tracking-widest text-white/20 uppercase select-none">
+              <span>Henima Signature Scent</span>
+              <span className="text-gold-400/40">✦</span>
+              <span>Luxury Scent</span>
+              <span className="text-gold-400/40">✦</span>
+              <span>Crafted For Your Signature</span>
+              <span className="text-gold-400/40">✦</span>
+            </div>
+            <div className="animate-marquee-hero flex items-center gap-12 text-5xl sm:text-7xl font-bold tracking-widest text-white/20 uppercase select-none ml-12" aria-hidden>
+              <span>Henima Signature Scent</span>
+              <span className="text-gold-400/40">✦</span>
+              <span>Luxury Scent</span>
+              <span className="text-gold-400/40">✦</span>
+              <span>Crafted For Your Signature</span>
+              <span className="text-gold-400/40">✦</span>
+            </div>
+          </div>
+        </div>
         <div className="relative w-full grid lg:grid-cols-2 gap-12 items-center px-8 sm:px-12 py-16">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-gold-400/30 bg-gold-400/10 px-4 py-2 text-xs font-semibold tracking-[0.2em] text-gold-300">
