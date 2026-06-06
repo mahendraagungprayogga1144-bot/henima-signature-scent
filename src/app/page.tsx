@@ -46,6 +46,7 @@ export default async function HomePage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/masuk" className="btn-primary px-8 py-3 text-base">Masuk Reseller</Link>
               <Link href="/daftar" className="btn-secondary px-8 py-3 text-base">Daftar Gratis</Link>
+              <Link href="/shop" className="btn-secondary px-8 py-3 text-base">🛍️ Beli Satuan</Link>
             </div>
             <div className="mt-8 flex flex-wrap gap-4 text-sm text-ink-200">
               <span className="text-ink-200">✓ Harga grosir khusus reseller</span>
