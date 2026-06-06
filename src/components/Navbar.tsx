@@ -16,8 +16,8 @@ export default function Navbar({ user }: { user?: any }) {
       <div className="container-page flex items-center justify-between py-4">
         <Link href="/" className="text-base font-semibold tracking-wide text-ink-50 sm:text-lg">
           <span className="text-gold-400">Henima</span>{" "}
-          <span className="text-ink-100 hidden sm:inline">Signature</span>{" "}
-          <span className="text-ink-200 hidden sm:inline">Scent</span>
+          <span className="text-ink-100">Signature</span>{" "}
+          <span className="text-ink-200">Scent</span>
         </Link>
 
         {user ? (
