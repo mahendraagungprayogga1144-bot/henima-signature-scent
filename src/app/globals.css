@@ -4,13 +4,13 @@
 
 @layer base {
   body {
-    @apply bg-ink-950 text-ink-100 antialiased;
+    @apply bg-[#FAF8F4] text-[#1C1917] antialiased;
   }
 }
 
 @layer components {
   .container-page {
-    @apply mx-auto max-w-6xl px-4;
+    @apply mx-auto max-w-none px-0;
   }
 
   .btn-primary {
