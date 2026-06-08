@@ -47,7 +47,7 @@ export default async function HomePage() {
               <div style={{position:'absolute', inset:0, background:'linear-gradient(to top, rgba(28,25,23,0.7) 0%, transparent 60%)'}} />
               <div style={{position:'absolute', bottom:'40px', right:'40px', textAlign:'right'}}>
                 <span style={{display:'block', fontFamily:'var(--font-cormorant)', fontSize:'13px', fontStyle:'italic', color:'rgba(245,240,232,0.7)', letterSpacing:'1px'}}>{products[0].name}</span>
-                <span style={{display:'block', fontSize:'11px', letterSpacing:'2px', textTransform:'uppercase', color:'rgba(200,184,154,0.5)', marginTop:'4px'}}>Eau de Parfum</span>
+                <span style={{display:'block', fontSize:'11px', letterSpacing:'2px', textTransform:'uppercase', color:'rgba(200,184,154,0.5)', marginTop:'4px'}}>Extrait de Parfum</span>
               </div>
             </>
           ) : (
@@ -61,7 +61,7 @@ export default async function HomePage() {
       {/* MARQUEE */}
       <div style={{background:'#1C1917', padding:'18px 0', overflow:'hidden', whiteSpace:'nowrap'}}>
         <div style={{display:'inline-flex', animation:'marquee 22s linear infinite'}}>
-          {['Afternoon','Distance','Eau de Parfum','Made in Indonesia','Crafted to be Remembered','Afternoon','Distance','Eau de Parfum','Made in Indonesia','Crafted to be Remembered'].map((item, i) => (
+          {['Afternoon','Distance','Extrait de Parfum','Made in Indonesia','Crafted to be Remembered','Afternoon','Distance','Extrait de Parfum','Made in Indonesia','Crafted to be Remembered'].map((item, i) => (
             <span key={i} style={{fontFamily:'var(--font-cormorant)', fontSize:'14px', fontStyle:'italic', color:'rgba(200,184,154,0.6)', letterSpacing:'2px', padding:'0 36px'}}>{item}</span>
           ))}
         </div>
@@ -124,7 +124,7 @@ export default async function HomePage() {
                         )}
                       </div>
                       <div style={{padding:'20px 24px 28px'}}>
-                        <p style={{fontSize:'9px', letterSpacing:'2.5px', textTransform:'uppercase', color:'#C8B89A', marginBottom:'6px'}}>Eau de Parfum</p>
+                        <p style={{fontSize:'9px', letterSpacing:'2.5px', textTransform:'uppercase', color:'#C8B89A', marginBottom:'6px'}}>Extrait de Parfum</p>
                         <h3 style={{fontFamily:'var(--font-cormorant)', fontSize:'24px', fontWeight:400, color:'#1C1917', marginBottom:'4px'}}>{product.name}</h3>
                         <p style={{fontSize:'12px', color:'#8A7F72', lineHeight:1.7, marginBottom:'16px', fontWeight:300}}>{product.description}</p>
                         <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
