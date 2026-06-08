@@ -11,77 +11,96 @@ export default async function ShopPage() {
   const waNumber = company.whatsappNumber || "6285190311230";
 
   return (
-    <div className="space-y-10">
-      <div className="text-center">
-        <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Henima Shop</p>
-        <h1 className="mt-2 text-4xl font-semibold text-ink-50 font-display">Koleksi Parfum</h1>
-        <p className="mt-3 text-ink-300 max-w-xl mx-auto">
-          Temukan parfum signature pilihan kamu. Pembelian satuan tersedia untuk semua varian.
+    <div style={{background:'#FAF8F4', minHeight:'100vh', color:'#1C1917', margin:'-40px', padding:'0'}}>
+
+      {/* HEADER */}
+      <div style={{textAlign:'center', padding:'80px 40px 60px', borderBottom:'1px solid rgba(200,184,154,0.2)'}}>
+        <p style={{fontSize:'10px', letterSpacing:'3px', textTransform:'uppercase', color:'#8A7F72', marginBottom:'16px', fontWeight:400}}>Collection</p>
+        <h1 style={{fontFamily:'var(--font-cormorant)', fontSize:'clamp(40px,6vw,72px)', fontWeight:300, color:'#1C1917', lineHeight:1, fontStyle:'italic', marginBottom:'20px'}}>
+          Our Scents
+        </h1>
+        <p style={{fontSize:'14px', color:'#8A7F72', maxWidth:'480px', margin:'0 auto', lineHeight:1.9, fontWeight:300}}>
+          Temukan parfum signature pilihan kamu. Setiap botol dirancang untuk meninggalkan kesan.
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* PRODUCT GRID */}
+      <div style={{padding:'64px 80px', display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:'2px'}}>
         {products.map((product) => {
           const variants = product.variants.filter((v) => v.active);
           const minPrice = variants.length > 0
             ? Math.min(...variants.map((v) => v.originalPrice))
             : product.originalPrice;
           const waText = encodeURIComponent(
-            "Halo Henima, saya ingin membeli " + product.name + " satuan. Boleh info ketersediaan dan cara ordernya?"
+            "Halo Henima, saya ingin membeli " + product.name + ". Boleh info ketersediaan dan cara ordernya?"
           );
           return (
-            <div key={product.id} className="group overflow-hidden rounded-3xl border border-ink-800 bg-ink-950/50 hover:border-gold-400/40 transition-all duration-300">
-              <div className="relative h-72 bg-ink-900 overflow-hidden cursor-pointer">
-                <Image
-                  src={product.photo}
-                  alt={product.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 to-transparent" />
+            <div key={product.id} style={{background:'#F5F0E8', overflow:'hidden', cursor:'pointer'}}>
+              {/* Image */}
+              <div style={{position:'relative', aspectRatio:'3/4', background:'linear-gradient(160deg,#E8E0D4,#D0C4B4)', overflow:'hidden'}}>
+                {product.photo ? (
+                  <Image
+                    src={product.photo}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    style={{transition:'transform 0.6s ease'}}
+                  />
+                ) : (
+                  <div style={{position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center'}}>
+                    <span style={{fontFamily:'var(--font-cormorant)', fontSize:'32px', fontWeight:300, fontStyle:'italic', color:'rgba(107,90,74,0.4)'}}>{product.name}</span>
+                  </div>
+                )}
+                <div style={{position:'absolute', inset:0, background:'linear-gradient(to top, rgba(28,25,23,0.4) 0%, transparent 50%)', pointerEvents:'none'}} />
               </div>
-              <div className="p-6 space-y-4">
-                <div>
-                  <h2 className="text-xl font-semibold text-ink-50 font-display">{product.name}</h2>
-                  {product.description && (
-                    <p className="mt-1 text-sm text-ink-300 line-clamp-2">{product.description}</p>
-                  )}
-                </div>
+
+              {/* Info */}
+              <div style={{padding:'24px 28px 32px', background:'#F5F0E8'}}>
+                <p style={{fontSize:'9px', letterSpacing:'2.5px', textTransform:'uppercase', color:'#C8B89A', marginBottom:'8px'}}>Extrait de Parfum</p>
+                <h2 style={{fontFamily:'var(--font-cormorant)', fontSize:'28px', fontWeight:400, color:'#1C1917', marginBottom:'8px'}}>{product.name}</h2>
+                {product.description && (
+                  <p style={{fontSize:'13px', color:'#8A7F72', lineHeight:1.8, marginBottom:'16px', fontWeight:300}}>{product.description}</p>
+                )}
+
+                {/* Notes */}
                 {((product as any).topNotes || (product as any).middleNotes || (product as any).baseNotes) && (
-                  <div className="space-y-1 border-t border-ink-800 pt-3">
+                  <div style={{borderTop:'1px solid rgba(200,184,154,0.3)', paddingTop:'16px', marginBottom:'16px', display:'flex', flexDirection:'column', gap:'4px'}}>
                     {(product as any).topNotes && (
-                      <p className="text-xs text-ink-400"><span className="text-ink-200 font-medium">Top:</span> {(product as any).topNotes}</p>
+                      <p style={{fontSize:'11px', color:'#8A7F72'}}><span style={{color:'#1C1917', fontWeight:400}}>Top</span> · {(product as any).topNotes}</p>
                     )}
                     {(product as any).middleNotes && (
-                      <p className="text-xs text-ink-400"><span className="text-ink-200 font-medium">Middle:</span> {(product as any).middleNotes}</p>
+                      <p style={{fontSize:'11px', color:'#8A7F72'}}><span style={{color:'#1C1917', fontWeight:400}}>Heart</span> · {(product as any).middleNotes}</p>
                     )}
                     {(product as any).baseNotes && (
-                      <p className="text-xs text-ink-400"><span className="text-ink-200 font-medium">Base:</span> {(product as any).baseNotes}</p>
+                      <p style={{fontSize:'11px', color:'#8A7F72'}}><span style={{color:'#1C1917', fontWeight:400}}>Base</span> · {(product as any).baseNotes}</p>
                     )}
                   </div>
                 )}
-                <div className="flex flex-wrap gap-2">
+
+                {/* Variants */}
+                <div style={{display:'flex', flexWrap:'wrap', gap:'6px', marginBottom:'24px'}}>
                   {variants.map((v) => (
-                    <span key={v.id} className="rounded-full border border-ink-700 bg-ink-900 px-3 py-1 text-xs text-ink-200">
+                    <span key={v.id} style={{border:'1px solid rgba(138,127,114,0.35)', padding:'4px 12px', fontSize:'11px', color:'#8A7F72', letterSpacing:'0.5px'}}>
                       {v.sizeMl}ml
                     </span>
                   ))}
                 </div>
-                <div className="flex items-center justify-between pt-2 border-t border-ink-800">
+
+                {/* Price + CTA */}
+                <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', borderTop:'1px solid rgba(200,184,154,0.3)', paddingTop:'20px'}}>
                   <div>
-                    <p className="text-xs text-ink-500">Mulai dari</p>
+                    <p style={{fontSize:'10px', letterSpacing:'1.5px', textTransform:'uppercase', color:'#C8B89A', marginBottom:'4px'}}>Mulai dari</p>
                     {(product as any).comingSoon ? (
-                      <span className="inline-block rounded-full bg-gold-400/10 border border-gold-400/30 px-3 py-1 text-xs font-semibold text-gold-300">Coming Soon</span>
+                      <span style={{fontSize:'12px', letterSpacing:'2px', textTransform:'uppercase', color:'#8A7F72', border:'1px solid rgba(138,127,114,0.3)', padding:'4px 12px'}}>Coming Soon</span>
                     ) : (
-                      <p className="text-xl font-bold text-gold-300">Rp {minPrice.toLocaleString("id-ID")}</p>
+                      <p style={{fontFamily:'var(--font-cormorant)', fontSize:'22px', fontWeight:400, color:'#1C1917'}}>Rp {minPrice.toLocaleString("id-ID")}</p>
                     )}
                   </div>
                   
-                  <a
-                  href={"https://wa.me/" + waNumber + "?text=" + waText}
+                    href={"https://wa.me/" + waNumber + "?text=" + waText}
                     target="_blank"
                     rel="noreferrer"
-                    className="btn-primary !py-2 !px-4 text-sm"
+                    style={{display:'inline-block', background:'#1C1917', color:'#F5F0E8', padding:'12px 24px', fontSize:'10px', letterSpacing:'2px', textTransform:'uppercase', textDecoration:'none', fontFamily:'var(--font-jost)', border:'1px solid #1C1917', transition:'all 0.3s'}}
                   >
                     Beli Sekarang
                   </a>
@@ -92,12 +111,17 @@ export default async function ShopPage() {
         })}
       </div>
 
-      <div className="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-ink-950 via-ink-900 to-ink-950 p-10 text-center">
-        <p className="text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase">Mau jual juga?</p>
-        <h2 className="mt-2 text-2xl font-semibold text-ink-50 font-display">Bergabung sebagai Reseller</h2>
-        <p className="mt-2 text-ink-300">Dapatkan harga khusus grosir dan mulai bisnis parfummu.</p>
-        <Link href="/daftar" className="btn-primary mt-6 inline-block px-8 py-3">Daftar Reseller</Link>
+      {/* RESELLER BAND — subtle */}
+      <div style={{margin:'0 80px 80px', borderTop:'1px solid rgba(200,184,154,0.3)', padding:'48px 0', display:'flex', justifyContent:'space-between', alignItems:'center', gap:'40px', flexWrap:'wrap'}}>
+        <div>
+          <h3 style={{fontFamily:'var(--font-cormorant)', fontSize:'26px', fontWeight:400, color:'#1C1917', marginBottom:'6px'}}>Become a Henima Partner</h3>
+          <p style={{fontSize:'13px', color:'#8A7F72', fontWeight:300}}>Bergabung sebagai mitra reseller eksklusif. Margin terbaik, support penuh.</p>
+        </div>
+        <Link href="/daftar" style={{display:'inline-block', background:'transparent', color:'#1C1917', padding:'13px 36px', fontSize:'10px', letterSpacing:'3px', textTransform:'uppercase', textDecoration:'none', border:'1px solid #1C1917', fontFamily:'var(--font-jost)', whiteSpace:'nowrap'}}>
+          Apply as Reseller
+        </Link>
       </div>
+
     </div>
   );
 }
