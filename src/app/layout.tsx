@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Cormorant_Garamond, Jost } from "next/font/google";
 
-const playfair = Playfair_Display({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-playfair",
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-cormorant",
 });
 
-const inter = Inter({
+const jost = Jost({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-jost",
 });
 import NavbarWrapper from "@/components/NavbarWrapper";
 import AnnouncementBar from "@/components/AnnouncementBar";
@@ -33,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`min-h-screen font-sans antialiased selection:bg-gold-400/30 selection:text-ink-50 ${inter.variable} ${playfair.variable}`}>
+      <body className={`min-h-screen font-sans antialiased selection:bg-gold-400/30 selection:text-ink-50 ${jost.variable} ${cormorant.variable}`}>
         <NavbarWrapper />
         <AnnouncementBar />
         <main className="container-page py-10">{children}</main>

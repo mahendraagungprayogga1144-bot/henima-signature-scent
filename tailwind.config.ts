@@ -9,8 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-        display: ["var(--font-playfair)", "Georgia", "serif"],
+        sans: ["var(--font-jost)", "system-ui", "sans-serif"],
+        display: ["var(--font-cormorant)", "Georgia", "serif"],
       },
       colors: {
         brand: {
@@ -26,17 +26,17 @@ const config: Config = {
           900: "#3b2716",
         },
         ink: {
-          50: "#f7f7f8",
-          100: "#eeeef0",
-          200: "#d7d8dc",
-          300: "#b6b8bf",
-          400: "#8b8f9a",
-          500: "#6b707e",
-          600: "#545866",
-          700: "#424654",
-          800: "#2b2d37",
-          900: "#13141a",
-          950: "#0a0a0d",
+          50: "#faf8f5",
+          100: "#f2ede6",
+          200: "#e0d5c8",
+          300: "#c4b49f",
+          400: "#a08c72",
+          500: "#7d6a52",
+          600: "#5e4f3d",
+          700: "#42382c",
+          800: "#2a231b",
+          900: "#1a1510",
+          950: "#0e0b08",
         },
         gold: {
           50: "#fff9ea",
