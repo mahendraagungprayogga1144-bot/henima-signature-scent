@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import ProductImageZoom from "@/components/ProductImageZoom";
 import ScrollReveal from "@/components/ScrollReveal";
 import { getCurrentUserSafe } from "@/lib/session";
 import { redirect } from "next/navigation";
@@ -18,101 +17,123 @@ export default async function HomePage() {
   const products = db.products.filter((p) => p.active);
 
   return (
-    <div className="min-h-screen space-y-0">
+    <div className="min-h-screen" style={{background: '#FAF8F4', color: '#1C1917'}}>
 
-      {/* HERO EDITORIAL SPLIT SCREEN */}
-      <section className="relative min-h-[90vh] grid lg:grid-cols-2 overflow-hidden rounded-[28px] border border-ink-800">
-        <div className="relative flex flex-col justify-between bg-ink-950 px-8 sm:px-14 py-14">
-          <div>
-            <p className="text-xs font-medium tracking-[0.3em] text-ink-400 uppercase">{company.name}</p>
-          </div>
-          <div className="space-y-8">
-            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-light italic text-ink-50 leading-none font-display">
-              Worn.<br />Not<br />Forgotten.
-            </h1>
-            <p className="text-base text-ink-300 max-w-sm leading-relaxed">
-              {company.tagline || "Setiap tetes adalah cerita. Setiap aroma adalah kenangan yang tidak terlupakan."}
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/shop" className="btn-primary px-8 py-3">Explore Koleksi</Link>
-              <Link href="/daftar" className="btn-secondary px-6 py-3 text-sm">Jadi Reseller</Link>
-            </div>
-          </div>
-          <div className="flex gap-8 text-xs text-ink-500 tracking-widest uppercase mt-8">
+      {/* HERO */}
+      <section style={{display:'grid', gridTemplateColumns:'1fr 1fr', minHeight:'90vh', overflow:'hidden', margin:'-40px -40px 0'}}>
+        <div style={{background:'#F5F0E8', display:'flex', flexDirection:'column', justifyContent:'center', padding:'80px 64px 80px 80px', position:'relative'}}>
+          <p style={{fontSize:'10px', letterSpacing:'3px', textTransform:'uppercase', color:'#8A7F72', marginBottom:'24px', fontWeight:400}}>
+            {company.name}
+          </p>
+          <h1 style={{fontFamily:'var(--font-cormorant)', fontSize:'clamp(56px,7vw,96px)', fontWeight:300, lineHeight:0.92, color:'#1C1917', marginBottom:'28px', letterSpacing:'-1px', fontStyle:'italic'}}>
+            Worn.<br />Not<br /><span style={{color:'#6B5A4A'}}>Forgotten.</span>
+          </h1>
+          <p style={{fontSize:'14px', color:'#8A7F72', lineHeight:1.9, maxWidth:'320px', marginBottom:'48px', fontWeight:300}}>
+            {company.tagline || "Setiap tetes adalah cerita. Setiap aroma adalah kenangan yang tidak terlupakan."}
+          </p>
+          <Link href="/shop" style={{display:'inline-block', background:'#1C1917', color:'#F5F0E8', padding:'14px 40px', fontSize:'10px', letterSpacing:'3px', textTransform:'uppercase', textDecoration:'none', fontFamily:'var(--font-jost)', fontWeight:400, width:'fit-content', border:'1px solid #1C1917', transition:'all 0.3s'}}>
+            Explore Koleksi
+          </Link>
+          <div style={{display:'flex', gap:'32px', marginTop:'64px', fontSize:'10px', color:'#C8B89A', letterSpacing:'3px', textTransform:'uppercase'}}>
             <span>Est. {(company as any).foundingYear || "2024"}</span>
             <span>Indonesia</span>
             <span>Signature Scent</span>
           </div>
         </div>
-        <div className="relative min-h-[50vh] lg:min-h-full bg-ink-900 overflow-hidden">
+        <div style={{position:'relative', background:'#2C2825', overflow:'hidden', minHeight:'500px'}}>
           {products.length > 0 && products[0].photo ? (
             <>
-              <Image src={products[0].photo} alt={products[0].name} fill className="object-cover object-center" priority />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-transparent" />
-              <div className="absolute bottom-8 left-8 right-8">
-                <p className="text-xs tracking-[0.3em] text-ink-300 uppercase">{products[0].name}</p>
-                {(products[0] as any).comingSoon ? (
-                  <p className="mt-1 text-sm text-gold-300 tracking-widest uppercase">Coming Soon</p>
-                ) : (
-                  <p className="mt-1 text-2xl font-light text-ink-50 font-display">Rp {products[0].discountPrice.toLocaleString("id-ID")}</p>
-                )}
+              <Image src={products[0].photo} alt={products[0].name} fill className="object-cover object-center" priority style={{opacity:0.85}} />
+              <div style={{position:'absolute', inset:0, background:'linear-gradient(to top, rgba(28,25,23,0.7) 0%, transparent 60%)'}} />
+              <div style={{position:'absolute', bottom:'40px', right:'40px', textAlign:'right'}}>
+                <span style={{display:'block', fontFamily:'var(--font-cormorant)', fontSize:'13px', fontStyle:'italic', color:'rgba(245,240,232,0.7)', letterSpacing:'1px'}}>{products[0].name}</span>
+                <span style={{display:'block', fontSize:'11px', letterSpacing:'2px', textTransform:'uppercase', color:'rgba(200,184,154,0.5)', marginTop:'4px'}}>Eau de Parfum</span>
               </div>
             </>
-          ) : company.heroImage ? (
-            <>
-              <Image src={company.heroImage} alt="Hero" fill className="object-cover" priority />
-              <div className="absolute inset-0 bg-ink-950/40" />
-            </>
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-ink-900 to-ink-950 flex items-center justify-center">
-              <p className="text-9xl font-display font-light italic text-ink-800">H</p>
+            <div style={{position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center'}}>
+              <span style={{fontFamily:'var(--font-cormorant)', fontSize:'120px', fontWeight:300, fontStyle:'italic', color:'rgba(200,184,154,0.08)'}}>H</span>
             </div>
           )}
         </div>
       </section>
 
-      {/* PRODUK */}
+      {/* MARQUEE */}
+      <div style={{background:'#1C1917', padding:'18px 0', overflow:'hidden', whiteSpace:'nowrap'}}>
+        <div style={{display:'inline-flex', animation:'marquee 22s linear infinite'}}>
+          {['Afternoon','Distance','Eau de Parfum','Made in Indonesia','Crafted to be Remembered','Afternoon','Distance','Eau de Parfum','Made in Indonesia','Crafted to be Remembered'].map((item, i) => (
+            <span key={i} style={{fontFamily:'var(--font-cormorant)', fontSize:'14px', fontStyle:'italic', color:'rgba(200,184,154,0.6)', letterSpacing:'2px', padding:'0 36px'}}>{item}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* STORY */}
+      <ScrollReveal>
+        <section style={{display:'grid', gridTemplateColumns:'1fr 1fr', minHeight:'500px', margin:'0 -40px'}}>
+          <div style={{background:'linear-gradient(135deg,#D4C9B8,#BFB0A0)', minHeight:'500px', display:'flex', alignItems:'center', justifyContent:'center'}}>
+            {company.heroImage ? (
+              <div style={{position:'relative', width:'100%', height:'100%', minHeight:'500px'}}>
+                <Image src={company.heroImage} alt="Henima" fill className="object-cover" />
+              </div>
+            ) : (
+              <span style={{fontFamily:'var(--font-cormorant)', fontSize:'64px', fontWeight:300, fontStyle:'italic', color:'rgba(255,255,255,0.3)', letterSpacing:'4px'}}>Henima</span>
+            )}
+          </div>
+          <div style={{background:'#F5F0E8', display:'flex', flexDirection:'column', justifyContent:'center', padding:'80px 80px 80px 64px'}}>
+            <p style={{fontSize:'10px', letterSpacing:'3px', textTransform:'uppercase', color:'#8A7F72', marginBottom:'20px'}}>Our Story</p>
+            <h2 style={{fontFamily:'var(--font-cormorant)', fontSize:'clamp(32px,4vw,48px)', fontWeight:400, lineHeight:1.15, color:'#1C1917', marginBottom:'24px'}}>
+              Fragrance is more<br />than <em style={{color:'#6B5A4A'}}>scent.</em>
+            </h2>
+            <p style={{fontSize:'14px', color:'#8A7F72', lineHeight:1.9, maxWidth:'400px', marginBottom:'40px', fontWeight:300}}>
+              {company.brandStory || "Setiap botol Henima dirancang untuk mengabadikan momen yang layak untuk diingat — kehangatan sore hari, rindu yang tak terucap."}
+            </p>
+            <Link href="/shop" style={{display:'inline-flex', alignItems:'center', gap:'12px', fontSize:'11px', letterSpacing:'2px', textTransform:'uppercase', color:'#1C1917', textDecoration:'none', borderBottom:'1px solid rgba(28,25,23,0.25)', paddingBottom:'2px', width:'fit-content'}}>
+              Explore Collection →
+            </Link>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      {/* PRODUCTS */}
       {products.length > 0 && (
         <ScrollReveal>
-          <section className="mt-20 space-y-8">
-            <div className="flex items-end justify-between">
+          <section style={{padding:'100px 0'}}>
+            <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:'56px'}}>
               <div>
-                <p className="text-xs font-medium tracking-[0.3em] text-ink-400 uppercase">Koleksi</p>
-                <h2 className="mt-1 text-3xl font-light italic text-ink-50 font-display">Produk Kami</h2>
+                <p style={{fontSize:'10px', letterSpacing:'3px', textTransform:'uppercase', color:'#8A7F72', marginBottom:'10px'}}>Featured Collection</p>
+                <h2 style={{fontFamily:'var(--font-cormorant)', fontSize:'38px', fontWeight:400, color:'#1C1917'}}>Our Scents</h2>
               </div>
-              <Link href="/shop" className="text-sm text-ink-300 hover:text-ink-50 tracking-widest uppercase">Lihat Semua</Link>
+              <Link href="/shop" style={{fontSize:'11px', letterSpacing:'2px', textTransform:'uppercase', color:'#1C1917', textDecoration:'none', borderBottom:'1px solid rgba(28,25,23,0.25)', paddingBottom:'2px'}}>
+                View All →
+              </Link>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))', gap:'2px'}}>
               {products.map((product, idx) => {
                 const variants = product.variants.filter((v) => v.active);
                 const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.discountPrice)) : product.discountPrice;
-                const maxPrice = variants.length > 0 ? Math.max(...variants.map((v) => v.discountPrice)) : product.discountPrice;
                 return (
                   <ScrollReveal key={product.id} delay={idx * 120} direction="up">
-                    <div className="group relative overflow-hidden rounded-3xl border border-ink-800 bg-ink-950/50 hover:border-gold-400/40 transition-all duration-500">
-                      <div className="relative h-72 bg-ink-900 overflow-hidden">
-                        <ProductImageZoom src={product.photo} alt={product.name} />
-                        <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 to-transparent pointer-events-none" />
+                    <div style={{background:'#F5F0E8', overflow:'hidden', cursor:'pointer'}}>
+                      <div style={{position:'relative', aspectRatio:'3/4', background:'linear-gradient(160deg,#E8E0D4,#D0C4B4)', overflow:'hidden'}}>
+                        {product.photo ? (
+                          <Image src={product.photo} alt={product.name} fill className="object-cover" style={{transition:'transform 0.6s ease'}} />
+                        ) : (
+                          <div style={{position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center'}}>
+                            <span style={{fontFamily:'var(--font-cormorant)', fontSize:'32px', fontWeight:300, fontStyle:'italic', color:'rgba(107,90,74,0.4)'}}>{product.name}</span>
+                          </div>
+                        )}
                       </div>
-                      <div className="p-6">
-                        <h3 className="text-lg font-light italic text-ink-50 font-display">{product.name}</h3>
-                        <p className="mt-1 text-sm text-ink-300 line-clamp-2">{product.description}</p>
-                        <div className="mt-4 flex items-center justify-between">
-                          <div>
-                            <p className="text-xs text-ink-500 tracking-widest uppercase">Harga Reseller</p>
-                            {(product as any).comingSoon ? (
-                              <span className="inline-block rounded-full bg-gold-400/10 border border-gold-400/30 px-3 py-1 text-xs font-semibold text-gold-300 mt-1">Coming Soon</span>
-                            ) : (
-                              <p className="text-lg font-light text-gold-300 font-display">
-                                {"Rp " + minPrice.toLocaleString("id-ID") + (maxPrice > minPrice ? " — " + maxPrice.toLocaleString("id-ID") : "")}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex gap-1">
-                            {variants.map((v) => (
-                              <span key={v.id} className="rounded-full border border-ink-700 bg-ink-900 px-2 py-0.5 text-xs text-ink-300">{v.sizeMl}ml</span>
-                            ))}
-                          </div>
+                      <div style={{padding:'20px 24px 28px'}}>
+                        <p style={{fontSize:'9px', letterSpacing:'2.5px', textTransform:'uppercase', color:'#C8B89A', marginBottom:'6px'}}>Eau de Parfum</p>
+                        <h3 style={{fontFamily:'var(--font-cormorant)', fontSize:'24px', fontWeight:400, color:'#1C1917', marginBottom:'4px'}}>{product.name}</h3>
+                        <p style={{fontSize:'12px', color:'#8A7F72', lineHeight:1.7, marginBottom:'16px', fontWeight:300}}>{product.description}</p>
+                        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                          <span style={{fontSize:'14px', fontWeight:400, color:'#1C1917'}}>
+                            {(product as any).comingSoon ? 'Coming Soon' : `Rp ${minPrice.toLocaleString('id-ID')}`}
+                          </span>
+                          <Link href="/shop" style={{fontSize:'9px', letterSpacing:'2px', textTransform:'uppercase', color:'#8A7F72', background:'none', border:'1px solid rgba(138,127,114,0.4)', padding:'8px 16px', textDecoration:'none', fontFamily:'var(--font-jost)'}}>
+                            Shop Now
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -124,131 +145,23 @@ export default async function HomePage() {
         </ScrollReveal>
       )}
 
-      {/* CARA JADI RESELLER */}
-      <ScrollReveal delay={100}>
-        <section className="mt-24">
-          <div className="text-center mb-12">
-            <p className="text-xs font-medium tracking-[0.3em] text-ink-400 uppercase">Bergabung</p>
-            <h2 className="mt-1 text-3xl font-light italic text-ink-50 font-display">Cara Jadi Reseller</h2>
-            <p className="mt-2 text-ink-300">Mulai berjualan dalam 3 langkah mudah.</p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { step: "01", title: "Daftar Gratis", desc: "Buat akun reseller dan langsung akses katalog harga khusus." },
-              { step: "02", title: "Pilih dan Pesan", desc: "Pilih produk, kurir, isi alamat — ongkir otomatis dihitung." },
-              { step: "03", title: "Bayar dan Kirim", desc: "Bayar via QRIS/transfer, upload bukti, pantau status real-time." },
-            ].map((item, idx) => (
-              <ScrollReveal key={item.step} delay={idx * 150} direction="up">
-                <div className="relative rounded-3xl border border-ink-800 bg-ink-950/50 p-8 overflow-hidden hover:border-gold-400/30 transition-all duration-500">
-                  <div className="absolute -right-4 -top-4 text-8xl font-black text-ink-800/60 select-none font-display">{item.step}</div>
-                  <div className="relative">
-                    <h3 className="text-lg font-medium text-ink-50">{item.title}</h3>
-                    <p className="mt-2 text-sm text-ink-300 leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </section>
-      </ScrollReveal>
+      {/* RESELLER BAND — subtle */}
+      <div style={{borderTop:'1px solid rgba(200,184,154,0.3)', borderBottom:'1px solid rgba(200,184,154,0.3)', padding:'48px 0', display:'flex', justifyContent:'space-between', alignItems:'center', gap:'40px', flexWrap:'wrap'}}>
+        <div>
+          <h3 style={{fontFamily:'var(--font-cormorant)', fontSize:'26px', fontWeight:400, color:'#1C1917', marginBottom:'6px'}}>Become a Henima Partner</h3>
+          <p style={{fontSize:'13px', color:'#8A7F72', fontWeight:300}}>Bergabung sebagai mitra reseller eksklusif. Margin terbaik, support penuh.</p>
+        </div>
+        <Link href="/daftar" style={{display:'inline-block', background:'transparent', color:'#1C1917', padding:'13px 36px', fontSize:'10px', letterSpacing:'3px', textTransform:'uppercase', textDecoration:'none', border:'1px solid #1C1917', fontFamily:'var(--font-jost)', whiteSpace:'nowrap'}}>
+          Apply as Reseller
+        </Link>
+      </div>
 
-      {/* TENTANG KAMI */}
-      {(company.brandStory || company.vision || company.mission || (company.team && (company.team as any[]).length > 0) || (company.advantages && (company.advantages as any[]).length > 0)) && (
-        <section className="mt-24 space-y-16">
-          <ScrollReveal direction="fade">
-            <div className="text-center">
-              <p className="text-xs font-medium tracking-[0.3em] text-ink-400 uppercase">Our Story</p>
-              <h2 className="mt-2 text-3xl font-light italic text-ink-50 font-display">
-                {company.name}
-                {(company as any).foundingYear && <span className="ml-3 text-lg text-ink-400 not-italic"> · est. {(company as any).foundingYear}</span>}
-              </h2>
-            </div>
-          </ScrollReveal>
-          {company.brandStory && (
-            <ScrollReveal direction="up" delay={100}>
-              <div className="mx-auto max-w-3xl rounded-3xl border border-gold-400/20 bg-gradient-to-b from-ink-950/60 to-ink-900/30 p-10">
-                <p className="text-center text-xl leading-relaxed text-ink-50 italic font-light font-display">"{company.brandStory}"</p>
-              </div>
-            </ScrollReveal>
-          )}
-          {(company.vision || company.mission) && (
-            <div className="grid gap-6 sm:grid-cols-2">
-              {company.vision && (
-                <ScrollReveal direction="left">
-                  <div className="rounded-3xl border border-ink-700 bg-ink-900 p-8 h-full border-l-4 border-l-gold-400">
-                    <p className="text-xs font-medium tracking-[0.2em] text-gold-400 uppercase">Visi</p>
-                    <p className="mt-4 text-ink-50 leading-relaxed">{company.vision}</p>
-                  </div>
-                </ScrollReveal>
-              )}
-              {company.mission && (
-                <ScrollReveal direction="right" delay={100}>
-                  <div className="rounded-3xl border border-ink-700 bg-ink-900 p-8 h-full border-l-4 border-l-gold-400">
-                    <p className="text-xs font-medium tracking-[0.2em] text-gold-400 uppercase">Misi</p>
-                    <p className="mt-4 text-ink-50 leading-relaxed text-sm">{company.mission}</p>
-                  </div>
-                </ScrollReveal>
-              )}
-            </div>
-          )}
-          {company.advantages && (company.advantages as any[]).length > 0 && (
-            <div>
-              <ScrollReveal direction="fade">
-                <h3 className="text-center text-2xl font-light italic text-ink-50 font-display mb-8">Keunggulan Produk</h3>
-              </ScrollReveal>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {(company.advantages as any[]).map((adv: any, idx: number) => (
-                  <ScrollReveal key={adv.id} delay={idx * 120} direction="up">
-                    <div className="rounded-3xl border border-ink-800 bg-ink-950/50 p-8 text-center hover:border-gold-400/30 transition-all duration-500 group">
-                      <p className="text-5xl group-hover:scale-110 transition-transform duration-300">{adv.icon}</p>
-                      <p className="mt-4 font-medium text-ink-50">{adv.title}</p>
-                      <p className="mt-2 text-sm text-ink-300 leading-relaxed">{adv.desc}</p>
-                    </div>
-                  </ScrollReveal>
-                ))}
-              </div>
-            </div>
-          )}
-          {company.team && (company.team as any[]).length > 0 && (
-            <div>
-              <ScrollReveal direction="fade">
-                <h3 className="text-center text-2xl font-light italic text-ink-50 font-display mb-8">Tim Kami</h3>
-              </ScrollReveal>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {(company.team as any[]).map((member: any, idx: number) => (
-                  <ScrollReveal key={member.id} delay={idx * 120} direction="up">
-                    <div className="rounded-3xl border border-ink-800 bg-ink-950/50 p-8 text-center hover:border-gold-400/30 transition-all duration-500">
-                      <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-full border-2 border-gold-400/30 bg-ink-900">
-                        {member.photo ? <Image src={member.photo} alt={member.name} fill className="object-cover" /> : <div className="flex h-full w-full items-center justify-center text-4xl">👤</div>}
-                      </div>
-                      <p className="mt-5 font-medium text-ink-50">{member.name}</p>
-                      <p className="text-sm text-gold-300">{member.role}</p>
-                      {member.bio && <p className="mt-3 text-xs text-ink-300 leading-relaxed">{member.bio}</p>}
-                    </div>
-                  </ScrollReveal>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* RESELLER BAND */}
-      <ScrollReveal direction="up" delay={100}>
-        <section className="mt-24 rounded-[28px] border border-ink-800 bg-ink-950/50 p-10 sm:p-14">
-          <div className="grid sm:grid-cols-2 gap-8 items-center">
-            <div>
-              <p className="text-xs font-medium tracking-[0.3em] text-gold-400 uppercase">Partner Program</p>
-              <h2 className="mt-2 text-3xl font-light italic text-ink-50 font-display">Become a Henima Partner</h2>
-              <p className="mt-3 text-ink-300">Bergabung sebagai reseller eksklusif Henima. Dapatkan harga khusus, materi promosi, dan dukungan penuh.</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
-              <Link href="/daftar" className="btn-primary px-8 py-3">Daftar Sekarang</Link>
-              <a href={"https://wa.me/6285190311230"} target="_blank" rel="noreferrer" className="btn-secondary px-8 py-3">Hubungi Kami</a>
-            </div>
-          </div>
-        </section>
-      </ScrollReveal>
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
 
     </div>
   );
