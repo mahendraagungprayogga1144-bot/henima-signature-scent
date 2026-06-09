@@ -65,19 +65,31 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* ── OUR STORY ── */}
-      <section style={{padding:"100px 8vw", maxWidth:"900px", margin:"0 auto"}}>
-        <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"20px", fontFamily:"var(--font-jost)"}}>Our Story</p>
-        <h2 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(32px,5vw,60px)", fontWeight:400, lineHeight:1.05, color:"#1C1917", marginBottom:"32px"}}>
-          Fragrance is more<br />than <em style={{color:"#7A6553"}}>scent.</em>
-        </h2>
-        <div style={{width:"48px", height:"1px", background:"rgba(200,184,154,0.5)", marginBottom:"32px"}} />
-        <p style={{fontSize:"16px", color:"#6B6560", lineHeight:2, maxWidth:"680px", marginBottom:"24px", fontWeight:300, fontFamily:"var(--font-jost)"}}>
-          {company.brandStory || "Setiap botol Henima dirancang untuk mengabadikan momen yang layak diingat — kehangatan sore hari, rindu yang tak terucap."}
-        </p>
-        <Link href="/shop" style={{display:"inline-flex", alignItems:"center", gap:"12px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#1C1917", textDecoration:"none", borderBottom:"1px solid rgba(28,25,23,0.2)", paddingBottom:"4px", width:"fit-content", fontFamily:"var(--font-jost)", marginTop:"16px"}}>
-          Discover More →
-        </Link>
+      {/* ── OUR STORY — HMNS dark style ── */}
+      <section style={{background:"#111009", padding:"80px 8vw", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"64px", alignItems:"center", minHeight:"60vh"}} className="story-grid">
+        <div>
+          <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"rgba(200,184,154,0.4)", marginBottom:"32px", fontFamily:"var(--font-jost)"}}>Our Story</p>
+          <p style={{fontFamily:"var(--font-jost)", fontSize:"clamp(18px,2.5vw,26px)", fontWeight:300, lineHeight:1.85, color:"rgba(240,235,227,0.85)", marginBottom:"48px"}}>
+            {company.brandStory || "Henima lahir dari kisah cinta jarak jauh — dua anak muda yang membuktikan bahwa parfum bukan sekadar aroma, melainkan identitas diri dan pengingat momen yang tak terlupakan."}
+          </p>
+          <Link href="/shop" style={{display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:"10px", letterSpacing:"2.5px", textTransform:"uppercase", color:"rgba(240,235,227,0.85)", textDecoration:"none", border:"1px solid rgba(240,235,227,0.2)", padding:"13px 28px", fontFamily:"var(--font-jost)"}}>
+            See Our Story
+          </Link>
+        </div>
+        <div style={{position:"relative", aspectRatio:"3/4", overflow:"hidden"}}>
+          {products.length > 0 && products[0].photo ? (
+            <Image src={products[0].photo} alt={products[0].name} fill className="object-cover object-center" />
+          ) : (
+            <div style={{position:"absolute", inset:0, background:"linear-gradient(160deg,#2C2420,#1A1210)", display:"flex", alignItems:"center", justifyContent:"center"}}>
+              <span style={{fontFamily:"var(--font-cormorant)", fontSize:"80px", fontWeight:300, fontStyle:"italic", color:"rgba(200,184,154,0.08)"}}>H</span>
+            </div>
+          )}
+          <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(10,8,6,0.65) 0%, transparent 55%)"}} />
+          <div style={{position:"absolute", bottom:"28px", left:"28px"}}>
+            <p style={{fontFamily:"var(--font-jost)", fontSize:"9px", letterSpacing:"3px", textTransform:"uppercase", color:"rgba(200,184,154,0.5)", marginBottom:"6px"}}>Extrait de Parfum</p>
+            <p style={{fontFamily:"var(--font-cormorant)", fontSize:"26px", fontWeight:300, fontStyle:"italic", color:"rgba(240,235,227,0.85)"}}>{products.length > 0 ? products[0].name : "Henima"}</p>
+          </div>
+        </div>
       </section>
 
       {/* ── VISI MISI ── */}
