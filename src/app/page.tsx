@@ -134,8 +134,8 @@ export default async function HomePage() {
               const variants = product.variants.filter((v) => v.active);
               const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.discountPrice)) : product.discountPrice;
               return (
-                <div key={product.id} style={{background:"#F0EBE3"}}>
-                  <div style={{position:"relative", aspectRatio:"1/1", background:"linear-gradient(160deg,#E4DDD4,#CFC5B8)", overflow:"hidden"}}>
+                <div key={product.id} style={{background:"#FAF8F4"}}>
+                  <div style={{position:"relative", aspectRatio:"1/1", background:"#F0EBE3", overflow:"hidden"}}>
                     {product.photo ? (
                       <Image src={product.photo} alt={product.name} fill className="object-cover" />
                     ) : (
@@ -151,15 +151,15 @@ export default async function HomePage() {
                   </div>
                   <div style={{padding:"20px 20px 24px"}}>
                     <p style={{fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"6px", fontFamily:"var(--font-jost)"}}>Extrait de Parfum</p>
-                    <h3 style={{fontFamily:"var(--font-cormorant)", fontSize:"22px", fontWeight:400, color:"#1C1917", marginBottom:"6px"}}>{product.name}</h3>
-                    <p style={{fontSize:"12px", color:"#9A8F82", lineHeight:1.7, marginBottom:"16px", fontWeight:300, fontFamily:"var(--font-jost)"}}>{product.description}</p>
-                    <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", borderTop:"1px solid rgba(200,184,154,0.25)", paddingTop:"16px"}}>
+                    <h3 style={{fontFamily:"var(--font-cormorant)", fontSize:"22px", fontWeight:400, color:"#1C1917", marginBottom:"4px"}}>{product.name}</h3>
+                    <p style={{fontSize:"12px", color:"#9A8F82", lineHeight:1.6, marginBottom:"14px", fontWeight:300, fontFamily:"var(--font-jost)"}}>{product.description}</p>
+                    <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
                       {(product as any).comingSoon ? (
                         <span style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82", fontFamily:"var(--font-jost)"}}>Coming Soon</span>
                       ) : (
-                        <p style={{fontFamily:"var(--font-cormorant)", fontSize:"20px", fontWeight:400, color:"#1C1917"}}>Rp {minPrice.toLocaleString("id-ID")}</p>
+                        <p style={{fontFamily:"var(--font-jost)", fontSize:"13px", fontWeight:400, color:"#1C1917"}}>Rp {minPrice.toLocaleString("id-ID")}</p>
                       )}
-                      <Link href="/shop" style={{fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#1C1917", border:"1px solid rgba(28,25,23,0.3)", padding:"8px 16px", textDecoration:"none", fontFamily:"var(--font-jost)"}}>
+                      <Link href="/shop" style={{fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#1C1917", border:"1px solid rgba(28,25,23,0.2)", padding:"7px 14px", textDecoration:"none", fontFamily:"var(--font-jost)"}}>
                         Shop
                       </Link>
                     </div>
