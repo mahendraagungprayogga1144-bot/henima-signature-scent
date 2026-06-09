@@ -1,4 +1,5 @@
-"use client";
+with open("src/components/PhotoCarousel.tsx", "w") as f:
+    f.write('''"use client";
 import { useState, useRef } from "react";
 import Image from "next/image";
 
@@ -76,3 +77,5 @@ export default function PhotoCarousel({ images }: { images: string[] }) {
     </section>
   );
 }
+''')
+print("Done!")
