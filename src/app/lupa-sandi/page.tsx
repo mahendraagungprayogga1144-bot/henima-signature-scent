@@ -1,5 +1,4 @@
-with open("src/app/lupa-sandi/page.tsx", "w") as f:
-    f.write("""export default function LupaSandiPage() {
+export default function LupaSandiPage() {
   return (
     <div style={{minHeight:"100vh",background:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--font-jost, sans-serif)",padding:"40px 24px"}}>
       <div style={{width:"100%",maxWidth:"440px",border:"1px solid #d5d5d5",padding:"48px 40px"}}>
@@ -11,5 +10,3 @@ with open("src/app/lupa-sandi/page.tsx", "w") as f:
     </div>
   );
 }
-""")
-print("Done!")
