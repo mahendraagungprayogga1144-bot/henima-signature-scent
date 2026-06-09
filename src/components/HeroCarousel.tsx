@@ -65,7 +65,7 @@ export default function HeroCarousel({ images, productName }: { images: string[]
   );
 
   return (
-    <div ref={containerRef} style={{position:"absolute", inset:0, userSelect:"none"}}>
+    <div ref={containerRef} style={{position:"absolute", inset:0, userSelect:"none", touchAction:"pan-y pinch-zoom"}}>
       {images.map((src, i) => (
         <div key={src+i} style={{
           position:"absolute", inset:0,
