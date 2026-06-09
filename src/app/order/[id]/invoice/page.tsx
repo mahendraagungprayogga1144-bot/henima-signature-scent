@@ -153,7 +153,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
           </div>
         </div>
 
-        <button className="print-btn" onClick={() => window.print()}>
+        <script dangerouslySetInnerHTML={{__html: "document.addEventListener('DOMContentLoaded', function() { document.querySelector('.print-btn').addEventListener('click', function() { window.print(); }); });"}} />
+        <button className="print-btn">
           🖨 Print / Save PDF
         </button>
       </body>
