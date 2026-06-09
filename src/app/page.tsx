@@ -82,21 +82,25 @@ export default async function HomePage() {
 
       {/* ── VISI MISI ── */}
       {(company.vision || company.mission) && (
-        <section style={{background:"#F0EBE3", padding:"80px 8vw"}}>
-          <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"48px", fontFamily:"var(--font-jost)", textAlign:"center"}}>Values</p>
-          <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px", maxWidth:"900px", margin:"0 auto"}} className="visi-grid">
-            {company.vision && (
-              <div style={{background:"#FAF8F4", padding:"48px 40px", borderLeft:"3px solid #C8B89A"}}>
-                <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"20px", fontFamily:"var(--font-jost)"}}>Visi</p>
-                <p style={{fontFamily:"var(--font-cormorant)", fontSize:"22px", fontWeight:400, color:"#1C1917", lineHeight:1.5}}>{company.vision}</p>
-              </div>
-            )}
-            {company.mission && (
-              <div style={{background:"#FAF8F4", padding:"48px 40px", borderLeft:"3px solid #C8B89A"}}>
-                <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"20px", fontFamily:"var(--font-jost)"}}>Misi</p>
-                <p style={{fontFamily:"var(--font-cormorant)", fontSize:"22px", fontWeight:400, color:"#1C1917", lineHeight:1.5}}>{company.mission}</p>
-              </div>
-            )}
+        <section style={{background:"#FAF8F4", padding:"80px 8vw", borderTop:"1px solid rgba(28,25,23,0.08)"}}>
+          <div style={{maxWidth:"960px", margin:"0 auto"}}>
+            <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"56px", fontFamily:"var(--font-jost)", fontWeight:400}}>Values</p>
+            <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"64px"}} className="visi-grid">
+              {company.vision && (
+                <div>
+                  <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"24px", fontFamily:"var(--font-jost)", fontWeight:400}}>Visi</p>
+                  <div style={{width:"32px", height:"1px", background:"rgba(200,184,154,0.6)", marginBottom:"24px"}} />
+                  <p style={{fontSize:"15px", color:"#4A4440", lineHeight:1.85, fontWeight:300, fontFamily:"var(--font-jost)"}}>{company.vision}</p>
+                </div>
+              )}
+              {company.mission && (
+                <div>
+                  <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"24px", fontFamily:"var(--font-jost)", fontWeight:400}}>Misi</p>
+                  <div style={{width:"32px", height:"1px", background:"rgba(200,184,154,0.6)", marginBottom:"24px"}} />
+                  <p style={{fontSize:"15px", color:"#4A4440", lineHeight:1.85, fontWeight:300, fontFamily:"var(--font-jost)"}}>{company.mission}</p>
+                </div>
+              )}
+            </div>
           </div>
         </section>
       )}
