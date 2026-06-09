@@ -14,6 +14,8 @@ export default function CheckoutPage() {
   const [city, setCity] = useState("");
   const [province, setProvince] = useState("");
   const [postalCode, setPostalCode] = useState("");
+  const [cities, setCities] = useState<any[]>([]);
+  const [selectedCityId, setSelectedCityId] = useState("");
   const [shippingOptions, setShippingOptions] = useState<any[]>([]);
   const [selectedShipping, setSelectedShipping] = useState<any>(null);
   const [loadingShipping, setLoadingShipping] = useState(false);
@@ -24,6 +26,8 @@ export default function CheckoutPage() {
     const cart = getCart();
     if (cart.length === 0) router.push("/shop");
     setItems(cart);
+    // Load cities
+    fetch("/api/cities").then(r => r.json()).then(d => setCities(d.cities || []));
   }, [router]);
 
   const subtotal = cartTotal(items);
@@ -31,13 +35,13 @@ export default function CheckoutPage() {
   const total = subtotal + shippingCost;
 
   async function checkShipping() {
-    if (!city || !postalCode) return;
+    if (!selectedCityId) return;
     setLoadingShipping(true);
     try {
       const res = await fetch("/api/shipping", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ destination: city, weight: items.length * 200 }),
+        body: JSON.stringify({ destination: selectedCityId, weight: items.length * 200 }),
       });
       const data = await res.json();
       setShippingOptions(data.results || []);
@@ -129,8 +133,20 @@ export default function CheckoutPage() {
                 <textarea required value={address} onChange={e => setAddress(e.target.value)}
                   placeholder="Address" rows={2}
                   style={{...inp, resize:"none", paddingTop:"14px"}} />
-                <input required value={city} onChange={e => setCity(e.target.value)}
-                  placeholder="City" style={inp} />
+                <select required value={selectedCityId}
+                  onChange={e => {
+                    const opt = cities.find((c:any) => c.city_id === e.target.value);
+                    setSelectedCityId(e.target.value);
+                    setCity(opt?.city_name || "");
+                  }}
+                  style={{...inp, paddingLeft:"0", cursor:"pointer"}}>
+                  <option value="">Pilih Kota/Kabupaten</option>
+                  {cities.map((c:any) => (
+                    <option key={c.city_id} value={c.city_id}>
+                      {c.type} {c.city_name} — {c.province}
+                    </option>
+                  ))}
+                </select>
                 <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px"}}>
                   <input required value={province} onChange={e => setProvince(e.target.value)}
                     placeholder="Province" style={inp} />
@@ -149,8 +165,8 @@ export default function CheckoutPage() {
             <div style={{marginBottom:"40px"}}>
               <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"20px"}}>
                 <h2 style={{fontSize:"18px", fontWeight:600, color:"#1C1917"}}>Shipping Method</h2>
-                <button type="button" onClick={checkShipping} disabled={loadingShipping || !city || !postalCode}
-                  style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", background:"none", border:"1px solid rgba(28,25,23,0.3)", padding:"8px 16px", cursor:"pointer", color:"#1C1917", fontFamily:"var(--font-jost)", opacity:(!city||!postalCode)?0.4:1}}>
+                <button type="button" onClick={checkShipping} disabled={loadingShipping || !selectedCityId}
+                  style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", background:"none", border:"1px solid rgba(28,25,23,0.3)", padding:"8px 16px", cursor:"pointer", color:"#1C1917", fontFamily:"var(--font-jost)", opacity:!selectedCityId?0.4:1}}>
                   {loadingShipping ? "Checking..." : "Check Shipping"}
                 </button>
               </div>
