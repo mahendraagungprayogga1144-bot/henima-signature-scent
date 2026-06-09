@@ -136,6 +136,11 @@ export default async function HomePage() {
                   <h2 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(40px,5vw,64px)", fontWeight:300, fontStyle:"italic", color:"#1C1917", marginBottom:"24px", lineHeight:1}}>{product.name}</h2>
                   <div style={{width:"40px", height:"1px", background:"rgba(200,184,154,0.5)", marginBottom:"28px"}} />
                   <p style={{fontSize:"14px", color:"#6B6560", lineHeight:1.9, maxWidth:"360px", marginBottom:"16px", fontWeight:300, fontFamily:"var(--font-jost)"}}>{product.description}</p>
+                  {(product as any).inspiration && (
+                    <p style={{fontSize:"13px", color:"#9A8F82", lineHeight:1.9, maxWidth:"360px", marginBottom:"16px", fontWeight:300, fontFamily:"var(--font-jost)", fontStyle:"italic", borderLeft:"2px solid rgba(200,184,154,0.4)", paddingLeft:"16px"}}>
+                      {(product as any).inspiration}
+                    </p>
+                  )}
                   {((product as any).topNotes || (product as any).middleNotes || (product as any).baseNotes) && (
                     <div style={{marginBottom:"32px", display:"flex", flexDirection:"column", gap:"6px"}}>
                       {(product as any).topNotes && <p style={{fontSize:"12px", color:"#9A8F82", fontFamily:"var(--font-jost)", fontWeight:300}}><span style={{color:"#1C1917", fontWeight:400}}>Top</span> · {(product as any).topNotes}</p>}
