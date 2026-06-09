@@ -18,6 +18,10 @@ interface Product {
   baseNotes?: string;
 }
 
+function toSlug(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 export default function ShopClient({ products, waNumber }: { products: Product[]; waNumber: string }) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
@@ -137,7 +141,7 @@ export default function ShopClient({ products, waNumber }: { products: Product[]
               const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.originalPrice)) : product.originalPrice;
               const waText = encodeURIComponent("Halo Henima, saya ingin membeli " + product.name + ". Boleh info ketersediaan dan cara ordernya?");
               return (
-                <div key={product.id} style={{background:"#FAF8F4", cursor:"pointer"}}>
+                <Link key={product.id} href={"/shop/" + toSlug(product.name)} style={{background:"#FAF8F4", cursor:"pointer", textDecoration:"none", color:"#1C1917", display:"block"}}>
                   <div style={{position:"relative", aspectRatio:"1/1", background:"#F0EBE3", overflow:"hidden"}}>
                     {product.photo ? (
                       <Image src={product.photo} alt={product.name} fill className="object-cover" />
@@ -167,7 +171,7 @@ export default function ShopClient({ products, waNumber }: { products: Product[]
                       </a>
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
