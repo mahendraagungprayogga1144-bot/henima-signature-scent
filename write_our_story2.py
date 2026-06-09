@@ -1,4 +1,5 @@
-import Link from "next/link";
+with open("src/app/our-story/page.tsx", "w") as f:
+    f.write('''import Link from "next/link";
 
 export default function OurStoryPage() {
   return (
@@ -63,3 +64,5 @@ export default function OurStoryPage() {
     </div>
   );
 }
+''')
+print("Done!")
