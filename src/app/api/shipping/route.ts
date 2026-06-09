@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     origin: origin,
     destination: String(destination),
     weight: Number(weight) || 500,
-    courier: "jne",
+    courier: "jne:jnt:sicepat:anteraja:ninja",
   };
 
   console.log("Payload:", JSON.stringify(payload));
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     formData.append("origin", payload.origin);
     formData.append("destination", payload.destination);
     formData.append("weight", String(payload.weight));
-    formData.append("courier", payload.courier);
+    formData.append("courier", "jne:jnt:sicepat:anteraja:ninja");
 
     const res = await fetch("https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost", {
       method: "POST",
@@ -42,14 +42,20 @@ export async function POST(request: Request) {
     const rawResults = data?.data || [];
 
     if (Array.isArray(rawResults)) {
-      rawResults.forEach((courier: any) => {
-        (courier?.costs || []).forEach((cost: any) => {
+      rawResults.forEach((item: any) => {
+        // Filter hanya layanan reguler yang relevan
+        const regularServices = ["REG", "YES", "CTC", "CTCYES", "REGULAR", "ECO", "OKE", "BEST", "SIUNT", "GOKIL"];
+        const service = item.service || "";
+        const isRegular = regularServices.some(s => service.toUpperCase().includes(s)) || 
+                         (!service.includes("JTR") && !service.includes(">") && !service.includes("<"));
+        
+        if (isRegular && item.cost <= 100000) {
           results.push({
-            service: (courier.courier_code || "").toUpperCase() + " " + (cost.service || ""),
-            description: cost.description || "",
-            cost: [{ value: cost.cost?.[0]?.value || 0, etd: cost.cost?.[0]?.etd || "-" }],
+            service: (item.code || "").toUpperCase() + " " + service,
+            description: item.description || "",
+            cost: [{ value: item.cost || 0, etd: item.etd || "-" }],
           });
-        });
+        }
       });
     }
 
