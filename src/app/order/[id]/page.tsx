@@ -79,6 +79,11 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
             style={{display:"inline-block", background:"transparent", color:"#1C1917", padding:"13px 28px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", textDecoration:"none", border:"1px solid rgba(28,25,23,0.25)"}}>
             Lanjut Belanja
           </Link>
+          <Link href={"/order/" + order.id + "/invoice"}
+            target="_blank"
+            style={{display:"inline-block", background:"transparent", color:"#1C1917", padding:"13px 28px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", textDecoration:"none", border:"1px solid rgba(28,25,23,0.25)"}}>
+            🧾 Lihat Invoice
+          </Link>
         </div>
       </div>
     </div>
