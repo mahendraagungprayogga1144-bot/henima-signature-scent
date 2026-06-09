@@ -14,8 +14,8 @@ export default async function KatalogDigitalPage() {
     <div style={{background:"#ffffff", minHeight:"100vh", color:"#1C1917", fontFamily:"var(--font-jost)"}}>
 
       {/* COVER */}
-      <div style={{minHeight:"60vh", display:"flex", flexDirection:"column", justifyContent:"center", padding:"80px 8vw", borderBottom:"1px solid rgba(28,25,23,0.1)"}}>
-        <p style={{fontSize:"11px", letterSpacing:"4px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"24px"}}>{company.name}</p>
+      <div style={{minHeight:"55vh", display:"flex", flexDirection:"column", justifyContent:"center", padding:"80px 8vw", borderBottom:"2px solid #1C1917"}}>
+        <p style={{fontSize:"11px", letterSpacing:"4px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"20px"}}>{company.name}</p>
         <h1 style={{fontFamily:"var(--font-jost)", fontSize:"clamp(48px,8vw,96px)", fontWeight:700, color:"#1C1917", lineHeight:1, marginBottom:"32px", letterSpacing:"-2px"}}>
           Catalog of<br />Henima
         </h1>
@@ -28,106 +28,87 @@ export default async function KatalogDigitalPage() {
             Order via WhatsApp
           </a>
           <Link href="/daftar"
-            style={{display:"inline-block", background:"transparent", color:"#1C1917", padding:"13px 32px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", textDecoration:"none", border:"1px solid rgba(28,25,23,0.3)", fontWeight:400}}>
+            style={{display:"inline-block", background:"transparent", color:"#1C1917", padding:"13px 32px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", textDecoration:"none", border:"1px solid rgba(28,25,23,0.3)"}}>
             Jadi Reseller
           </Link>
         </div>
       </div>
 
       {/* PRODUCTS */}
-      {products.map((product, idx) => {
+      {products.map((product) => {
         const variants = product.variants.filter((v) => v.active);
         const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.originalPrice)) : product.originalPrice;
         return (
-          <div key={product.id} style={{borderBottom:"1px solid rgba(28,25,23,0.08)", padding:"80px 8vw"}}>
-            
-            {/* Product header */}
-            <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"48px", alignItems:"start", marginBottom:"48px"}} className="katalog-header">
-              <div>
-                <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"16px"}}>
-                  {(product as any).scentFamily || "Extrait de Parfum"}
-                </p>
-                <h2 style={{fontFamily:"var(--font-jost)", fontSize:"clamp(32px,5vw,64px)", fontWeight:700, color:"#1C1917", lineHeight:1, marginBottom:"12px", letterSpacing:"-1px"}}>
-                  {product.name}
-                </h2>
-                <p style={{fontSize:"13px", color:"#9A8F82", marginBottom:"4px"}}>
-                  Extrait de Parfum · {variants.map(v => v.sizeMl + "ml").join(" · ")}
-                </p>
-                {!(product as any).comingSoon && (
-                  <p style={{fontSize:"16px", fontWeight:600, color:"#1C1917", marginTop:"8px"}}>
-                    Rp {minPrice.toLocaleString("id-ID")},-
-                  </p>
-                )}
-              </div>
-              {(product as any).inspiration && (
-                <div style={{paddingTop:"8px"}}>
-                  <p style={{fontSize:"15px", color:"#4A4440", lineHeight:1.85, fontWeight:300, fontStyle:"normal"}}>
-                    {(product as any).inspiration}
-                  </p>
-                </div>
-              )}
-            </div>
+          <div key={product.id} style={{padding:"64px 8vw", borderBottom:"1px solid rgba(28,25,23,0.1)"}}>
 
-            {/* Product image + notes */}
-            <div style={{display:"grid", gridTemplateColumns:"1fr 2fr", gap:"64px", alignItems:"center"}} className="katalog-body">
+            {/* Name + subtitle */}
+            <h2 style={{fontFamily:"var(--font-jost)", fontSize:"clamp(32px,5vw,56px)", fontWeight:700, color:"#1C1917", lineHeight:1, marginBottom:"10px", letterSpacing:"-1px"}}>
+              {product.name}
+            </h2>
+            <p style={{fontSize:"13px", color:"#6B6560", marginBottom:"4px"}}>
+              Extrait de Parfum · {variants.map(v => v.sizeMl + "ml").join(" · ")}
+              {(product as any).scentFamily ? " · " + (product as any).scentFamily : ""}
+            </p>
+            {!(product as any).comingSoon && (
+              <p style={{fontSize:"15px", fontWeight:600, color:"#1C1917", marginBottom:"32px"}}>
+                Rp {minPrice.toLocaleString("id-ID")},-
+              </p>
+            )}
+            {(product as any).comingSoon && (
+              <p style={{fontSize:"13px", color:"#9A8F82", marginBottom:"32px"}}>Coming Soon</p>
+            )}
+
+            {/* Photo + Notes side by side */}
+            <div style={{display:"grid", gridTemplateColumns:"1fr 2fr", gap:"40px", alignItems:"start"}}>
               {/* Image */}
-              <div style={{position:"relative", aspectRatio:"3/4", background:"#F5F5F5", overflow:"hidden"}}>
+              <div style={{position:"relative", aspectRatio:"2/3", background:"#F5F5F5", overflow:"hidden"}}>
                 {product.photo ? (
                   <Image src={product.photo} alt={product.name} fill className="object-cover object-center" />
                 ) : (
-                  <div style={{position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center"}}>
-                    <span style={{fontFamily:"var(--font-cormorant)", fontSize:"32px", fontStyle:"italic", color:"rgba(0,0,0,0.15)"}}>{product.name}</span>
-                  </div>
-                )}
-                {(product as any).comingSoon && (
-                  <div style={{position:"absolute", top:"16px", left:"16px", background:"#1C1917", color:"#fff", fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", padding:"5px 12px"}}>
-                    Coming Soon
+                  <div style={{position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", background:"#F0F0F0"}}>
+                    <span style={{fontSize:"14px", color:"#ccc"}}>{product.name}</span>
                   </div>
                 )}
               </div>
 
-              {/* Notes + specs */}
+              {/* Notes */}
               <div>
-                {((product as any).topNotes || (product as any).middleNotes || (product as any).baseNotes) && (
-                  <div style={{marginBottom:"40px", display:"flex", flexDirection:"column", gap:"16px"}}>
-                    {(product as any).topNotes && (
-                      <div>
-                        <p style={{fontSize:"11px", fontWeight:600, color:"#1C1917", marginBottom:"4px"}}>Mind Notes</p>
-                        <p style={{fontSize:"14px", color:"#6B6560", fontWeight:300}}>{(product as any).topNotes}</p>
-                      </div>
-                    )}
-                    {(product as any).middleNotes && (
-                      <div>
-                        <p style={{fontSize:"11px", fontWeight:600, color:"#1C1917", marginBottom:"4px"}}>Heart Notes</p>
-                        <p style={{fontSize:"14px", color:"#6B6560", fontWeight:300}}>{(product as any).middleNotes}</p>
-                      </div>
-                    )}
-                    {(product as any).baseNotes && (
-                      <div>
-                        <p style={{fontSize:"11px", fontWeight:600, color:"#1C1917", marginBottom:"4px"}}>Soul Notes</p>
-                        <p style={{fontSize:"14px", color:"#6B6560", fontWeight:300}}>{(product as any).baseNotes}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {((product as any).sillage || (product as any).projection || (product as any).longevity) && (
-                  <div style={{borderTop:"1px solid rgba(28,25,23,0.1)", paddingTop:"24px"}}>
-                    <p style={{fontSize:"11px", fontWeight:600, color:"#1C1917", marginBottom:"16px"}}>
-                      {(product as any).sillage && `Sillage ${(product as any).sillage}`}
-                      {(product as any).projection && ` · Projection ${(product as any).projection}`}
-                      {(product as any).longevity && ` · Longevity ${(product as any).longevity}`}
-                    </p>
-                  </div>
-                )}
-
-                {product.description && (
-                  <p style={{fontSize:"13px", color:"#9A8F82", lineHeight:1.8, fontWeight:300, marginTop:"16px"}}>
-                    {product.description}
+                {(product as any).inspiration && (
+                  <p style={{fontSize:"14px", color:"#4A4440", lineHeight:1.8, fontWeight:300, marginBottom:"24px"}}>
+                    {(product as any).inspiration}
                   </p>
+                )}
+                {(product as any).topNotes && (
+                  <div style={{marginBottom:"14px"}}>
+                    <p style={{fontSize:"12px", fontWeight:700, color:"#1C1917", marginBottom:"3px"}}>Mind Notes</p>
+                    <p style={{fontSize:"13px", color:"#6B6560", fontWeight:300}}>{(product as any).topNotes}</p>
+                  </div>
+                )}
+                {(product as any).middleNotes && (
+                  <div style={{marginBottom:"14px"}}>
+                    <p style={{fontSize:"12px", fontWeight:700, color:"#1C1917", marginBottom:"3px"}}>Heart Notes</p>
+                    <p style={{fontSize:"13px", color:"#6B6560", fontWeight:300}}>{(product as any).middleNotes}</p>
+                  </div>
+                )}
+                {(product as any).baseNotes && (
+                  <div style={{marginBottom:"14px"}}>
+                    <p style={{fontSize:"12px", fontWeight:700, color:"#1C1917", marginBottom:"3px"}}>Soul Notes</p>
+                    <p style={{fontSize:"13px", color:"#6B6560", fontWeight:300}}>{(product as any).baseNotes}</p>
+                  </div>
                 )}
               </div>
             </div>
+
+            {/* Sillage / Projection / Longevity */}
+            {((product as any).sillage || (product as any).projection || (product as any).longevity) && (
+              <div style={{borderTop:"1px solid rgba(28,25,23,0.1)", marginTop:"32px", paddingTop:"20px"}}>
+                <p style={{fontSize:"13px", color:"#1C1917", lineHeight:1.8}}>
+                  {(product as any).sillage && <><span style={{fontWeight:700}}>Sillage</span> {(product as any).sillage}</>}
+                  {(product as any).projection && <> · <span style={{fontWeight:700}}>Projection</span> {(product as any).projection}</>}
+                  {(product as any).longevity && <> · <span style={{fontWeight:700}}>Longevity</span> {(product as any).longevity}</>}
+                </p>
+              </div>
+            )}
           </div>
         );
       })}
@@ -144,12 +125,6 @@ export default async function KatalogDigitalPage() {
         </a>
       </div>
 
-      <style>{`
-        @media (max-width: 768px) {
-          .katalog-header { grid-template-columns: 1fr !important; gap: 24px !important; }
-          .katalog-body { grid-template-columns: 1fr !important; gap: 32px !important; }
-        }
-      `}</style>
     </div>
   );
 }
