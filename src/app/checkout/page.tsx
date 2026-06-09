@@ -79,11 +79,16 @@ export default function CheckoutPage() {
 
   return (
     <div style={{background:"#FAF8F4", minHeight:"100vh", color:"#1C1917", fontFamily:"var(--font-jost)"}}>
-      <div style={{padding:"20px 8vw", borderBottom:"1px solid rgba(28,25,23,0.08)"}}>
-        <div style={{display:"flex", alignItems:"center", gap:"8px", fontSize:"12px", color:"#9A8F82"}}>
-          <Link href="/cart" style={{color:"#9A8F82", textDecoration:"none"}}>Cart</Link>
-          <span>→</span>
-          <span style={{color:"#1C1917"}}>Checkout</span>
+      {/* Header */}
+      <div style={{padding:"20px 8vw 0", borderBottom:"1px solid rgba(28,25,23,0.06)"}}>
+        <div style={{display:"flex", alignItems:"center", justifyContent:"center", gap:"16px", fontSize:"11px", color:"#9A8F82", letterSpacing:"2px", textTransform:"uppercase", padding:"16px 0"}}>
+          <Link href="/cart" style={{color:"#9A8F82", textDecoration:"none", fontFamily:"var(--font-jost)"}}>Cart</Link>
+          <span style={{color:"#C8B89A"}}>›</span>
+          <span style={{color:"#1C1917", fontFamily:"var(--font-jost)"}}>Information</span>
+          <span style={{color:"#C8B89A"}}>›</span>
+          <span style={{color:"#C8B89A", fontFamily:"var(--font-jost)"}}>Shipping</span>
+          <span style={{color:"#C8B89A"}}>›</span>
+          <span style={{color:"#C8B89A", fontFamily:"var(--font-jost)"}}>Payment</span>
         </div>
       </div>
 
@@ -95,7 +100,7 @@ export default function CheckoutPage() {
 
             {/* Contact */}
             <div>
-              <h2 style={{fontSize:"16px", fontWeight:600, marginBottom:"20px", letterSpacing:"0.5px"}}>Informasi Kontak</h2>
+              <h2 style={{fontSize:"11px", fontWeight:400, marginBottom:"24px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", fontFamily:"var(--font-jost)"}}>Contact</h2>
               <div style={{display:"flex", flexDirection:"column", gap:"12px"}}>
                 <input required value={name} onChange={e => setName(e.target.value)}
                   placeholder="Nama Lengkap" style={inputStyle} />
@@ -108,7 +113,7 @@ export default function CheckoutPage() {
 
             {/* Shipping Address */}
             <div>
-              <h2 style={{fontSize:"16px", fontWeight:600, marginBottom:"20px", letterSpacing:"0.5px"}}>Alamat Pengiriman</h2>
+              <h2 style={{fontSize:"11px", fontWeight:400, marginBottom:"24px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", fontFamily:"var(--font-jost)", marginTop:"40px"}}>Shipping Address</h2>
               <div style={{display:"flex", flexDirection:"column", gap:"12px"}}>
                 <textarea required value={address} onChange={e => setAddress(e.target.value)}
                   placeholder="Alamat lengkap (jalan, nomor, RT/RW, kelurahan, kecamatan)"
@@ -124,7 +129,7 @@ export default function CheckoutPage() {
                     placeholder="Kode Pos" style={inputStyle} />
                   <button type="button" onClick={checkShipping} disabled={loadingShipping || !city || !postalCode}
                     style={{background:"#1C1917", color:"#FAF8F4", border:"none", cursor:"pointer", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", fontFamily:"var(--font-jost)", opacity: (!city || !postalCode) ? 0.5 : 1}}>
-                    {loadingShipping ? "Mengecek..." : "Cek Ongkir"}
+                    {loadingShipping ? "Checking..." : "Check Shipping"}
                   </button>
                 </div>
               </div>
@@ -133,7 +138,7 @@ export default function CheckoutPage() {
             {/* Shipping Options */}
             {shippingOptions.length > 0 && (
               <div>
-                <h2 style={{fontSize:"16px", fontWeight:600, marginBottom:"20px", letterSpacing:"0.5px"}}>Pilih Kurir</h2>
+                <h2 style={{fontSize:"11px", fontWeight:400, marginBottom:"24px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", fontFamily:"var(--font-jost)", marginTop:"40px"}}>Shipping Method</h2>
                 <div style={{display:"flex", flexDirection:"column", gap:"8px"}}>
                   {shippingOptions.map((opt: any) => (
                     <label key={opt.service} onClick={() => setSelectedShipping(opt)}
@@ -154,7 +159,7 @@ export default function CheckoutPage() {
 
           {/* RIGHT - Order Summary */}
           <div style={{background:"#F0EBE3", padding:"28px", position:"sticky", top:"80px"}}>
-            <h2 style={{fontSize:"16px", fontWeight:600, marginBottom:"20px"}}>Order Summary</h2>
+            <h2 style={{fontSize:"11px", fontWeight:400, marginBottom:"24px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", fontFamily:"var(--font-jost)"}}>Order Summary</h2>
 
             {items.map((item) => (
               <div key={item.productId + item.variantId} style={{display:"flex", gap:"12px", marginBottom:"16px", alignItems:"center"}}>
@@ -189,7 +194,7 @@ export default function CheckoutPage() {
 
             <button type="submit" disabled={submitting || !selectedShipping}
               style={{display:"block", width:"100%", background: (!selectedShipping || submitting) ? "#9A8F82" : "#1C1917", color:"#FAF8F4", padding:"16px", fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", border:"none", cursor: (!selectedShipping || submitting) ? "not-allowed" : "pointer", fontFamily:"var(--font-jost)", fontWeight:500}}>
-              {submitting ? "Memproses..." : "Buat Pesanan"}
+              {submitting ? "Processing..." : "Continue to Payment"}
             </button>
           </div>
         </div>
@@ -205,8 +210,8 @@ export default function CheckoutPage() {
 }
 
 const inputStyle: React.CSSProperties = {
-  width:"100%", padding:"12px 16px", background:"#fff",
-  border:"1px solid rgba(28,25,23,0.15)", fontSize:"14px",
-  color:"#1C1917", fontFamily:"var(--font-jost)", outline:"none",
-  boxSizing:"border-box",
+  width:"100%", padding:"14px 0", background:"transparent",
+  border:"none", borderBottom:"1px solid rgba(28,25,23,0.2)",
+  fontSize:"14px", color:"#1C1917", fontFamily:"var(--font-jost)",
+  outline:"none", boxSizing:"border-box", borderRadius:"0",
 };
