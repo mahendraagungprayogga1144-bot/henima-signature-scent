@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
+import PhotoCarousel from "@/components/PhotoCarousel";
 import HeroCarousel from "@/components/HeroCarousel";
 import { getCurrentUserSafe } from "@/lib/session";
 import { redirect } from "next/navigation";
@@ -103,82 +104,9 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── PRODUCTS HMNS STYLE ── */}
-      {products.length > 0 && (
-        <section style={{background:"#FAF8F4", borderTop:"1px solid rgba(28,25,23,0.06)"}}>
-          <div style={{padding:"64px 8vw 24px"}}>
-            <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", fontFamily:"var(--font-jost)"}}>Collection</p>
-          </div>
-          {products.map((product, idx) => {
-            const variants = product.variants.filter((v) => v.active);
-            const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.discountPrice)) : product.discountPrice;
-            const isEven = idx % 2 === 0;
-            return (
-              <div key={product.id} style={{display:"grid", gridTemplateColumns:"1fr 1fr", minHeight:"80vh", borderTop:"1px solid rgba(28,25,23,0.06)"}} className="product-hmns-row">
-                {/* Image */}
-                <div style={{order: isEven ? 0 : 1, position:"relative", background:"#F0EBE3", overflow:"hidden", minHeight:"500px"}}>
-                  {product.photo ? (
-                    <Image src={product.photo} alt={product.name} fill className="object-cover object-center" />
-                  ) : (
-                    <div style={{position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center"}}>
-                      <span style={{fontFamily:"var(--font-cormorant)", fontSize:"48px", fontStyle:"italic", color:"rgba(107,90,74,0.2)"}}>{product.name}</span>
-                    </div>
-                  )}
-                  {(product as any).comingSoon && (
-                    <div style={{position:"absolute", top:"24px", left:"24px", background:"#1C1917", color:"#FAF8F4", fontSize:"8px", letterSpacing:"2px", textTransform:"uppercase", padding:"5px 12px", fontFamily:"var(--font-jost)"}}>
-                      Coming Soon
-                    </div>
-                  )}
-                </div>
-                {/* Text */}
-                <div style={{order: isEven ? 1 : 0, display:"flex", flexDirection:"column", justifyContent:"center", padding:"64px 8vw", background:"#FAF8F4"}}>
-                  <p style={{fontSize:"9px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"20px", fontFamily:"var(--font-jost)"}}>Extrait de Parfum</p>
-                  <h2 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(40px,5vw,64px)", fontWeight:300, fontStyle:"italic", color:"#1C1917", marginBottom:"24px", lineHeight:1}}>{product.name}</h2>
-                  <div style={{width:"40px", height:"1px", background:"rgba(200,184,154,0.5)", marginBottom:"28px"}} />
-                  <p style={{fontSize:"14px", color:"#6B6560", lineHeight:1.9, maxWidth:"360px", marginBottom:"16px", fontWeight:300, fontFamily:"var(--font-jost)"}}>{product.description}</p>
-                  {(product as any).inspiration && (
-                    <p style={{fontSize:"13px", color:"#9A8F82", lineHeight:1.9, maxWidth:"360px", marginBottom:"16px", fontWeight:300, fontFamily:"var(--font-jost)", fontStyle:"italic", borderLeft:"2px solid rgba(200,184,154,0.4)", paddingLeft:"16px"}}>
-                      {(product as any).inspiration}
-                    </p>
-                  )}
-                  {((product as any).topNotes || (product as any).middleNotes || (product as any).baseNotes) && (
-                    <div style={{marginBottom:"32px", display:"flex", flexDirection:"column", gap:"6px"}}>
-                      {(product as any).topNotes && <p style={{fontSize:"12px", color:"#9A8F82", fontFamily:"var(--font-jost)", fontWeight:300}}><span style={{color:"#1C1917", fontWeight:400}}>Top</span> · {(product as any).topNotes}</p>}
-                      {(product as any).middleNotes && <p style={{fontSize:"12px", color:"#9A8F82", fontFamily:"var(--font-jost)", fontWeight:300}}><span style={{color:"#1C1917", fontWeight:400}}>Heart</span> · {(product as any).middleNotes}</p>}
-                      {(product as any).baseNotes && <p style={{fontSize:"12px", color:"#9A8F82", fontFamily:"var(--font-jost)", fontWeight:300}}><span style={{color:"#1C1917", fontWeight:400}}>Base</span> · {(product as any).baseNotes}</p>}
-                    </div>
-                  )}
-                  <div style={{display:"flex", gap:"12px", alignItems:"center", flexWrap:"wrap", marginBottom:"32px"}}>
-                    {variants.map((v) => (
-                      <span key={v.id} style={{border:"1px solid rgba(28,25,23,0.15)", padding:"5px 14px", fontSize:"11px", color:"#9A8F82", fontFamily:"var(--font-jost)"}}>{v.sizeMl}ml</span>
-                    ))}
-                  </div>
-                  <div style={{display:"flex", gap:"12px", alignItems:"center"}}>
-                    {(product as any).comingSoon ? (
-                      <span style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82", fontFamily:"var(--font-jost)"}}>Coming Soon</span>
-                    ) : (
-                      <p style={{fontFamily:"var(--font-jost)", fontSize:"16px", fontWeight:400, color:"#1C1917"}}>Rp {minPrice.toLocaleString("id-ID")}</p>
-                    )}
-                    <Link href="/shop" style={{display:"inline-block", background:"#1C1917", color:"#FAF8F4", padding:"12px 28px", fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", textDecoration:"none", fontFamily:"var(--font-jost)"}}>
-                      Shop Now
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </section>
-      )}
+      {/* ── PHOTO CAROUSEL ── */}
+      <PhotoCarousel images={(company as any).galleryImages || []} />
 
-
-
-      <style>{`
-        @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-        @media (max-width: 768px) {
-          .visi-grid { grid-template-columns: 1fr !important; }
-          .story-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }

@@ -104,6 +104,10 @@ export async function POST(request: Request) {
     if (heroPath) db.settings.company.heroImage = heroPath;
     if (heroImages.length > 0) (db.settings.company as any).heroImages = heroImages;
     else if (heroPath) (db.settings.company as any).heroImages = [heroPath];
+    const galleryImagesRaw = String(form.get("galleryImages") || "").trim();
+    let galleryImages: string[] = [];
+    if (galleryImagesRaw) { try { galleryImages = JSON.parse(galleryImagesRaw); } catch {} }
+    (db.settings.company as any).galleryImages = galleryImages;
     if (team) db.settings.company.team = team;
     if (advantages) db.settings.company.advantages = advantages;
     if (bankAccounts) db.settings.payment.bankAccounts = bankAccounts;
