@@ -7,7 +7,7 @@ import { formatRupiah } from "@/lib/format";
 export default async function ProfilePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/masuk");
-  if (user.role !== "reseller") redirect("/admin");
+  if (user.role === "admin") redirect("/admin");
 
   const db = await getDatabase();
   const orders = db.orders.filter((o) => o.resellerId === user.id);
