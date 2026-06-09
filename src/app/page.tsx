@@ -162,9 +162,10 @@ export default async function HomePage() {
         @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
         @media (max-width: 768px) {
           .hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
-          .hero-grid > div:first-child { padding: 60px 24px 48px !important; }
-          .hero-grid > div:last-child { min-height: 60vw !important; }
+          .hero-grid > div:first-child { padding: 56px 24px 48px !important; order: 1; }
+          .hero-grid > div:last-child { min-height: 75vw !important; order: 2; }
           .story-grid { grid-template-columns: 1fr !important; }
+          .story-grid > div:first-child { min-height: 60vw !important; }
           .story-grid > div:last-child { padding: 48px 24px !important; }
         }
       `}</style>
