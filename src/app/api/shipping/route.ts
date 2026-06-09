@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const { destination, weight } = await request.json();
   const apiKey = process.env.KOMERCE_SHIPPING_KEY || "";
-  const origin = process.env.RAJAONGKIR_ORIGIN_ID || "444";
+  const origin = process.env.RAJAONGKIR_ORIGIN_ID || "31"; // Sidoarjo
 
   try {
     const res = await fetch("https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost", {
