@@ -15,6 +15,8 @@ export default function CheckoutPage() {
   const [province, setProvince] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [cities, setCities] = useState<any[]>([]);
+  const [citySearch, setCitySearch] = useState("");
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [selectedCityId, setSelectedCityId] = useState("");
   const [shippingOptions, setShippingOptions] = useState<any[]>([]);
   const [selectedShipping, setSelectedShipping] = useState<any>(null);
@@ -26,13 +28,23 @@ export default function CheckoutPage() {
     const cart = getCart();
     if (cart.length === 0) router.push("/shop");
     setItems(cart);
-    // Load cities
-    fetch("/api/cities").then(r => r.json()).then(d => setCities(d.cities || []));
+
   }, [router]);
 
   const subtotal = cartTotal(items);
   const shippingCost = selectedShipping?.cost?.[0]?.value || 0;
   const total = subtotal + shippingCost;
+
+  async function searchCities(q: string) {
+    setCitySearch(q);
+    if (q.length < 2) { setCities([]); return; }
+    try {
+      const res = await fetch("/api/cities?q=" + encodeURIComponent(q));
+      const data = await res.json();
+      setCities(data.cities || []);
+      setShowCityDropdown(true);
+    } catch {}
+  }
 
   async function checkShipping() {
     if (!selectedCityId) return;
@@ -133,20 +145,32 @@ export default function CheckoutPage() {
                 <textarea required value={address} onChange={e => setAddress(e.target.value)}
                   placeholder="Address" rows={2}
                   style={{...inp, resize:"none", paddingTop:"14px"}} />
-                <select required value={selectedCityId}
-                  onChange={e => {
-                    const opt = cities.find((c:any) => c.city_id === e.target.value);
-                    setSelectedCityId(e.target.value);
-                    setCity(opt?.city_name || "");
-                  }}
-                  style={{...inp, paddingLeft:"0", cursor:"pointer"}}>
-                  <option value="">Pilih Kota/Kabupaten</option>
-                  {cities.map((c:any) => (
-                    <option key={c.city_id} value={c.city_id}>
-                      {c.type} {c.city_name} — {c.province}
-                    </option>
-                  ))}
-                </select>
+                <div style={{position:"relative"}}>
+                  <input
+                    value={citySearch}
+                    onChange={e => searchCities(e.target.value)}
+                    onFocus={() => citySearch.length >= 2 && setShowCityDropdown(true)}
+                    placeholder="Cari kota (contoh: Surabaya, Nganjuk...)"
+                    style={inp}
+                    autoComplete="off"
+                  />
+                  {showCityDropdown && cities.length > 0 && (
+                    <div style={{position:"absolute", top:"100%", left:0, right:0, background:"#fff", border:"1px solid rgba(28,25,23,0.15)", zIndex:100, maxHeight:"200px", overflowY:"auto", boxShadow:"0 4px 12px rgba(0,0,0,0.08)"}}>
+                      {cities.map((c:any) => (
+                        <div key={c.city_id}
+                          onClick={() => {
+                            setSelectedCityId(c.city_id);
+                            setCity(c.city_name);
+                            setCitySearch(c.type + " " + c.city_name + " — " + c.province);
+                            setShowCityDropdown(false);
+                          }}
+                          style={{padding:"12px 16px", cursor:"pointer", fontSize:"13px", color:"#1C1917", borderBottom:"1px solid rgba(28,25,23,0.06)"}}>
+                          {c.type} {c.city_name} <span style={{color:"#9A8F82"}}>— {c.province}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px"}}>
                   <input required value={province} onChange={e => setProvince(e.target.value)}
                     placeholder="Province" style={inp} />
