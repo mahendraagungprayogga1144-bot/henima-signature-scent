@@ -59,7 +59,9 @@ function rowToUser(row: Record<string, unknown>): User {
     address: (row.address as string | null) ?? undefined,
     reseller: (row.reseller as User["reseller"] | null) ?? undefined,
     createdAt: row.created_at as string,
-  };
+    resetToken: (row.reset_token as string | null) ?? undefined,
+    resetTokenExpiry: (row.reset_token_expiry as string | null) ?? undefined,
+  } as any;
 }
 
 function userToRow(u: User) {
@@ -74,6 +76,8 @@ function userToRow(u: User) {
     address: u.address ?? null,
     reseller: u.reseller ?? null,
     created_at: u.createdAt,
+    reset_token: (u as any).resetToken ?? null,
+    reset_token_expiry: (u as any).resetTokenExpiry ?? null,
   };
 }
 
@@ -149,8 +153,6 @@ const DEFAULT_SETTINGS: Settings = {
   },
 };
 
-// ---------- Public API ----------
-
 export async function getDatabase(): Promise<Database> {
   const [
     { data: productsData, error: pErr },
@@ -201,7 +203,7 @@ export async function updateDatabase(
   const before = await getDatabase();
   const after: Database = JSON.parse(JSON.stringify(before));
 
-  await updater(after); // may throw — nothing is saved if it does
+  await updater(after);
 
   await Promise.all([
     syncArray("products", before.products, after.products, productToRow),
@@ -212,8 +214,6 @@ export async function updateDatabase(
 
   return after;
 }
-
-// ---------- Internal sync helpers ----------
 
 async function syncArray<T extends { id: string }>(
   table: string,
