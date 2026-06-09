@@ -1,4 +1,10 @@
 @tailwind base;
+
+html, body {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
 @tailwind components;
 @tailwind utilities;
 
