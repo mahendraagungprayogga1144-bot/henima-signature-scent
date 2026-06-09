@@ -13,8 +13,8 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        origin_id: origin,
-        destination_id: destination,
+        origin: origin,
+        destination: destination,
         weight: weight || 500,
         courier: "jne:jnt:sicepat:anteraja",
       }),
