@@ -40,14 +40,9 @@ export default function HeroCarousel({ images, productName }: { images: string[]
         </div>
       ))}
 
-      {/* Gradient overlay */}
-      <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(20,16,12,0.75) 0%, transparent 60%)", zIndex:2}} />
 
-      {/* Caption */}
-      <div style={{position:"absolute", bottom:"40px", left:"40px", zIndex:3}}>
-        <p style={{fontFamily:"var(--font-cormorant)", fontSize:"11px", letterSpacing:"4px", textTransform:"uppercase", color:"rgba(200,184,154,0.6)", marginBottom:"8px"}}>New Arrival</p>
-        <p style={{fontFamily:"var(--font-cormorant)", fontSize:"28px", fontWeight:300, fontStyle:"italic", color:"rgba(240,235,227,0.9)"}}>{productName}</p>
-      </div>
+
+
 
       {/* Dots */}
       {images.length > 1 && (
