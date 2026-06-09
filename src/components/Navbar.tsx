@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 
 export default function Navbar({ user }: { user?: any }) {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (open) document.body.style.overflow = "hidden";
@@ -12,170 +11,204 @@ export default function Navbar({ user }: { user?: any }) {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const navStyle: React.CSSProperties = {
-    position: "sticky",
-    top: 0,
-    zIndex: 40,
-    background: scrolled ? "rgba(250,248,244,0.95)" : "rgba(250,248,244,0.92)",
-    backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
-    borderBottom: "1px solid rgba(200,184,154,0.25)",
-    transition: "all 0.3s ease",
-  };
-
-  const linkStyle: React.CSSProperties = {
-    fontSize: "11px",
-    letterSpacing: "2px",
-    textTransform: "uppercase",
-    color: "#2C2825",
-    textDecoration: "none",
-    fontWeight: 400,
-    padding: "8px 4px",
-    fontFamily: "var(--font-jost)",
-    transition: "color 0.3s",
-  };
-
-  const logoStyle: React.CSSProperties = {
-    fontFamily: "var(--font-cormorant)",
-    fontSize: "20px",
-    fontWeight: 400,
-    letterSpacing: "6px",
-    textTransform: "uppercase",
-    color: "#1C1917",
-    textDecoration: "none",
-    position: "absolute",
-    left: "50%",
-    transform: "translateX(-50%)",
-  };
-
   return (
-    <header style={navStyle}>
-      <div style={{maxWidth:"1400px", margin:"0 auto", padding:"0 48px", display:"flex", alignItems:"center", justifyContent:"space-between", height:"64px", position:"relative"}}>
+    <>
+      <header style={{
+        position:"sticky", top:0, zIndex:50,
+        background:"rgba(250,248,244,0.95)",
+        backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)",
+        borderBottom:"1px solid rgba(28,25,23,0.08)",
+      }}>
+        <div style={{
+          display:"flex", alignItems:"center", justifyContent:"space-between",
+          padding:"0 24px", height:"60px", position:"relative",
+        }}>
 
-        {/* LEFT NAV */}
-        {!user && (
-          <nav style={{display:"flex", alignItems:"center", gap:"32px"}} className="hidden-mobile">
-            <Link href="/shop" style={linkStyle}>Shop</Link>
-            <Link href="/katalog-digital" style={linkStyle}>Collection</Link>
-            <Link href="/galeri" style={linkStyle}>Gallery</Link>
-          </nav>
-        )}
-        {user && (
-          <nav style={{display:"flex", alignItems:"center", gap:"24px"}} className="hidden-mobile">
-            {user.role === "reseller" && (
+          {/* LEFT — desktop nav only */}
+          <nav className="nav-desktop" style={{display:"flex", alignItems:"center", gap:"28px"}}>
+            {!user && (
               <>
-                <Link href="/katalog" style={linkStyle}>Katalog</Link>
-                <Link href="/pesanan" style={linkStyle}>Pesanan</Link>
-                <Link href="/leaderboard" style={linkStyle}>Leaderboard</Link>
+                <Link href="/shop" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#2C2825", textDecoration:"none", fontFamily:"var(--font-jost)", fontWeight:400}}>Shop</Link>
+                <Link href="/katalog-digital" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#2C2825", textDecoration:"none", fontFamily:"var(--font-jost)", fontWeight:400}}>Collection</Link>
+                <Link href="/galeri" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#2C2825", textDecoration:"none", fontFamily:"var(--font-jost)", fontWeight:400}}>Gallery</Link>
               </>
             )}
-            {user.role === "admin" && (
-              <Link href="/admin" style={linkStyle}>Dashboard</Link>
+            {user?.role === "reseller" && (
+              <>
+                <Link href="/katalog" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#2C2825", textDecoration:"none", fontFamily:"var(--font-jost)"}}>Katalog</Link>
+                <Link href="/pesanan" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#2C2825", textDecoration:"none", fontFamily:"var(--font-jost)"}}>Pesanan</Link>
+              </>
+            )}
+            {user?.role === "admin" && (
+              <Link href="/admin" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#2C2825", textDecoration:"none", fontFamily:"var(--font-jost)"}}>Dashboard</Link>
             )}
           </nav>
-        )}
 
-        {/* LOGO CENTER */}
-        <Link href="/" style={logoStyle}>Henima</Link>
+          {/* CENTER — logo */}
+          <Link href="/" style={{
+            fontFamily:"var(--font-cormorant)", fontSize:"19px", fontWeight:400,
+            letterSpacing:"6px", textTransform:"uppercase", color:"#1C1917",
+            textDecoration:"none", position:"absolute", left:"50%", transform:"translateX(-50%)",
+          }}>
+            Henima
+          </Link>
 
-        {/* RIGHT NAV */}
-        <div style={{display:"flex", alignItems:"center", gap:"24px"}}>
-          {!user ? (
-            <>
-              <div className="hidden-mobile" style={{display:"flex", alignItems:"center", gap:"24px"}}>
-                <Link href="/blog" style={linkStyle}>Journal</Link>
-                <Link href="/masuk" style={{...linkStyle, color:"#8A7F72"}}>Masuk</Link>
-                <Link href="/daftar" style={{fontSize:"10px", letterSpacing:"2.5px", textTransform:"uppercase", color:"#1C1917", textDecoration:"none", border:"1px solid #1C1917", padding:"10px 20px", fontFamily:"var(--font-jost)", fontWeight:400, transition:"all 0.3s", background:"transparent"}}>
-                  Daftar
-                </Link>
-              </div>
-              {/* Mobile hamburger */}
-              <button
-                onClick={() => setOpen(!open)}
-                style={{background:"none", border:"1px solid rgba(200,184,154,0.4)", padding:"8px", cursor:"pointer", color:"#1C1917", display:"flex", alignItems:"center", justifyContent:"center"}}
-                className="show-mobile"
-              >
-                {open ? (
-                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12"/></svg>
-                ) : (
-                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16"/></svg>
-                )}
-              </button>
-            </>
-          ) : (
-            <>
-              <span style={{...linkStyle, color:"#8A7F72"}} className="hidden-mobile">{user.name}</span>
-              <form action="/api/auth/logout" method="POST" className="hidden-mobile">
-                <button type="submit" style={{...linkStyle, background:"none", border:"none", cursor:"pointer", color:"#8A7F72"}}>Keluar</button>
-              </form>
-              <button
-                onClick={() => setOpen(!open)}
-                style={{background:"none", border:"1px solid rgba(200,184,154,0.4)", padding:"8px", cursor:"pointer", color:"#1C1917", display:"flex", alignItems:"center", justifyContent:"center"}}
-                className="show-mobile"
-              >
-                {open ? (
-                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12"/></svg>
-                ) : (
-                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16"/></svg>
-                )}
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {open && (
-        <div style={{background:"#FAF8F4", borderTop:"1px solid rgba(200,184,154,0.25)", padding:"24px 48px 32px"}}>
-          <nav style={{display:"flex", flexDirection:"column", gap:"4px"}}>
+          {/* RIGHT — desktop auth + hamburger */}
+          <div style={{display:"flex", alignItems:"center", gap:"20px"}}>
             {!user ? (
               <>
-                <Link href="/shop" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", borderBottom:"1px solid rgba(200,184,154,0.15)"}}>Shop</Link>
-                <Link href="/katalog-digital" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", borderBottom:"1px solid rgba(200,184,154,0.15)"}}>Collection</Link>
-                <Link href="/galeri" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", borderBottom:"1px solid rgba(200,184,154,0.15)"}}>Gallery</Link>
-                <Link href="/blog" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", borderBottom:"1px solid rgba(200,184,154,0.15)"}}>Journal</Link>
-                <Link href="/masuk" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", borderBottom:"1px solid rgba(200,184,154,0.15)", color:"#8A7F72"}}>Masuk</Link>
-                <Link href="/daftar" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", color:"#8A7F72"}}>Daftar</Link>
+                <Link href="/masuk" className="nav-desktop" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#8A7F72", textDecoration:"none", fontFamily:"var(--font-jost)"}}>Masuk</Link>
+                <Link href="/daftar" className="nav-desktop" style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#1C1917", textDecoration:"none", border:"1px solid #1C1917", padding:"9px 18px", fontFamily:"var(--font-jost)"}}>Daftar</Link>
               </>
             ) : (
               <>
-                {user.role === "reseller" && (
-                  <>
-                    <Link href="/katalog" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", borderBottom:"1px solid rgba(200,184,154,0.15)"}}>Katalog</Link>
-                    <Link href="/pesanan" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", borderBottom:"1px solid rgba(200,184,154,0.15)"}}>Pesanan</Link>
-                    <Link href="/profil" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", borderBottom:"1px solid rgba(200,184,154,0.15)"}}>Profil</Link>
-                    <Link href="/leaderboard" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", borderBottom:"1px solid rgba(200,184,154,0.15)"}}>Leaderboard</Link>
-                  </>
-                )}
+                <span className="nav-desktop" style={{fontSize:"11px", color:"#8A7F72", fontFamily:"var(--font-jost)"}}>{user.name}</span>
+                <form action="/api/auth/logout" method="POST" className="nav-desktop">
+                  <button type="submit" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#8A7F72", background:"none", border:"none", cursor:"pointer", fontFamily:"var(--font-jost)"}}>Keluar</button>
+                </form>
+              </>
+            )}
+            {/* Hamburger — always visible */}
+            <button onClick={() => setOpen(true)} style={{background:"none", border:"none", cursor:"pointer", display:"flex", flexDirection:"column", gap:"5px", padding:"4px"}}>
+              <span style={{display:"block", width:"22px", height:"1.5px", background:"#1C1917"}} />
+              <span style={{display:"block", width:"22px", height:"1.5px", background:"#1C1917"}} />
+              <span style={{display:"block", width:"14px", height:"1.5px", background:"#1C1917"}} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* FULLSCREEN MENU */}
+      {open && (
+        <div style={{
+          position:"fixed", inset:0, zIndex:100,
+          background:"#1C1917",
+          display:"flex", flexDirection:"column",
+          padding:"0 40px 48px",
+          overflowY:"auto",
+        }}>
+          {/* Top bar */}
+          <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", height:"60px", borderBottom:"1px solid rgba(255,255,255,0.06)", flexShrink:0}}>
+            <Link href="/" onClick={() => setOpen(false)} style={{
+              fontFamily:"var(--font-cormorant)", fontSize:"19px", fontWeight:400,
+              letterSpacing:"6px", textTransform:"uppercase", color:"#F0EBE3", textDecoration:"none",
+            }}>
+              Henima
+            </Link>
+            <button onClick={() => setOpen(false)} style={{background:"none", border:"none", cursor:"pointer", color:"#F0EBE3", fontSize:"28px", lineHeight:1, fontWeight:200}}>×</button>
+          </div>
+
+          {/* Nav links */}
+          <nav style={{flex:1, display:"flex", flexDirection:"column", justifyContent:"center", gap:"4px", padding:"32px 0"}}>
+            {!user ? (
+              <>
+                {[
+                  ["/shop","Shop"],
+                  ["/katalog-digital","Collection"],
+                  ["/galeri","Gallery"],
+                  ["/blog","Journal"],
+                ].map(([href, label]) => (
+                  <Link key={href} href={href} onClick={() => setOpen(false)} style={{
+                    fontFamily:"var(--font-jost)", fontSize:"clamp(28px,7vw,42px)",
+                    fontWeight:300, color:"rgba(240,235,227,0.9)", textDecoration:"none",
+                    lineHeight:1.4, letterSpacing:"2px", textTransform:"uppercase",
+                    borderBottom:"1px solid rgba(255,255,255,0.06)", paddingBottom:"14px", marginBottom:"4px",
+                  }}>
+                    {label}
+                  </Link>
+                ))}
+                <div style={{marginTop:"24px", display:"flex", gap:"16px"}}>
+                  <Link href="/masuk" onClick={() => setOpen(false)} style={{
+                    fontFamily:"var(--font-jost)", fontSize:"13px", fontWeight:300,
+                    color:"rgba(200,184,154,0.6)", textDecoration:"none", letterSpacing:"1px",
+                  }}>
+                    Masuk
+                  </Link>
+                  <span style={{color:"rgba(200,184,154,0.3)"}}>·</span>
+                  <Link href="/daftar" onClick={() => setOpen(false)} style={{
+                    fontFamily:"var(--font-jost)", fontSize:"13px", fontWeight:300,
+                    color:"rgba(200,184,154,0.6)", textDecoration:"none", letterSpacing:"1px",
+                  }}>
+                    Daftar
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                {user.role === "reseller" && [
+                  ["/katalog","Katalog"],
+                  ["/pesanan","Pesanan"],
+                  ["/profil","Profil"],
+                  ["/leaderboard","Leaderboard"],
+                ].map(([href, label]) => (
+                  <Link key={href} href={href} onClick={() => setOpen(false)} style={{
+                    fontFamily:"var(--font-jost)", fontSize:"clamp(28px,7vw,42px)",
+                    fontWeight:300, color:"rgba(240,235,227,0.9)", textDecoration:"none",
+                    lineHeight:1.4, letterSpacing:"2px", textTransform:"uppercase",
+                    borderBottom:"1px solid rgba(255,255,255,0.06)", paddingBottom:"14px", marginBottom:"4px",
+                  }}>
+                    {label}
+                  </Link>
+                ))}
                 {user.role === "admin" && (
-                  <Link href="/admin" onClick={() => setOpen(false)} style={{...linkStyle, padding:"12px 0", borderBottom:"1px solid rgba(200,184,154,0.15)"}}>Dashboard</Link>
+                  <Link href="/admin" onClick={() => setOpen(false)} style={{
+                    fontFamily:"var(--font-jost)", fontSize:"clamp(28px,7vw,42px)",
+                    fontWeight:300, color:"rgba(240,235,227,0.9)", textDecoration:"none",
+                    lineHeight:1.4, letterSpacing:"2px", textTransform:"uppercase",
+                  }}>
+                    Dashboard
+                  </Link>
                 )}
-                <span style={{...linkStyle, padding:"12px 0", color:"#8A7F72", display:"block"}}>{user.name}</span>
-                <form action="/api/auth/logout" method="POST">
-                  <button type="submit" style={{...linkStyle, background:"none", border:"none", cursor:"pointer", color:"#8A7F72", padding:"12px 0"}}>Keluar</button>
+                <form action="/api/auth/logout" method="POST" style={{marginTop:"20px"}}>
+                  <button type="submit" style={{
+                    fontFamily:"var(--font-jost)", fontSize:"13px", fontWeight:300,
+                    color:"rgba(200,184,154,0.4)", background:"none", border:"none",
+                    cursor:"pointer", letterSpacing:"1px", padding:0,
+                  }}>
+                    Keluar
+                  </button>
                 </form>
               </>
             )}
           </nav>
+
+          {/* Bottom — subscribe */}
+          <div style={{borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:"28px", flexShrink:0}}>
+            <p style={{fontSize:"16px", fontWeight:400, color:"#F0EBE3", marginBottom:"8px", fontFamily:"var(--font-jost)"}}>
+              Get exclusive benefits!
+            </p>
+            <p style={{fontSize:"13px", color:"rgba(200,184,154,0.5)", fontWeight:300, marginBottom:"20px", fontFamily:"var(--font-jost)", lineHeight:1.6}}>
+              Subscribe to our list and get exclusive promos and new product launches!
+            </p>
+            <div style={{display:"flex"}}>
+              <input type="email" placeholder="Email address" style={{
+                flex:1, background:"transparent",
+                border:"1px solid rgba(255,255,255,0.15)", borderRight:"none",
+                padding:"13px 16px", fontSize:"13px", color:"#F0EBE3",
+                fontFamily:"var(--font-jost)", outline:"none",
+              }} />
+              <button style={{
+                background:"#F0EBE3", border:"1px solid #F0EBE3",
+                color:"#1C1917", padding:"13px 20px", fontSize:"11px",
+                letterSpacing:"1px", textTransform:"uppercase",
+                fontFamily:"var(--font-jost)", cursor:"pointer", fontWeight:500,
+              }}>
+                Subscribe
+              </button>
+            </div>
+            <p style={{fontSize:"11px", color:"rgba(200,184,154,0.25)", marginTop:"24px", fontFamily:"var(--font-jost)", textAlign:"center"}}>
+              ©️ {new Date().getFullYear()} Henima Signature Scent. All rights reserved.
+            </p>
+          </div>
         </div>
       )}
 
       <style>{`
-        @media (min-width: 768px) {
-          .hidden-mobile { display: flex !important; }
-          .show-mobile { display: none !important; }
-        }
-        @media (max-width: 767px) {
-          .hidden-mobile { display: none !important; }
-          .show-mobile { display: flex !important; }
+        .nav-desktop { display: flex !important; }
+        @media (max-width: 768px) {
+          .nav-desktop { display: none !important; }
         }
       `}</style>
-    </header>
+    </>
   );
 }
