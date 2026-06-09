@@ -67,6 +67,7 @@ export default async function HomePage() {
       </div>
 
       {/* ── OUR STORY — HMNS dark style ── */}
+      <ScrollReveal direction="up" delay={0}>
       <section style={{background:"#FAF8F4", padding:"100px 8vw", borderTop:"1px solid rgba(28,25,23,0.06)"}}>
         <div style={{maxWidth:"800px"}}>
           <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"32px", fontFamily:"var(--font-jost)"}}>Our Story</p>
@@ -78,9 +79,11 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ── VISI MISI ── */}
       {(company.vision || company.mission) && (
+      <ScrollReveal direction="up" delay={100}>
         <section style={{background:"#FAF8F4", padding:"80px 8vw", borderTop:"1px solid rgba(28,25,23,0.08)"}}>
           <div style={{maxWidth:"960px", margin:"0 auto"}}>
             <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"56px", fontFamily:"var(--font-jost)", fontWeight:400}}>Values</p>
@@ -102,6 +105,7 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+      </ScrollReveal>
       )}
 
       {/* ── PHOTO CAROUSEL ── */}

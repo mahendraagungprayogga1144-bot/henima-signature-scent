@@ -4,6 +4,13 @@ export default function OurStoryPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#FAF8F4", fontFamily: "var(--font-jost, sans-serif)", color: "#1C1917" }}>
 
+      <style>{`
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-section { animation: fadeUp 1.1s cubic-bezier(0.22,1,0.36,1) both; }
+        .animate-hero { animation: fadeIn 1.4s cubic-bezier(0.22,1,0.36,1) both; }
+      `}</style>
+
       <section style={{ background: "#1C1917", padding: "120px 32px 100px", textAlign: "center" }}>
         <p style={{ fontSize: "10px", letterSpacing: "4px", textTransform: "uppercase", color: "rgba(200,184,154,0.7)", marginBottom: "24px", fontWeight: 300 }}>Henima Signature Scent</p>
         <h1 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "clamp(48px,8vw,96px)", fontWeight: 300, color: "#F5F0E8", lineHeight: 0.95, fontStyle: "italic", marginBottom: "32px", letterSpacing: "-1px" }}>Our Story</h1>
