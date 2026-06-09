@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getDatabase } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export const dynamic = "force-dynamic";
 
@@ -99,33 +100,18 @@ export default async function ProductDetailPage({
             </div>
           )}
 
-          {/* Variants */}
-          {variants.length > 0 && (
-            <div style={{marginBottom:"32px"}}>
-              <p style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"16px"}}>Pilih Ukuran</p>
-              <div style={{display:"flex", gap:"8px", flexWrap:"wrap"}}>
-                {variants.map((v) => (
-                  <div key={v.id} style={{border:"1px solid rgba(28,25,23,0.2)", padding:"10px 20px", cursor:"pointer", background:"#FAF8F4"}}>
-                    <p style={{fontSize:"12px", color:"#1C1917", fontWeight:400}}>{v.sizeMl}ml</p>
-                    <p style={{fontSize:"13px", color:"#1C1917", fontWeight:500, marginTop:"4px"}}>
-                      Rp {v.originalPrice.toLocaleString("id-ID")}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* CTA */}
+          {/* Add to Cart */}
           {(product as any).comingSoon ? (
             <div style={{border:"1px solid rgba(28,25,23,0.15)", padding:"16px", textAlign:"center"}}>
               <p style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82"}}>Coming Soon</p>
             </div>
           ) : (
-            <a href={waLink} target="_blank" rel="noreferrer"
-              style={{display:"block", background:"#1C1917", color:"#FAF8F4", padding:"16px", fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", textDecoration:"none", textAlign:"center", fontWeight:500}}>
-              Beli Sekarang via WhatsApp
-            </a>
+            <AddToCartButton
+              productId={product.id}
+              productName={product.name}
+              productPhoto={product.photo || ""}
+              variants={variants.map(v => ({ id: v.id, sizeMl: v.sizeMl, originalPrice: v.originalPrice, active: v.active }))}
+            />
           )}
 
           {/* Sillage Projection Longevity */}
