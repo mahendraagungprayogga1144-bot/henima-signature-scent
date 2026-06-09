@@ -66,29 +66,15 @@ export default async function HomePage() {
       </div>
 
       {/* ── OUR STORY — HMNS dark style ── */}
-      <section style={{background:"#111009", padding:"80px 8vw", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"64px", alignItems:"center", minHeight:"60vh"}} className="story-grid">
-        <div>
-          <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"rgba(200,184,154,0.4)", marginBottom:"32px", fontFamily:"var(--font-jost)"}}>Our Story</p>
-          <p style={{fontFamily:"var(--font-jost)", fontSize:"clamp(18px,2.5vw,26px)", fontWeight:300, lineHeight:1.85, color:"rgba(240,235,227,0.85)", marginBottom:"48px"}}>
+      <section style={{background:"#FAF8F4", padding:"100px 8vw", borderTop:"1px solid rgba(28,25,23,0.06)"}}>
+        <div style={{maxWidth:"800px"}}>
+          <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"32px", fontFamily:"var(--font-jost)"}}>Our Story</p>
+          <p style={{fontFamily:"var(--font-jost)", fontSize:"clamp(16px,2vw,22px)", fontWeight:300, lineHeight:1.9, color:"#4A4440", marginBottom:"48px"}}>
             {company.brandStory || "Henima lahir dari kisah cinta jarak jauh — dua anak muda yang membuktikan bahwa parfum bukan sekadar aroma, melainkan identitas diri dan pengingat momen yang tak terlupakan."}
           </p>
-          <Link href="/shop" style={{display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:"10px", letterSpacing:"2.5px", textTransform:"uppercase", color:"rgba(240,235,227,0.85)", textDecoration:"none", border:"1px solid rgba(240,235,227,0.2)", padding:"13px 28px", fontFamily:"var(--font-jost)"}}>
-            See Our Story
+          <Link href="/shop" style={{display:"inline-flex", alignItems:"center", gap:"12px", fontSize:"10px", letterSpacing:"2.5px", textTransform:"uppercase", color:"#1C1917", textDecoration:"none", borderBottom:"1px solid rgba(28,25,23,0.2)", paddingBottom:"4px", fontFamily:"var(--font-jost)"}}>
+            Discover More →
           </Link>
-        </div>
-        <div style={{position:"relative", aspectRatio:"3/4", overflow:"hidden"}}>
-          {products.length > 0 && products[0].photo ? (
-            <Image src={products[0].photo} alt={products[0].name} fill className="object-cover object-center" />
-          ) : (
-            <div style={{position:"absolute", inset:0, background:"linear-gradient(160deg,#2C2420,#1A1210)", display:"flex", alignItems:"center", justifyContent:"center"}}>
-              <span style={{fontFamily:"var(--font-cormorant)", fontSize:"80px", fontWeight:300, fontStyle:"italic", color:"rgba(200,184,154,0.08)"}}>H</span>
-            </div>
-          )}
-          <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(10,8,6,0.65) 0%, transparent 55%)"}} />
-          <div style={{position:"absolute", bottom:"28px", left:"28px"}}>
-            <p style={{fontFamily:"var(--font-jost)", fontSize:"9px", letterSpacing:"3px", textTransform:"uppercase", color:"rgba(200,184,154,0.5)", marginBottom:"6px"}}>Extrait de Parfum</p>
-            <p style={{fontFamily:"var(--font-cormorant)", fontSize:"26px", fontWeight:300, fontStyle:"italic", color:"rgba(240,235,227,0.85)"}}>{products.length > 0 ? products[0].name : "Henima"}</p>
-          </div>
         </div>
       </section>
 
@@ -117,57 +103,65 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── PRODUCTS ── */}
+      {/* ── PRODUCTS HMNS STYLE ── */}
       {products.length > 0 && (
-        <section style={{padding:"100px 8vw"}}>
-          <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:"56px", flexWrap:"wrap", gap:"16px"}}>
-            <div>
-              <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"12px", fontFamily:"var(--font-jost)"}}>Featured Collection</p>
-              <h2 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(28px,4vw,44px)", fontWeight:400, color:"#1C1917"}}>Our Scents</h2>
-            </div>
-            <Link href="/shop" style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82", textDecoration:"none", borderBottom:"1px solid rgba(154,143,130,0.4)", paddingBottom:"3px", fontFamily:"var(--font-jost)"}}>
-              View All →
-            </Link>
+        <section style={{background:"#FAF8F4", borderTop:"1px solid rgba(28,25,23,0.06)"}}>
+          <div style={{padding:"64px 8vw 24px"}}>
+            <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", fontFamily:"var(--font-jost)"}}>Collection</p>
           </div>
-          <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:"16px"}}>
-            {products.map((product) => {
-              const variants = product.variants.filter((v) => v.active);
-              const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.discountPrice)) : product.discountPrice;
-              return (
-                <div key={product.id} style={{background:"#FAF8F4"}}>
-                  <div style={{position:"relative", aspectRatio:"1/1", background:"#F0EBE3", overflow:"hidden"}}>
-                    {product.photo ? (
-                      <Image src={product.photo} alt={product.name} fill className="object-cover" />
-                    ) : (
-                      <div style={{position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center"}}>
-                        <span style={{fontFamily:"var(--font-cormorant)", fontSize:"24px", fontStyle:"italic", color:"rgba(107,90,74,0.3)"}}>{product.name}</span>
-                      </div>
-                    )}
-                    {(product as any).comingSoon && (
-                      <div style={{position:"absolute", top:"14px", left:"14px", background:"#1C1917", color:"#F0EBE3", fontSize:"8px", letterSpacing:"2px", textTransform:"uppercase", padding:"4px 10px", fontFamily:"var(--font-jost)"}}>
-                        Coming Soon
-                      </div>
-                    )}
-                  </div>
-                  <div style={{padding:"20px 20px 24px"}}>
-                    <p style={{fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"6px", fontFamily:"var(--font-jost)"}}>Extrait de Parfum</p>
-                    <h3 style={{fontFamily:"var(--font-cormorant)", fontSize:"22px", fontWeight:400, color:"#1C1917", marginBottom:"4px"}}>{product.name}</h3>
-                    <p style={{fontSize:"12px", color:"#9A8F82", lineHeight:1.6, marginBottom:"14px", fontWeight:300, fontFamily:"var(--font-jost)"}}>{product.description}</p>
-                    <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-                      {(product as any).comingSoon ? (
-                        <span style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82", fontFamily:"var(--font-jost)"}}>Coming Soon</span>
-                      ) : (
-                        <p style={{fontFamily:"var(--font-jost)", fontSize:"13px", fontWeight:400, color:"#1C1917"}}>Rp {minPrice.toLocaleString("id-ID")}</p>
-                      )}
-                      <Link href="/shop" style={{fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#1C1917", border:"1px solid rgba(28,25,23,0.2)", padding:"7px 14px", textDecoration:"none", fontFamily:"var(--font-jost)"}}>
-                        Shop
-                      </Link>
+          {products.map((product, idx) => {
+            const variants = product.variants.filter((v) => v.active);
+            const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.discountPrice)) : product.discountPrice;
+            const isEven = idx % 2 === 0;
+            return (
+              <div key={product.id} style={{display:"grid", gridTemplateColumns:"1fr 1fr", minHeight:"80vh", borderTop:"1px solid rgba(28,25,23,0.06)"}} className="product-hmns-row">
+                {/* Image */}
+                <div style={{order: isEven ? 0 : 1, position:"relative", background:"#F0EBE3", overflow:"hidden", minHeight:"500px"}}>
+                  {product.photo ? (
+                    <Image src={product.photo} alt={product.name} fill className="object-cover object-center" />
+                  ) : (
+                    <div style={{position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center"}}>
+                      <span style={{fontFamily:"var(--font-cormorant)", fontSize:"48px", fontStyle:"italic", color:"rgba(107,90,74,0.2)"}}>{product.name}</span>
                     </div>
+                  )}
+                  {(product as any).comingSoon && (
+                    <div style={{position:"absolute", top:"24px", left:"24px", background:"#1C1917", color:"#FAF8F4", fontSize:"8px", letterSpacing:"2px", textTransform:"uppercase", padding:"5px 12px", fontFamily:"var(--font-jost)"}}>
+                      Coming Soon
+                    </div>
+                  )}
+                </div>
+                {/* Text */}
+                <div style={{order: isEven ? 1 : 0, display:"flex", flexDirection:"column", justifyContent:"center", padding:"64px 8vw", background:"#FAF8F4"}}>
+                  <p style={{fontSize:"9px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"20px", fontFamily:"var(--font-jost)"}}>Extrait de Parfum</p>
+                  <h2 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(40px,5vw,64px)", fontWeight:300, fontStyle:"italic", color:"#1C1917", marginBottom:"24px", lineHeight:1}}>{product.name}</h2>
+                  <div style={{width:"40px", height:"1px", background:"rgba(200,184,154,0.5)", marginBottom:"28px"}} />
+                  <p style={{fontSize:"14px", color:"#6B6560", lineHeight:1.9, maxWidth:"360px", marginBottom:"16px", fontWeight:300, fontFamily:"var(--font-jost)"}}>{product.description}</p>
+                  {((product as any).topNotes || (product as any).middleNotes || (product as any).baseNotes) && (
+                    <div style={{marginBottom:"32px", display:"flex", flexDirection:"column", gap:"6px"}}>
+                      {(product as any).topNotes && <p style={{fontSize:"12px", color:"#9A8F82", fontFamily:"var(--font-jost)", fontWeight:300}}><span style={{color:"#1C1917", fontWeight:400}}>Top</span> · {(product as any).topNotes}</p>}
+                      {(product as any).middleNotes && <p style={{fontSize:"12px", color:"#9A8F82", fontFamily:"var(--font-jost)", fontWeight:300}}><span style={{color:"#1C1917", fontWeight:400}}>Heart</span> · {(product as any).middleNotes}</p>}
+                      {(product as any).baseNotes && <p style={{fontSize:"12px", color:"#9A8F82", fontFamily:"var(--font-jost)", fontWeight:300}}><span style={{color:"#1C1917", fontWeight:400}}>Base</span> · {(product as any).baseNotes}</p>}
+                    </div>
+                  )}
+                  <div style={{display:"flex", gap:"12px", alignItems:"center", flexWrap:"wrap", marginBottom:"32px"}}>
+                    {variants.map((v) => (
+                      <span key={v.id} style={{border:"1px solid rgba(28,25,23,0.15)", padding:"5px 14px", fontSize:"11px", color:"#9A8F82", fontFamily:"var(--font-jost)"}}>{v.sizeMl}ml</span>
+                    ))}
+                  </div>
+                  <div style={{display:"flex", gap:"12px", alignItems:"center"}}>
+                    {(product as any).comingSoon ? (
+                      <span style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82", fontFamily:"var(--font-jost)"}}>Coming Soon</span>
+                    ) : (
+                      <p style={{fontFamily:"var(--font-jost)", fontSize:"16px", fontWeight:400, color:"#1C1917"}}>Rp {minPrice.toLocaleString("id-ID")}</p>
+                    )}
+                    <Link href="/shop" style={{display:"inline-block", background:"#1C1917", color:"#FAF8F4", padding:"12px 28px", fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", textDecoration:"none", fontFamily:"var(--font-jost)"}}>
+                      Shop Now
+                    </Link>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </section>
       )}
 
