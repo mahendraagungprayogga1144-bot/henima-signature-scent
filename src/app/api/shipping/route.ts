@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const { destination, weight } = await request.json();
+  const body = await request.json();
+  const { destination, weight } = body;
   const apiKey = process.env.KOMERCE_SHIPPING_KEY || "";
-  const origin = process.env.RAJAONGKIR_ORIGIN_ID || "31"; // Sidoarjo
+  const origin = "31";
+
+  const payload = {
+    origin: origin,
+    destination: String(destination),
+    weight: Number(weight) || 500,
+    courier: "jne",
+  };
+
+  console.log("Payload:", JSON.stringify(payload));
+  console.log("API Key exists:", apiKey.length > 0);
 
   try {
     const res = await fetch("https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost", {
@@ -11,36 +22,34 @@ export async function POST(request: Request) {
       headers: {
         "key": apiKey,
         "Content-Type": "application/json",
+        "Accept": "application/json",
       },
-      body: JSON.stringify({
-        origin: origin,
-        destination: destination,
-        weight: weight || 500,
-        courier: "jne:jnt:sicepat:anteraja",
-      }),
+      body: JSON.stringify(payload),
     });
 
-    const data = await res.json();
-    console.log("Shipping response:", JSON.stringify(data).slice(0, 300));
+    const text = await res.text();
+    console.log("Raw response:", text.slice(0, 300));
+    
+    let data;
+    try { data = JSON.parse(text); } catch { data = { error: text }; }
 
     const results: any[] = [];
-    const rawResults = data?.data || data?.rajaongkir?.results || [];
+    const rawResults = data?.data || [];
 
     if (Array.isArray(rawResults)) {
       rawResults.forEach((courier: any) => {
-        const costs = courier?.costs || courier?.cost || [];
-        costs.forEach((cost: any) => {
+        (courier?.costs || []).forEach((cost: any) => {
           results.push({
-            service: (courier.code || courier.name || "").toUpperCase() + " " + (cost.service || ""),
+            service: (courier.courier_code || "").toUpperCase() + " " + (cost.service || ""),
             description: cost.description || "",
-            cost: [{ value: cost.cost?.[0]?.value || cost.value || 0, etd: cost.cost?.[0]?.etd || cost.etd || "-" }],
+            cost: [{ value: cost.cost?.[0]?.value || 0, etd: cost.cost?.[0]?.etd || "-" }],
           });
         });
       });
     }
 
-    return NextResponse.json({ results, raw: data });
+    return NextResponse.json({ results, raw: data, payload });
   } catch (err: any) {
-    return NextResponse.json({ results: [], error: err.message });
+    return NextResponse.json({ results: [], error: err.message, payload });
   }
 }
