@@ -111,17 +111,18 @@ export async function GET(request: Request) {
   // Try RajaOngkir API first
   const apiKey = process.env.RAJAONGKIR_API_KEY || "";
   try {
-    const res = await fetch("https://api.rajaongkir.com/starter/city", {
+    const res = await fetch("https://rajaongkir.komerce.id/api/v1/destination/domestic-destination?search=" + encodeURIComponent(q), {
       headers: { "key": apiKey },
-      next: { revalidate: 86400 },
     });
     const data = await res.json();
-    const cities = data?.rajaongkir?.results || [];
+    const cities = data?.data || [];
     if (cities.length > 0) {
-      const filtered = q ? cities.filter((c: any) => 
-        c.city_name.toLowerCase().includes(q) || c.province.toLowerCase().includes(q)
-      ) : cities;
-      return NextResponse.json({ cities: filtered.slice(0, 100) });
+      return NextResponse.json({ cities: cities.slice(0, 50).map((c: any) => ({
+        city_id: c.id || c.city_id,
+        city_name: c.label || c.city_name,
+        type: c.type || "",
+        province: c.province || "",
+      }))});
     }
   } catch {}
   
