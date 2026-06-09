@@ -169,7 +169,7 @@ export default async function ProfilePage() {
               {firstName}, kita pengen banget kenal kamu lebih dekat. Bukan cuma kenal nama aja, tapi benar-benar tahu apa yang kamu suka,
               biar kita bisa kasih pengalaman yang pas banget buat kamu.
             </p>
-            <Link href="/ganti-password" style={{ display: "inline-block", background: "#1C1917", color: "#fff", padding: "14px 36px", fontSize: "11px", letterSpacing: "2px", textTransform: "uppercase", textDecoration: "none", fontWeight: 500 }}>
+            <Link href="/edit-profil" style={{ display: "inline-block", background: "#1C1917", color: "#fff", padding: "14px 36px", fontSize: "11px", letterSpacing: "2px", textTransform: "uppercase", textDecoration: "none", fontWeight: 500 }}>
               Ubah Profile
             </Link>
           </div>
