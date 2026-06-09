@@ -70,7 +70,7 @@ export default async function HomePage() {
         <div style={{maxWidth:"800px"}}>
           <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"32px", fontFamily:"var(--font-jost)"}}>Our Story</p>
           <p style={{fontFamily:"var(--font-jost)", fontSize:"clamp(16px,2vw,22px)", fontWeight:300, lineHeight:1.9, color:"#4A4440", marginBottom:"48px"}}>
-            {company.brandStory || "Henima lahir dari kisah cinta jarak jauh — dua anak muda yang membuktikan bahwa parfum bukan sekadar aroma, melainkan identitas diri dan pengingat momen yang tak terlupakan."}
+            {company.brandStory || "Henima was born from a long-distance love story — two young souls who proved that fragrance is more than just a scent. It is identity, memory, and a celebration of love that transcends distance."}
           </p>
           <Link href="/shop" style={{display:"inline-flex", alignItems:"center", gap:"12px", fontSize:"10px", letterSpacing:"2.5px", textTransform:"uppercase", color:"#1C1917", textDecoration:"none", borderBottom:"1px solid rgba(28,25,23,0.2)", paddingBottom:"4px", fontFamily:"var(--font-jost)"}}>
             Discover More →
@@ -86,14 +86,14 @@ export default async function HomePage() {
             <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"64px"}} className="visi-grid">
               {company.vision && (
                 <div>
-                  <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"24px", fontFamily:"var(--font-jost)", fontWeight:400}}>Visi</p>
+                  <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"24px", fontFamily:"var(--font-jost)", fontWeight:400}}>Vision</p>
                   <div style={{width:"32px", height:"1px", background:"rgba(200,184,154,0.6)", marginBottom:"24px"}} />
                   <p style={{fontSize:"15px", color:"#4A4440", lineHeight:1.85, fontWeight:300, fontFamily:"var(--font-jost)"}}>{company.vision}</p>
                 </div>
               )}
               {company.mission && (
                 <div>
-                  <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"24px", fontFamily:"var(--font-jost)", fontWeight:400}}>Misi</p>
+                  <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"24px", fontFamily:"var(--font-jost)", fontWeight:400}}>Mission</p>
                   <div style={{width:"32px", height:"1px", background:"rgba(200,184,154,0.6)", marginBottom:"24px"}} />
                   <p style={{fontSize:"15px", color:"#4A4440", lineHeight:1.85, fontWeight:300, fontFamily:"var(--font-jost)"}}>{company.mission}</p>
                 </div>
