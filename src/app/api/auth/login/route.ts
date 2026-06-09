@@ -23,6 +23,6 @@ export async function POST(request: Request) {
   }
 
   await setSessionCookie(user.id);
-  const dest = user.role === "admin" ? "/admin" : user.role === "reseller" ? "/katalog" : "/profil";
+  const dest = user.role === "admin" ? "/admin" : "/profil";
   return NextResponse.redirect(new URL(dest, request.url));
 }
