@@ -55,12 +55,12 @@ export default async function ProfilePage() {
           <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#B5935A" strokeWidth="1.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
         <div style={{ flex: 1, minWidth: "280px" }}>
-          <p style={{ fontSize: "11px", letterSpacing: "3px", textTransform: "uppercase", color: "#B5935A", marginBottom: "12px", fontWeight: 600 }}>Henima Circle</p>
+          <p style={{ fontSize: "11px", letterSpacing: "3px", textTransform: "uppercase", color: "#B5935A", marginBottom: "12px", fontWeight: 600 }}>The Intimate</p>
           <h1 style={{ fontSize: "clamp(24px,3.5vw,38px)", fontWeight: 400, color: "#1C1917", marginBottom: "16px", lineHeight: 1.2 }}>
             Holla, selamat datang <strong style={{ fontWeight: 700 }}>{firstName}</strong>
           </h1>
           <p style={{ fontSize: "14px", color: "#6B5E52", lineHeight: 1.9, maxWidth: "580px", marginBottom: "20px" }}>
-            Selamat datang di Henima Circle — cara baru untuk merayakan setiap momen yang kamu jalin bersama Henima.
+            Selamat datang di The Intimate — cara baru untuk merayakan setiap momen yang kamu jalin bersama Henima.
             Tiap kali kamu berbelanja, kamu bisa naik level. Semakin dekat kita, semakin banyak keistimewaan yang bisa kamu nikmatin.
           </p>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", background: "#fff", padding: "10px 20px", border: "1px solid " + currentTier.color, borderRadius: "2px" }}>
