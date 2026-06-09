@@ -26,11 +26,12 @@ export default function HeroCarousel({ images, productName }: { images: string[]
     }, 400);
   }, [animating, images.length]);
 
-  useEffect(() => {
-    if (images.length <= 1) return;
-    const t = setInterval(next, 5000);
-    return () => clearInterval(t);
-  }, [next, images.length]);
+  // Auto-slide dimatikan - manual swipe only
+  // useEffect(() => {
+  //   if (images.length <= 1) return;
+  //   const t = setInterval(next, 5000);
+  //   return () => clearInterval(t);
+  // }, [next, images.length]);
 
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
