@@ -37,13 +37,18 @@ export default function CheckoutPage() {
 
   async function searchCities(q: string) {
     setCitySearch(q);
-    if (q.length < 2) { setCities([]); return; }
+    setSelectedCityId("");
+    setCity("");
+    if (q.length < 2) { setCities([]); setShowCityDropdown(false); return; }
     try {
       const res = await fetch("/api/cities?q=" + encodeURIComponent(q));
       const data = await res.json();
-      setCities(data.cities || []);
-      setShowCityDropdown(true);
-    } catch {}
+      const list = data.cities || [];
+      setCities(list);
+      setShowCityDropdown(list.length > 0);
+    } catch (e) {
+      console.error("City search error:", e);
+    }
   }
 
   async function checkShipping() {
