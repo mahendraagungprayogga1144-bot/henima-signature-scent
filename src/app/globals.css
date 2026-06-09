@@ -1,4 +1,7 @@
 @tailwind base;
+
+html { overflow-x: hidden; }
+body { overflow-x: hidden; max-width: 100vw; }
 @tailwind components;
 @tailwind utilities;
 
