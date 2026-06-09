@@ -59,6 +59,15 @@ export async function POST(request: Request) {
       });
     }
 
+    if (results.length === 0) {
+      // Fallback flat rate
+      return NextResponse.json({ results: [
+        { service: "JNE REG", description: "Reguler (2-3 hari)", cost: [{ value: 15000, etd: "2-3" }] },
+        { service: "JNE YES", description: "Yakin Esok Sampai", cost: [{ value: 25000, etd: "1" }] },
+        { service: "J&T REG", description: "Reguler (2-3 hari)", cost: [{ value: 14000, etd: "2-3" }] },
+        { service: "SICEPAT REG", description: "Reguler (2-3 hari)", cost: [{ value: 13000, etd: "2-3" }] },
+      ], raw: data, payload });
+    }
     return NextResponse.json({ results, raw: data, payload });
   } catch (err: any) {
     return NextResponse.json({ results: [], error: err.message, payload });
