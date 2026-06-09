@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
+import HeroCarousel from "@/components/HeroCarousel";
 import { getCurrentUserSafe } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { getDatabase } from "@/lib/db";
@@ -45,20 +46,10 @@ export default async function HomePage() {
           </div>
         </div>
         <div style={{position:"relative", background:"#2A2420", overflow:"hidden", minHeight:"400px"}}>
-          {products.length > 0 && products[0].photo ? (
-            <>
-              <Image src={products[0].photo} alt={products[0].name} fill className="object-cover object-center" priority style={{opacity:0.9}} />
-              <div style={{position:"absolute", inset:0, background:"linear-gradient(to top, rgba(20,16,12,0.75) 0%, transparent 60%)"}} />
-              <div style={{position:"absolute", bottom:"40px", left:"40px"}}>
-                <p style={{fontFamily:"var(--font-cormorant)", fontSize:"11px", letterSpacing:"4px", textTransform:"uppercase", color:"rgba(200,184,154,0.6)", marginBottom:"8px"}}>New Arrival</p>
-                <p style={{fontFamily:"var(--font-cormorant)", fontSize:"28px", fontWeight:300, fontStyle:"italic", color:"rgba(240,235,227,0.9)"}}>{products[0].name}</p>
-              </div>
-            </>
-          ) : (
-            <div style={{position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center"}}>
-              <span style={{fontFamily:"var(--font-cormorant)", fontSize:"100px", fontWeight:300, fontStyle:"italic", color:"rgba(200,184,154,0.06)"}}>H</span>
-            </div>
-          )}
+          <HeroCarousel
+            images={(company as any).heroImages?.length ? (company as any).heroImages : products.length > 0 && products[0].photo ? [products[0].photo] : []}
+            productName={products.length > 0 ? products[0].name : undefined}
+          />
         </div>
       </section>
 

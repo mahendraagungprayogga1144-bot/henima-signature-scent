@@ -145,6 +145,7 @@ export interface CompanySettings {
   foundingYear?: string;
   logo?: string;
   heroImage?: string;
+  heroImages?: string[];
   team?: TeamMember[];
   advantages?: Advantage[];
 }
