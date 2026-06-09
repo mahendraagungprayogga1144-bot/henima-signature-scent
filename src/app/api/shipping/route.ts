@@ -17,7 +17,7 @@ export async function POST(request: Request) {
         origin: origin,
         destination: destination,
         weight: String(weight || 500),
-        courier: "jne:j&t:sicepat",
+        courier: "jne",
       }).toString(),
     });
 
