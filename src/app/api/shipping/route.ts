@@ -17,14 +17,19 @@ export async function POST(request: Request) {
   console.log("API Key exists:", apiKey.length > 0);
 
   try {
+    const formData = new URLSearchParams();
+    formData.append("origin", payload.origin);
+    formData.append("destination", payload.destination);
+    formData.append("weight", String(payload.weight));
+    formData.append("courier", payload.courier);
+
     const res = await fetch("https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost", {
       method: "POST",
       headers: {
         "key": apiKey,
-        "Content-Type": "application/json",
-        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: JSON.stringify(payload),
+      body: formData.toString(),
     });
 
     const text = await res.text();
