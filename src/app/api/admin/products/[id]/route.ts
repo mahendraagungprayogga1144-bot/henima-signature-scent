@@ -28,6 +28,10 @@ export async function POST(
   const middleNotes = form.get("middleNotes") as string || null;
   const baseNotes = form.get("baseNotes") as string || null;
   const inspiration = form.get("inspiration") as string || null;
+  const sillage = form.get("sillage") as string || null;
+  const projection = form.get("projection") as string || null;
+  const longevity = form.get("longevity") as string || null;
+  const scentFamily = form.get("scentFamily") as string || null;
 
   if (originalPrice < 0 || discountPrice < 0) {
     return NextResponse.json({ error: "Harga tidak valid" }, { status: 400 });
@@ -67,6 +71,10 @@ export async function POST(
       if (middleNotes !== null) (product as any).middleNotes = middleNotes;
       if (baseNotes !== null) (product as any).baseNotes = baseNotes;
       if (inspiration !== null) (product as any).inspiration = inspiration;
+      if (sillage !== null) (product as any).sillage = sillage;
+      if (projection !== null) (product as any).projection = projection;
+      if (longevity !== null) (product as any).longevity = longevity;
+      if (scentFamily !== null) (product as any).scentFamily = scentFamily;
       if (variants) product.variants = variants;
     }
   });

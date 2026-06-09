@@ -38,6 +38,10 @@ export interface Product {
   active: boolean;
   variants: ProductVariant[];
   topNotes?: string;
+  sillage?: string;
+  projection?: string;
+  longevity?: string;
+  scentFamily?: string;
   middleNotes?: string;
   baseNotes?: string;
   inspiration?: string;

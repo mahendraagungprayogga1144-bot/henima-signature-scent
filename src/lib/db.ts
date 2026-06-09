@@ -17,6 +17,10 @@ function rowToProduct(row: Record<string, unknown>): Product {
     middleNotes: (row.middle_notes as string) ?? undefined,
     baseNotes: (row.base_notes as string) ?? undefined,
     inspiration: (row.inspiration as string) ?? undefined,
+    sillage: (row.sillage as string) ?? undefined,
+    projection: (row.projection as string) ?? undefined,
+    longevity: (row.longevity as string) ?? undefined,
+    scentFamily: (row.scent_family as string) ?? undefined,
     comingSoon: (row.coming_soon as boolean) ?? false,
   };
 }
@@ -35,6 +39,10 @@ function productToRow(p: Product) {
     middle_notes: p.middleNotes ?? null,
     base_notes: p.baseNotes ?? null,
     inspiration: p.inspiration ?? null,
+    sillage: (p as any).sillage ?? null,
+    projection: (p as any).projection ?? null,
+    longevity: (p as any).longevity ?? null,
+    scent_family: (p as any).scentFamily ?? null,
     coming_soon: (p as any).comingSoon ?? false,
   };
 }

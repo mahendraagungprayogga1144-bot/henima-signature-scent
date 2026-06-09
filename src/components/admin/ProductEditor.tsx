@@ -29,6 +29,10 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   const [middleNotes, setMiddleNotes] = useState((product as any).middleNotes || "");
   const [baseNotes, setBaseNotes] = useState((product as any).baseNotes || "");
   const [inspiration, setInspiration] = useState((product as any).inspiration || "");
+  const [sillage, setSillage] = useState((product as any).sillage || "");
+  const [projection, setProjection] = useState((product as any).projection || "");
+  const [longevity, setLongevity] = useState((product as any).longevity || "");
+  const [scentFamily, setScentFamily] = useState((product as any).scentFamily || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -67,6 +71,10 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
       fd.set("middleNotes", middleNotes);
       fd.set("baseNotes", baseNotes);
       fd.set("inspiration", inspiration);
+      fd.set("sillage", sillage);
+      fd.set("projection", projection);
+      fd.set("longevity", longevity);
+      fd.set("scentFamily", scentFamily);
       fd.set("photoUrl", photoUrl);
 
       const res = await fetch(`/api/admin/products/${product.id}`, { method: "POST", body: fd });
@@ -166,6 +174,27 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
           <div className="sm:col-span-2">
             <label className="label">Kisah / Inspirasi Produk</label>
             <textarea className="input-field" rows={3} value={inspiration} onChange={(e) => setInspiration(e.target.value)} placeholder="Cerita di balik nama dan konsep parfum ini..." />
+            <div className="mt-4">
+              <p className="text-xs font-medium tracking-widest uppercase text-ink-400 mb-3">Scent Profile</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="label">Scent Family</label>
+                  <input className="input-field" value={scentFamily} onChange={(e) => setScentFamily(e.target.value)} placeholder="Woody, Floral, Oriental..." />
+                </div>
+                <div>
+                  <label className="label">Sillage</label>
+                  <input className="input-field" value={sillage} onChange={(e) => setSillage(e.target.value)} placeholder="Medium, Medium-strong..." />
+                </div>
+                <div>
+                  <label className="label">Projection</label>
+                  <input className="input-field" value={projection} onChange={(e) => setProjection(e.target.value)} placeholder="±2 m, 1.5-2 m..." />
+                </div>
+                <div>
+                  <label className="label">Longevity</label>
+                  <input className="input-field" value={longevity} onChange={(e) => setLongevity(e.target.value)} placeholder="6-8 hours, ±6 hours..." />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
