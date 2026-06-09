@@ -23,6 +23,8 @@ export default async function ProductDetailPage({
 
   const variants = product.variants.filter((v) => v.active);
   const waNumber = company.whatsappNumber || "6285190311230";
+  const waText = encodeURIComponent("Halo Henima, saya ingin membeli " + product.name + ". Boleh info ketersediaan dan cara ordernya?");
+  const waLink = "https://wa.me/" + waNumber + "?text=" + waText;
 
   return (
     <div style={{background:"#FAF8F4", minHeight:"100vh", color:"#1C1917", fontFamily:"var(--font-jost)"}}>
@@ -34,10 +36,10 @@ export default async function ProductDetailPage({
         <span style={{fontSize:"12px", color:"#1C1917"}}>{product.name}</span>
       </div>
 
-      {/* MAIN CONTENT */}
+      {/* MAIN */}
       <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0", minHeight:"80vh"}} className="product-detail-grid">
 
-        {/* LEFT — Images */}
+        {/* LEFT — Image */}
         <div style={{position:"relative", background:"#F0EBE3", minHeight:"600px", overflow:"hidden"}}>
           {product.photo ? (
             <Image src={product.photo} alt={product.name} fill className="object-cover object-center" priority />
@@ -55,27 +57,21 @@ export default async function ProductDetailPage({
 
         {/* RIGHT — Info */}
         <div style={{padding:"64px 8vw", display:"flex", flexDirection:"column", justifyContent:"center", background:"#FAF8F4"}}>
-          
           {(product as any).scentFamily && (
             <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"16px"}}>
               {(product as any).scentFamily}
             </p>
           )}
-
           <h1 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(40px,5vw,64px)", fontWeight:300, fontStyle:"italic", color:"#1C1917", marginBottom:"8px", lineHeight:1}}>
             {product.name}
           </h1>
-
           <p style={{fontSize:"12px", color:"#9A8F82", marginBottom:"24px"}}>Extrait de Parfum</p>
-
           <div style={{width:"40px", height:"1px", background:"rgba(200,184,154,0.5)", marginBottom:"24px"}} />
-
           {(product as any).inspiration && (
             <p style={{fontSize:"14px", color:"#4A4440", lineHeight:1.9, marginBottom:"28px", fontWeight:300}}>
               {(product as any).inspiration}
             </p>
           )}
-
           {product.description && (
             <p style={{fontSize:"13px", color:"#9A8F82", lineHeight:1.8, marginBottom:"32px", fontWeight:300}}>
               {product.description}
@@ -103,7 +99,7 @@ export default async function ProductDetailPage({
             </div>
           )}
 
-          {/* Size + Price */}
+          {/* Variants */}
           {variants.length > 0 && (
             <div style={{marginBottom:"32px"}}>
               <p style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"16px"}}>Pilih Ukuran</p>
@@ -126,18 +122,13 @@ export default async function ProductDetailPage({
               <p style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82"}}>Coming Soon</p>
             </div>
           ) : (
-            <div style={{display:"flex", flexDirection:"column", gap:"12px"}}>
-              
-                href={"https://wa.me/" + waNumber + "?text=" + encodeURIComponent("Halo Henima, saya ingin membeli " + product.name + ". Boleh info ketersediaan dan cara ordernya?")}
-                target="_blank" rel="noreferrer"
-                style={{display:"block", background:"#1C1917", color:"#FAF8F4", padding:"16px", fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", textDecoration:"none", textAlign:"center", fontWeight:500}}
-              >
-                Beli Sekarang via WhatsApp
-              </a>
-            </div>
+            <a href={waLink} target="_blank" rel="noreferrer"
+              style={{display:"block", background:"#1C1917", color:"#FAF8F4", padding:"16px", fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", textDecoration:"none", textAlign:"center", fontWeight:500}}>
+              Beli Sekarang via WhatsApp
+            </a>
           )}
 
-          {/* Sillage / Projection / Longevity */}
+          {/* Sillage Projection Longevity */}
           {((product as any).sillage || (product as any).projection || (product as any).longevity) && (
             <div style={{marginTop:"32px", padding:"20px 0", borderTop:"1px solid rgba(28,25,23,0.08)", display:"flex", gap:"32px", flexWrap:"wrap"}}>
               {(product as any).sillage && (
@@ -168,7 +159,7 @@ export default async function ProductDetailPage({
         <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"40px"}}>You May Also Like</p>
         <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))", gap:"16px"}}>
           {products.filter(p => p.id !== product.id).map((p) => (
-            <Link key={p.id} href={"/shop/" + toSlug(p.name)} style={{textDecoration:"none", color:"#1C1917"}}>
+            <Link key={p.id} href={"/shop/" + toSlug(p.name)} style={{textDecoration:"none", color:"#1C1917", display:"block"}}>
               <div style={{background:"#F0EBE3", overflow:"hidden"}}>
                 <div style={{position:"relative", aspectRatio:"1/1", background:"#E8E0D4"}}>
                   {p.photo && <Image src={p.photo} alt={p.name} fill className="object-cover" />}
