@@ -92,10 +92,13 @@ export default async function ProfilePage() {
       <div style={{ background: "#fff", padding: "80px 32px" }}>
         <div style={{ textAlign: "center", marginBottom: "64px", maxWidth: "700px", margin: "0 auto 64px" }}>
           <h2 style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: 700, color: "#1C1917", marginBottom: "12px" }}>Keuntungan Tiap Level</h2>
-          <p style={{ fontSize: "14px", color: "#9E8E7E", fontStyle: "italic", marginBottom: "20px" }}>"Every scent tells a story, and we are here to celebrate yours."</p>
+          <p style={{ fontSize: "14px", color: "#9E8E7E", fontStyle: "italic", marginBottom: "20px" }}>"Every distance has a scent, and every scent tells your story."</p>
           <p style={{ fontSize: "14px", color: "#6B5E52", lineHeight: 1.9 }}>
-            Setiap pembelian membawamu lebih dekat ke pengalaman Henima yang lebih personal.
-            Kita bukan sekadar parfum — kita adalah bagian dari momenmu.
+            Henima lahir dari sebuah jarak. Dua kota, satu rindu — dan aroma yang jadi penghubungnya.
+
+            Kita tahu rasanya menunggu. Kita tahu rasanya kangen. Dan kita tahu bahwa kadang, sebuah wangi bisa membawa kamu kembali ke momen yang paling kamu rindukan.
+
+            Tiap kali kamu memilih Henima, kamu bukan sekadar membeli parfum. Kamu menyimpan sebuah cerita. Dan semakin dalam perjalananmu bersama kami, semakin banyak keistimewaan yang ingin kami bagikan — karena kamu bukan sekadar pelanggan. Kamu adalah bagian dari cerita Henima.
           </p>
         </div>
 
