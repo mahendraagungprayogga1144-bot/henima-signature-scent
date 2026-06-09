@@ -1,4 +1,4 @@
-import Link from "next/link";
+code = '''import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
@@ -178,4 +178,8 @@ export default async function ProfilePage() {
 
     </div>
   );
-}
+}'''
+
+with open("src/app/profil/page.tsx", "w") as f:
+    f.write(code)
+print("Done!")
