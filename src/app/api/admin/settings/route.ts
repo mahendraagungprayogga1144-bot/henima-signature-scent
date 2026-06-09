@@ -43,6 +43,9 @@ export async function POST(request: Request) {
   const qrisUrlExisting = form.get("qrisUrl") as string | null;
   const logoUrlExisting = form.get("logoUrl") as string | null;
   const heroUrlExisting = form.get("heroUrl") as string | null;
+  const heroImagesRaw = String(form.get("heroImages") || "").trim();
+  let heroImages: string[] = [];
+  if (heroImagesRaw) { try { heroImages = JSON.parse(heroImagesRaw); } catch {} }
   const qrisFile = form.get("qrisImage") as File | null;
   const logoFile = form.get("logo") as File | null;
   const heroFile = form.get("heroImage") as File | null;
@@ -99,6 +102,8 @@ export async function POST(request: Request) {
     (db.settings.company as any).foundingYear = foundingYear || undefined;
     if (logoPath) db.settings.company.logo = logoPath;
     if (heroPath) db.settings.company.heroImage = heroPath;
+    if (heroImages.length > 0) (db.settings.company as any).heroImages = heroImages;
+    else if (heroPath) (db.settings.company as any).heroImages = [heroPath];
     if (team) db.settings.company.team = team;
     if (advantages) db.settings.company.advantages = advantages;
     if (bankAccounts) db.settings.payment.bankAccounts = bankAccounts;

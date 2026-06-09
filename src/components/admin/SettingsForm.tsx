@@ -26,6 +26,8 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
   ]);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [heroFile, setHeroFile] = useState<File | null>(null);
+  const [heroImages, setHeroImages] = useState<string[]>((settings.company as any).heroImages || (settings.company.heroImage ? [settings.company.heroImage] : []));
+  const [heroUploading, setHeroUploading] = useState(false);
   const [qrisFile, setQrisFile] = useState<File | null>(null);
   const [banks, setBanks] = useState<BankAccount[]>(() => {
     const byCode = new Map(settings.payment.bankAccounts.map((b) => [b.code, b]));
@@ -37,6 +39,19 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
   const qrisPreview = useMemo(() => (qrisFile ? URL.createObjectURL(qrisFile) : null), [qrisFile]);
   const logoPreview = useMemo(() => (logoFile ? URL.createObjectURL(logoFile) : null), [logoFile]);
   const heroPreview = useMemo(() => (heroFile ? URL.createObjectURL(heroFile) : null), [heroFile]);
+
+  async function addHeroImage(file: File) {
+    setHeroUploading(true);
+    try {
+      const url = await uploadToSupabase(file, "hero");
+      setHeroImages((prev) => [...prev, url]);
+    } catch (err: any) { alert("Upload gagal: " + err.message); }
+    finally { setHeroUploading(false); }
+  }
+
+  function removeHeroImage(idx: number) {
+    setHeroImages((prev) => prev.filter((_, i) => i !== idx));
+  }
 
   async function uploadToSupabase(file: File, prefix: string): Promise<string> {
     const ext = file.name.split(".").pop() || "jpg";
@@ -78,6 +93,7 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
       fd.set("bankAccounts", JSON.stringify(banks));
       fd.set("logoUrl", logoUrl);
       fd.set("heroUrl", heroUrl);
+      fd.set("heroImages", JSON.stringify(heroImages.length > 0 ? heroImages : heroUrl ? [heroUrl] : []));
       fd.set("qrisUrl", qrisUrl);
 
       const res = await fetch("/api/admin/settings", { method: "POST", body: fd });
@@ -168,14 +184,43 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
               </div>
             </div>
             <div className="rounded-2xl border border-ink-800 bg-ink-950/20 p-4">
-              <p className="text-sm font-semibold text-ink-100">Hero Image</p>
-              <div className="mt-3 grid gap-3 sm:grid-cols-[120px_1fr]">
-                <div className="relative h-24 w-24 overflow-hidden rounded-2xl border border-ink-800 bg-ink-950/40">
-                  <Image src={heroPreview || settings.company.heroImage || "/products/placeholder.svg"} alt="Hero" fill className="object-cover" />
-                </div>
-                <input type="file" accept="image/*" className="block w-full text-sm text-ink-300 file:mr-4 file:rounded-lg file:border-0 file:bg-ink-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink-50"
-                  onChange={(e) => setHeroFile(e.target.files?.[0] ?? null)} />
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-ink-100">Hero Images (Carousel)</p>
+                <span className="text-xs text-ink-400">{heroImages.length}/4 foto</span>
               </div>
+              <p className="text-xs text-ink-400 mb-3">Upload 3-4 foto untuk slideshow di homepage. Foto pertama tampil paling awal.</p>
+              <div className="grid grid-cols-2 gap-2 mb-3 sm:grid-cols-4">
+                {heroImages.map((url, idx) => (
+                  <div key={idx} className="relative group">
+                    <div className="relative h-24 overflow-hidden rounded-lg border border-ink-700 bg-ink-950/40">
+                      <Image src={url} alt={"Hero " + (idx+1)} fill className="object-cover" />
+                    </div>
+                    <button type="button" onClick={() => removeHeroImage(idx)}
+                      className="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      ×
+                    </button>
+                    <p className="text-xs text-ink-400 text-center mt-1">Foto {idx+1}</p>
+                  </div>
+                ))}
+                {heroImages.length < 4 && (
+                  <label className="relative h-24 rounded-lg border-2 border-dashed border-ink-700 bg-ink-950/20 flex flex-col items-center justify-center cursor-pointer hover:border-gold-400/50 transition-colors">
+                    {heroUploading ? (
+                      <span className="text-xs text-ink-400">Uploading...</span>
+                    ) : (
+                      <>
+                        <span className="text-2xl text-ink-500">+</span>
+                        <span className="text-xs text-ink-400 mt-1">Tambah foto</span>
+                      </>
+                    )}
+                    <input type="file" accept="image/*" className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) addHeroImage(f); }}
+                      disabled={heroUploading} />
+                  </label>
+                )}
+              </div>
+              {heroImages.length === 0 && (
+                <p className="text-xs text-amber-400">⚠ Belum ada foto hero. Tambah minimal 1 foto.</p>
+              )}
             </div>
           </div>
         </div>
