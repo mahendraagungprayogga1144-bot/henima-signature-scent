@@ -71,28 +71,35 @@ export default async function HomePage() {
       </div>
 
       {/* STORY */}
-      <section style={{display:"grid", gridTemplateColumns:"1fr 1fr", width:"100%", minHeight:"500px"}} className="story-grid">
-        <div style={{position:"relative", background:"#E8E0D6", minHeight:"400px", overflow:"hidden"}}>
-          {company.heroImage ? (
-            <Image src={company.heroImage} alt="Henima" fill className="object-cover" />
-          ) : (
-            <div style={{width:"100%", height:"100%", minHeight:"400px", background:"linear-gradient(135deg,#D8CFC4,#C4B8A8)", display:"flex", alignItems:"center", justifyContent:"center"}}>
-              <span style={{fontFamily:"var(--font-cormorant)", fontSize:"64px", fontWeight:300, fontStyle:"italic", color:"rgba(255,255,255,0.25)"}}>Scent</span>
-            </div>
-          )}
-        </div>
-        <div style={{background:"#FAF8F4", display:"flex", flexDirection:"column", justifyContent:"center", padding:"64px 8vw 64px 56px"}}>
-          <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"20px"}}>Our Story</p>
-          <h2 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(28px,4vw,48px)", fontWeight:400, lineHeight:1.1, color:"#1C1917", marginBottom:"24px"}}>
+      <section style={{display:"grid", gridTemplateColumns:"1fr 1fr", width:"100%", minHeight:"520px"}} className="story-grid">
+        <div style={{background:"#F5F0E8", display:"flex", flexDirection:"column", justifyContent:"center", padding:"80px 8vw 80px 8vw"}}>
+          <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"20px", fontFamily:"var(--font-jost)"}}>Our Story</p>
+          <h2 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(28px,4vw,52px)", fontWeight:400, lineHeight:1.1, color:"#1C1917", marginBottom:"24px"}}>
             Fragrance is more<br />than <em style={{color:"#7A6553"}}>scent.</em>
           </h2>
           <div style={{width:"40px", height:"1px", background:"rgba(200,184,154,0.5)", marginBottom:"24px"}} />
-          <p style={{fontSize:"14px", color:"#9A8F82", lineHeight:1.95, maxWidth:"380px", marginBottom:"40px", fontWeight:300}}>
+          <p style={{fontSize:"14px", color:"#9A8F82", lineHeight:1.95, maxWidth:"420px", marginBottom:"40px", fontWeight:300, fontFamily:"var(--font-jost)"}}>
             {company.brandStory || "Setiap botol Henima dirancang untuk mengabadikan momen yang layak diingat."}
           </p>
           <Link href="/shop" style={{display:"inline-flex", alignItems:"center", gap:"12px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#1C1917", textDecoration:"none", borderBottom:"1px solid rgba(28,25,23,0.2)", paddingBottom:"4px", width:"fit-content", fontFamily:"var(--font-jost)"}}>
             Discover More →
           </Link>
+        </div>
+        <div style={{background:"#1C1917", display:"flex", alignItems:"center", justifyContent:"center", padding:"64px 8vw", flexDirection:"column", gap:"32px"}}>
+          <p style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(48px,6vw,80px)", fontWeight:300, fontStyle:"italic", color:"rgba(200,184,154,0.15)", lineHeight:1, textAlign:"center", letterSpacing:"2px"}}>Henima</p>
+          <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1px", width:"100%"}}>
+            {[
+              {icon:"🌿", label:"Bahan Premium"},
+              {icon:"⏰", label:"Tahan 8-12 Jam"},
+              {icon:"💚", label:"Aman di Kulit"},
+              {icon:"🇮🇩", label:"Made in Indonesia"},
+            ].map((item) => (
+              <div key={item.label} style={{background:"rgba(200,184,154,0.05)", padding:"20px", textAlign:"center"}}>
+                <p style={{fontSize:"20px", marginBottom:"8px"}}>{item.icon}</p>
+                <p style={{fontSize:"10px", letterSpacing:"1.5px", textTransform:"uppercase", color:"rgba(200,184,154,0.5)", fontFamily:"var(--font-jost)", fontWeight:300}}>{item.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
