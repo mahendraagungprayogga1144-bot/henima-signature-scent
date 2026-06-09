@@ -170,17 +170,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── RESELLER BAND ── */}
-      <div style={{background:"#1C1917", padding:"72px 8vw", display:"flex", justifyContent:"space-between", alignItems:"center", gap:"32px", flexWrap:"wrap"}}>
-        <div>
-          <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"rgba(200,184,154,0.5)", marginBottom:"12px", fontFamily:"var(--font-jost)"}}>Partner Program</p>
-          <h3 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(22px,3vw,32px)", fontWeight:300, fontStyle:"italic", color:"#F0EBE3", marginBottom:"8px"}}>Become a Henima Partner</h3>
-          <p style={{fontSize:"13px", color:"rgba(200,184,154,0.5)", fontWeight:300, fontFamily:"var(--font-jost)"}}>Bergabung sebagai mitra reseller eksklusif. Margin terbaik, support penuh.</p>
-        </div>
-        <Link href="/daftar" style={{display:"inline-block", background:"transparent", color:"#F0EBE3", padding:"14px 36px", fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", textDecoration:"none", border:"1px solid rgba(200,184,154,0.35)", fontFamily:"var(--font-jost)", whiteSpace:"nowrap"}}>
-          Apply as Reseller
-        </Link>
-      </div>
+
 
       <style>{`
         @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }

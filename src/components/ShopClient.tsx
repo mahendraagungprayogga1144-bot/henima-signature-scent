@@ -174,17 +174,7 @@ export default function ShopClient({ products, waNumber }: { products: Product[]
         </div>
       </div>
 
-      {/* RESELLER BAND */}
-      <div style={{background:"#1C1917", padding:"56px 6vw", display:"flex", justifyContent:"space-between", alignItems:"center", gap:"24px", flexWrap:"wrap"}}>
-        <div>
-          <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"rgba(200,184,154,0.5)", marginBottom:"10px", fontFamily:"var(--font-jost)"}}>Partner Program</p>
-          <h3 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(20px,3vw,28px)", fontWeight:300, fontStyle:"italic", color:"#F0EBE3", marginBottom:"6px"}}>Become a Henima Partner</h3>
-          <p style={{fontSize:"13px", color:"rgba(200,184,154,0.5)", fontWeight:300, fontFamily:"var(--font-jost)"}}>Bergabung sebagai mitra reseller eksklusif.</p>
-        </div>
-        <Link href="/daftar" style={{display:"inline-block", background:"transparent", color:"#F0EBE3", padding:"12px 28px", fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", textDecoration:"none", border:"1px solid rgba(200,184,154,0.3)", fontFamily:"var(--font-jost)", whiteSpace:"nowrap"}}>
-          Apply as Reseller
-        </Link>
-      </div>
+
 
       <style>{`
         @media (max-width: 768px) {

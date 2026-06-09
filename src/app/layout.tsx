@@ -68,7 +68,7 @@ export default function RootLayout({
             <div>
               <h4 style={{fontSize:"10px", letterSpacing:"2.5px", textTransform:"uppercase", color:"rgba(200,184,154,0.4)", fontWeight:400, marginBottom:"20px"}}>Partner</h4>
               <ul style={{listStyle:"none", padding:0, margin:0, display:"flex", flexDirection:"column", gap:"10px"}}>
-                {[["Reseller Program","/daftar"],["Login Reseller","/masuk"],["Katalog","/katalog-digital"]].map(([label,href]) => (
+                {[["Partner Program","/partner"],["Katalog","/katalog-digital"]].map(([label,href]) => (
                   <li key={label}><a href={href} style={{fontSize:"13px", color:"rgba(240,235,227,0.6)", textDecoration:"none", fontWeight:300}}>{label}</a></li>
                 ))}
               </ul>
