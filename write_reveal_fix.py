@@ -1,4 +1,5 @@
-"use client";
+with open("src/components/Reveal.tsx", "w") as f:
+    f.write('''"use client";
 import { useEffect, useRef, useState } from "react";
 
 export default function Reveal({
@@ -65,3 +66,5 @@ export default function Reveal({
     </div>
   );
 }
+''')
+print("Done!")
