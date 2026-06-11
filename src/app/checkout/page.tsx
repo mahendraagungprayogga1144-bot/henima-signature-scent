@@ -60,7 +60,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({ destinationAreaId: selectedCityId, weightGrams: items.reduce((s, i) => s + i.quantity * 250, 0) }),
       });
       const data = await res.json();
-      setShippingOptions(data.results || []);
+      setShippingOptions(Array.isArray(data) ? data : (data.pricing || data.results || []));
     } catch {}
     finally { setLoadingShipping(false); }
   }
