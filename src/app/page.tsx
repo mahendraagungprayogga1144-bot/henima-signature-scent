@@ -74,7 +74,7 @@ export default async function HomePage() {
           <p style={{fontFamily:"var(--font-jost)", fontSize:"clamp(16px,2vw,22px)", fontWeight:300, lineHeight:1.9, color:"#4A4440", marginBottom:"48px"}}>
             {company.brandStory || "Henima was born from a long-distance love story — two young souls who proved that fragrance is more than just a scent. It is identity, memory, and a celebration of love that transcends distance."}
           </p>
-          <Link href="/shop" style={{display:"inline-flex", alignItems:"center", gap:"12px", fontSize:"10px", letterSpacing:"2.5px", textTransform:"uppercase", color:"#1C1917", textDecoration:"none", borderBottom:"1px solid rgba(28,25,23,0.2)", paddingBottom:"4px", fontFamily:"var(--font-jost)"}}>
+          <Link href="/our-story" style={{display:"inline-flex", alignItems:"center", gap:"12px", fontSize:"10px", letterSpacing:"2.5px", textTransform:"uppercase", color:"#1C1917", textDecoration:"none", borderBottom:"1px solid rgba(28,25,23,0.2)", paddingBottom:"4px", fontFamily:"var(--font-jost)"}}>
             Discover More →
           </Link>
         </div>
