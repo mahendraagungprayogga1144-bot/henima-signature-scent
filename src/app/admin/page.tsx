@@ -100,6 +100,7 @@ export default async function AdminDashboardPage() {
       <p style={s.sectionTitle}>Operasional</p>
       <div style={s.menuGrid}>
         {[
+          { href: "/admin/orders", icon: "🛍️", label: "Retail Orders", desc: "Kelola order dari web shop, update status, input resi pengiriman" },
           { href: "/admin/pesanan", icon: "📦", label: "Kelola Pesanan", desc: "Konfirmasi pembayaran, update status pengiriman, lihat detail order" },
           { href: "/admin/produk", icon: "🧴", label: "Kelola Produk", desc: "Tambah produk, edit harga, kelola varian ukuran dan stok" },
           { href: "/admin/reseller", icon: "👥", label: "Kelola Reseller", desc: "Approve pendaftaran, lihat performa, kelola akun reseller" },
