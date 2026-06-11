@@ -58,7 +58,7 @@ export default function CheckoutPage() {
       const res = await fetch("/api/shipping", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ destination: selectedCityId, weight: items.reduce((s, i) => s + i.quantity * 200, 0) }),
+        body: JSON.stringify({ destination: selectedCityId, weight: items.reduce((s, i) => s + i.quantity * 250, 0) }),
       });
       const data = await res.json();
       setShippingOptions(data.results || []);
