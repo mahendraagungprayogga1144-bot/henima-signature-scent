@@ -30,13 +30,13 @@ export default function Navbar({ user }: { user?: any }) {
   return (
     <>
       <header style={{
-        position:"fixed", top:0, left:0, right:0, zIndex:50,
-        background: scrolled ? "rgba(250,248,244,0.97)" : "rgba(250,248,244,0.0)",
-        backdropFilter: scrolled ? "blur(16px)" : "none",
-        WebkitBackdropFilter: scrolled ? "blur(16px)" : "none",
-        borderBottom: scrolled ? "1px solid rgba(28,25,23,0.08)" : "1px solid transparent",
-        transform: hidden ? "translateY(-100%)" : "translateY(0)",
-        transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), background 0.3s ease, border-color 0.3s ease",
+        position:"sticky", top:0, zIndex:50,
+        background:"rgba(250,248,244,0.95)",
+        backdropFilter:"blur(12px)",
+        WebkitBackdropFilter:"blur(12px)",
+        borderBottom:"1px solid rgba(28,25,23,0.08)",
+        
+        
       }}>
         <div style={{
           display:"flex", alignItems:"center", justifyContent:"space-between",
