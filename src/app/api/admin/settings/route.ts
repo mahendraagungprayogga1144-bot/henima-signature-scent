@@ -108,12 +108,6 @@ export async function POST(request: Request) {
     let marqueeItems: string[] = [];
     if (marqueeRaw) { try { marqueeItems = JSON.parse(marqueeRaw); } catch {} }
     if (marqueeItems.length > 0) (db.settings as any).marqueeItems = marqueeItems;
-    await supabase.from("settings").update({ marquee_items: marqueeItems.length > 0 ? marqueeItems : undefined }).eq("id", 1);
-    const marqueeRaw = String(form.get("marqueeItems") || "").trim();
-    let marqueeItems: string[] = [];
-    if (marqueeRaw) { try { marqueeItems = JSON.parse(marqueeRaw); } catch {} }
-    if (marqueeItems.length > 0) (db.settings as any).marqueeItems = marqueeItems;
-    await supabase.from("settings").update({ marquee_items: marqueeItems.length > 0 ? marqueeItems : undefined }).eq("id", 1);
     const galleryImagesRaw = String(form.get("galleryImages") || "").trim();
     let galleryImages: string[] = [];
     if (galleryImagesRaw) { try { galleryImages = JSON.parse(galleryImagesRaw); } catch {} }
