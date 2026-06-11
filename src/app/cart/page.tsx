@@ -34,7 +34,7 @@ export default function CartPage() {
         <Link href="/shop" style={{fontSize:"12px", color:"#9A8F82", textDecoration:"none"}}>← Back to Shopping</Link>
       </div>
 
-      <div style={{padding:"48px 8vw"}}>
+      <div style={{padding:"32px 5vw"}}>
         <h1 style={{fontFamily:"var(--font-jost)", fontSize:"clamp(28px,4vw,48px)", fontWeight:700, color:"#1C1917", marginBottom:"40px", letterSpacing:"-1px"}}>
           Your Cart {items.length > 0 && <span style={{fontSize:"16px", fontWeight:400, color:"#9A8F82"}}>({items.length} item{items.length > 1 ? "s" : ""})</span>}
         </h1>
@@ -53,7 +53,7 @@ export default function CartPage() {
             {/* ITEMS */}
             <div>
               {/* Header */}
-              <div style={{display:"grid", gridTemplateColumns:"1fr auto auto auto", gap:"16px", padding:"0 0 16px", borderBottom:"2px solid #1C1917", marginBottom:"0"}}>
+              <div className="cart-header" style={{display:"grid", gridTemplateColumns:"1fr auto auto auto", gap:"16px", padding:"0 0 16px", borderBottom:"2px solid #1C1917", marginBottom:"0"}}>
                 <p style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82"}}>Product</p>
                 <p style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82", textAlign:"center"}}>Qty</p>
                 <p style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82", textAlign:"right"}}>Total</p>
@@ -62,7 +62,7 @@ export default function CartPage() {
 
               {items.map((item) => (
                 <div key={item.productId + item.variantId}
-                  style={{display:"grid", gridTemplateColumns:"1fr auto auto auto", gap:"16px", alignItems:"center", padding:"20px 0", borderBottom:"1px solid rgba(28,25,23,0.08)"}}>
+                  className="cart-item" style={{display:"grid", gridTemplateColumns:"1fr auto auto auto", gap:"16px", alignItems:"center", padding:"20px 0", borderBottom:"1px solid rgba(28,25,23,0.08)"}}>
 
                   {/* Product info */}
                   <div style={{display:"flex", gap:"16px", alignItems:"center"}}>
@@ -137,7 +137,10 @@ export default function CartPage() {
 
       <style>{`
         @media (max-width: 768px) {
-          .cart-grid { grid-template-columns: 1fr !important; }
+          .cart-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .cart-header { display: none !important; }
+          .cart-item { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .cart-item-info { flex-direction: column !important; }
         }
       `}</style>
     </div>
