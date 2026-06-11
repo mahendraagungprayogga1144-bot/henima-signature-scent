@@ -126,7 +126,7 @@ export default function CheckoutPage() {
               <div style={{display:"flex", flexDirection:"column", gap:"0"}}>
                 <input required value={email} onChange={e => setEmail(e.target.value)}
                   placeholder="Email" style={inp} type="email" />
-                <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px"}}>
+                <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px"}} className="name-grid">
                   <input required value={name} onChange={e => setName(e.target.value)}
                     placeholder="First name" style={inp} />
                   <input value={""} placeholder="Last name" style={inp} readOnly />
@@ -176,7 +176,7 @@ export default function CheckoutPage() {
                     </div>
                   )}
                 </div>
-                <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px"}}>
+                <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px"}} className="name-grid">
                   <input required value={province} onChange={e => setProvince(e.target.value)}
                     placeholder="Province" style={inp} />
                   <input required value={postalCode} onChange={e => setPostalCode(e.target.value)}
