@@ -200,12 +200,7 @@ export default async function ProductDetailPage({
         </div>
       </div>
 
-      <style>{\`
-        @media (max-width: 768px) {
-          .product-detail-grid { grid-template-columns: 1fr !important; }
-          .product-detail-right { padding: 32px 6vw !important; }
-        }
-      \`}</style>
+      <style>{"@media (max-width: 768px) { .product-detail-grid { grid-template-columns: 1fr !important; } .product-detail-right { padding: 32px 6vw !important; } }"}</style>
     </div>
   );
 }
