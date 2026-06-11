@@ -5,14 +5,10 @@ export default function SplashScreen() {
   const [phase, setPhase] = useState<"enter" | "hold" | "exit" | "done">("enter");
 
   useEffect(() => {
-    const seen = sessionStorage.getItem("henima-splash");
-    if (seen) { setPhase("done"); return; }
-
     const t1 = setTimeout(() => setPhase("hold"), 1500);
     const t2 = setTimeout(() => setPhase("exit"), 3000);
     const t3 = setTimeout(() => {
       setPhase("done");
-      sessionStorage.setItem("henima-splash", "1");
     }, 4500);
 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
