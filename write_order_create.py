@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+with open("src/app/api/orders/create/route.ts", "w") as f:
+    f.write('''import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
 const ADMIN_WA = process.env.ADMIN_WHATSAPP || "6285190311230";
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
 
   // Kirim notifikasi WA ke admin via Fonnte
   try {
-    const itemsList = items.map((i: any) => `${i.productName} ${i.sizeMl}ml x${i.quantity}`).join("\n");
+    const itemsList = items.map((i: any) => `${i.productName} ${i.sizeMl}ml x${i.quantity}`).join("\\n");
     const msg = `ORDER BARU MASUK!
 
 Order ID: ${orderId}
@@ -66,3 +67,5 @@ Cek di: henimaofficial.com/admin/orders`;
 
   return NextResponse.json({ orderId });
 }
+''')
+print("Done!")
