@@ -4,6 +4,19 @@ import { useState, useEffect, useRef } from "react";
 
 export default function Navbar({ user }: { user?: any }) {
   const [open, setOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const updateCart = () => {
+      try {
+        const cart = JSON.parse(localStorage.getItem("henima-cart") || "[]");
+        setCartCount(cart.reduce((s: number, i: any) => s + i.quantity, 0));
+      } catch {}
+    };
+    updateCart();
+    window.addEventListener("cart-updated", updateCart);
+    return () => window.removeEventListener("cart-updated", updateCart);
+  }, []);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const lastScrollY = useRef(0);
@@ -86,6 +99,21 @@ export default function Navbar({ user }: { user?: any }) {
                   <button type="submit" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#8A7F72", background:"none", border:"none", cursor:"pointer", fontFamily:"var(--font-jost)"}}>Keluar</button>
                 </form>
               </>
+            )}
+            {/* Cart */}
+            {!user && (
+              <a href="/cart" style={{position:"relative", display:"flex", alignItems:"center", textDecoration:"none", color:"#1C1917"}}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C1917" strokeWidth="1.5">
+                  <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                  <line x1="3" y1="6" x2="21" y2="6"/>
+                  <path d="M16 10a4 4 0 01-8 0"/>
+                </svg>
+                {cartCount > 0 && (
+                  <span style={{position:"absolute", top:"-6px", right:"-6px", background:"#1C1917", color:"#FAF8F4", borderRadius:"50%", width:"16px", height:"16px", fontSize:"9px", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:600}}>
+                    {cartCount}
+                  </span>
+                )}
+              </a>
             )}
             {/* Hamburger — always visible */}
             <button onClick={() => setOpen(true)} style={{background:"none", border:"none", cursor:"pointer", display:"flex", flexDirection:"column", gap:"5px", padding:"4px"}}>
