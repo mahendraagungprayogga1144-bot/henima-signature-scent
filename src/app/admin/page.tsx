@@ -112,6 +112,7 @@ export default async function AdminDashboardPage() {
       <div style={s.menuGrid}>
         {[
           { href: "/admin/pengaturan", icon: "⚙️", label: "Pengaturan Brand", desc: "Edit nama brand, tagline, brand story, hero image, kontak WhatsApp" },
+          { href: "/admin/broadcast", icon: "📣", label: "Broadcast Email", desc: "Kirim email promo atau info terbaru ke semua subscriber" },
           { href: "/admin/blog", icon: "✍️", label: "Blog / Journal", desc: "Tulis artikel, tips parfum, cerita brand untuk halaman journal" },
           { href: "/admin/galeri", icon: "🖼️", label: "Galeri Foto", desc: "Upload dan kelola foto produk untuk halaman galeri publik" },
           { href: "/admin/ganti-password", icon: "🔒", label: "Ganti Password", desc: "Update password akun admin" },
