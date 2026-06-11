@@ -32,7 +32,7 @@ export default function CheckoutPage() {
   }, [router]);
 
   const subtotal = cartTotal(items);
-  const shippingCost = selectedShipping?.price || 0;
+  const shippingCost = selectedShipping?.price || selectedShipping?.shipping_fee || 0;
   const total = subtotal + shippingCost;
 
   async function searchCities(q: string) {
