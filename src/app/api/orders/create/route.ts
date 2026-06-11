@@ -30,6 +30,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // Simpan email customer ke subscribers
+  try {
+    if (email) {
+      await supabase.from("subscribers").upsert({ email }, { onConflict: "email", ignoreDuplicates: true });
+    }
+  } catch (e) {
+    console.error("Subscribe error:", e);
+  }
+
   // Kirim notifikasi WA ke admin via Fonnte
   try {
     const itemsList = items.map((i: any) => `${i.productName} ${i.sizeMl}ml x${i.quantity}`).join("\n");
