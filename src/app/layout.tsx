@@ -3,7 +3,8 @@ import ScrollObserver from "@/components/ScrollObserver";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import NavbarWrapper from "@/components/NavbarWrapper";
-import AnnouncementBar from "@/components/AnnouncementBar";
+import AnnouncementBarWrapper from "@/components/AnnouncementBarWrapper";
+import { getDatabase } from "@/lib/db";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -40,7 +41,7 @@ export default function RootLayout({
       <ScrollObserver />
       <body className={`min-h-screen font-sans antialiased ${jost.variable} ${cormorant.variable}`} style={{background:"#FAF8F4", color:"#1C1917", overflowX:"hidden"}}>
         <NavbarWrapper />
-        <AnnouncementBar />
+        <AnnouncementBarWrapper />
         <main style={{width:"100%", overflow:"hidden"}}>{children}</main>
         <footer style={{background:"#1C1917", padding:"72px 8vw 40px"}}>
           <div style={{display:"grid", gridTemplateColumns:"1.5fr 1fr 1fr 1fr", gap:"48px", marginBottom:"64px", paddingBottom:"48px", borderBottom:"1px solid rgba(200,184,154,0.12)"}}>
