@@ -1,5 +1,6 @@
-"use client";
-import { useEffect, useState } from "react";
+with open("src/components/SplashScreen.tsx", "w") as f:
+    f.write('''"use client";
+import { useEffect, useState } from "use";
 
 export default function SplashScreen() {
   const [phase, setPhase] = useState<"typing" | "hold" | "exit" | "done">("typing");
@@ -112,3 +113,5 @@ export default function SplashScreen() {
     </div>
   );
 }
+''')
+print("Done!")
