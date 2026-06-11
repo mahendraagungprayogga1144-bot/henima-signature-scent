@@ -23,13 +23,9 @@ export default async function KatalogDigitalPage() {
           Made for those who believe fragrance is more than scent — it is memory, emotion, and identity.
         </p>
         <div style={{display:"flex", gap:"12px", flexWrap:"wrap"}}>
-          <a href={"https://wa.me/" + waNumber} target="_blank" rel="noreferrer"
+          <Link href="/shop"
             style={{display:"inline-block", background:"#1C1917", color:"#fff", padding:"14px 32px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", textDecoration:"none", fontWeight:500}}>
-            Order via WhatsApp
-          </a>
-          <Link href="/daftar"
-            style={{display:"inline-block", background:"transparent", color:"#1C1917", padding:"13px 32px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", textDecoration:"none", border:"1px solid rgba(28,25,23,0.3)"}}>
-            Jadi Reseller
+            Shop Now
           </Link>
         </div>
       </div>
