@@ -51,6 +51,7 @@ export default function AdminOrderCard({ order }: { order: any }) {
             </span>
           </div>
           <p style={{ fontSize: "12px", color: "#888" }}>{order.customer?.name} · {order.customer?.phone} · {order.customer?.city}</p>
+          <p style={{ fontSize: "11px", color: "#aaa" }}>{order.customer?.email}</p>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
           <p style={{ fontSize: "14px", fontWeight: 700, color: "#1a1a1a" }}>Rp {order.total?.toLocaleString("id-ID")}</p>
