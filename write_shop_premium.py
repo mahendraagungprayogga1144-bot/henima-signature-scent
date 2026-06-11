@@ -1,4 +1,5 @@
-"use client";
+with open("src/components/ShopClient.tsx", "w") as f:
+    f.write('''"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -206,3 +207,5 @@ export default function ShopClient({ products, waNumber }: { products: Product[]
     </div>
   );
 }
+''')
+print("Done!")
