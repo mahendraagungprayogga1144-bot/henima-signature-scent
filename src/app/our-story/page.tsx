@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Reveal from "@/components/Reveal";
 
 export default function OurStoryPage() {
   return (
@@ -27,7 +28,7 @@ export default function OurStoryPage() {
         <p style={{ fontSize: "15px", color: "#6B5E52", lineHeight: 2, marginBottom: "24px" }}>Every Henima variant name is born from their real story — because we believe fragrance is more than just a scent. It is identity, a reminder of beautiful moments, and a celebration of love that transcends distance.</p>
         <p style={{ fontSize: "16px", color: "#B5935A", lineHeight: 2, fontStyle: "italic", marginBottom: "40px", fontFamily: "var(--font-cormorant, serif)" }}>Welcome to Henima — Signature of Your Story. Because love is real.</p>
         <Link href="/shop" style={{ display: "inline-block", background: "#1C1917", color: "#F5F0E8", padding: "14px 40px", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", textDecoration: "none", fontWeight: 500 }}>Discover More</Link>
-      </section>
+      </section></Reveal>
 
       <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0 32px" }}><div style={{ height: "1px", background: "#E8E0D5" }} /></div>
 
@@ -59,13 +60,13 @@ export default function OurStoryPage() {
         </div>
       </section>
 
-      <section data-reveal="fade" style={{ background: "#1C1917", padding: "100px 32px", textAlign: "center" }}>
+      <Reveal direction="fade"><section style={{ background: "#1C1917", padding: "100px 32px", textAlign: "center" }}>
         <p style={{ fontSize: "10px", letterSpacing: "4px", textTransform: "uppercase", color: "rgba(200,184,154,0.6)", marginBottom: "24px" }}>Henima Signature Scent</p>
         <h2 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "clamp(36px,6vw,64px)", fontWeight: 300, color: "#F5F0E8", fontStyle: "italic", lineHeight: 1.1, marginBottom: "32px" }}>Every fragrance<br />carries a memory.</h2>
         <div style={{ width: "40px", height: "1px", background: "rgba(200,184,154,0.4)", margin: "0 auto 40px" }} />
         <p style={{ fontSize: "14px", color: "rgba(240,235,227,0.6)", marginBottom: "40px", lineHeight: 1.8 }}>Crafted with care in Indonesia.<br />Made to be remembered.</p>
         <Link href="/shop" style={{ display: "inline-block", background: "rgba(240,235,227,0.95)", color: "#1C1917", padding: "15px 48px", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", textDecoration: "none", fontWeight: 500 }}>Explore Collection</Link>
-      </section>
+      </section></Reveal>
 
     </div>
   );
