@@ -1,4 +1,5 @@
-import Image from "next/image";
+with open("src/app/shop/[slug]/page.tsx", "w") as f:
+    f.write('''import Image from "next/image";
 import { getDatabase } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -209,3 +210,5 @@ export default async function ProductDetailPage({
     </div>
   );
 }
+''')
+print("Page Done!")
