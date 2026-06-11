@@ -1,4 +1,5 @@
-import Link from "next/link";
+with open("src/app/our-story/page.tsx", "w") as f:
+    f.write('''import Link from "next/link";
 import Reveal from "@/components/Reveal";
 
 export default function OurStoryPage() {
@@ -70,3 +71,5 @@ export default function OurStoryPage() {
     </div>
   );
 }
+''')
+print("Done!")
