@@ -1,3 +1,4 @@
+import SplashScreen from "@/components/SplashScreen";
 import ScrollObserver from "@/components/ScrollObserver";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
@@ -35,6 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
+      <SplashScreen />
       <ScrollObserver />
       <body className={`min-h-screen font-sans antialiased ${jost.variable} ${cormorant.variable}`} style={{background:"#FAF8F4", color:"#1C1917", overflowX:"hidden"}}>
         <NavbarWrapper />
