@@ -169,6 +169,7 @@ export default function CheckoutPage() {
                             setPostalCode(String(c.postal_code || ""));
                             setCitySearch(c.name);
                             setShowCityDropdown(false);
+                            setTimeout(() => checkShippingById(c.id), 100);
                           }}
                           style={{padding:"12px 16px", cursor:"pointer", fontSize:"13px", color:"#1C1917", borderBottom:"1px solid rgba(28,25,23,0.06)"}}>
                           {c.name}
