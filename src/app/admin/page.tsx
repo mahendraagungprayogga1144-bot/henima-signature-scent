@@ -78,12 +78,7 @@ export default async function AdminDashboardPage() {
       {/* STATS */}
       <div style={s.statGrid}>
         {[
-          { label: "Pesanan Hari Ini", value: ordersToday, href: "/admin/pesanan" },
-          { label: "Revenue Hari Ini", value: formatRupiah(revenueToday), href: "/admin/pesanan" },
-          { label: "Pending Konfirmasi", value: pendingOrders, href: "/admin/pesanan", warn: pendingOrders > 0 },
-          { label: "Total Reseller", value: resellers, href: "/admin/reseller" },
-          { label: "Total Pesanan", value: totalOrders, href: "/admin/pesanan" },
-          { label: "Total Revenue", value: formatRupiah(revenueTotal), href: "/admin/pesanan" },
+          { label: "Total Revenue", value: formatRupiah(revenueTotal), href: "/admin/orders" },
           { label: "Produk Aktif", value: activeProducts, href: "/admin/produk" },
         ].map((stat) => (
           <Link key={stat.label} href={stat.href} style={s.statCard}>
@@ -101,9 +96,7 @@ export default async function AdminDashboardPage() {
       <div style={s.menuGrid}>
         {[
           { href: "/admin/orders", icon: "🛍️", label: "Retail Orders", desc: "Kelola order dari web shop, update status, input resi pengiriman" },
-          { href: "/admin/pesanan", icon: "📦", label: "Kelola Pesanan", desc: "Konfirmasi pembayaran, update status pengiriman, lihat detail order" },
           { href: "/admin/produk", icon: "🧴", label: "Kelola Produk", desc: "Tambah produk, edit harga, kelola varian ukuran dan stok" },
-          { href: "/admin/reseller", icon: "👥", label: "Kelola Reseller", desc: "Approve pendaftaran, lihat performa, kelola akun reseller" },
           { href: "/admin/katalog", icon: "📋", label: "Katalog Digital", desc: "Update katalog yang bisa diakses reseller dan publik" },
         ].map((m) => (
           <Link key={m.href} href={m.href} style={s.menuCard}>
