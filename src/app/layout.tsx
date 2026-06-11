@@ -41,7 +41,7 @@ export default function RootLayout({
       <body className={`min-h-screen font-sans antialiased ${jost.variable} ${cormorant.variable}`} style={{background:"#FAF8F4", color:"#1C1917", overflowX:"hidden"}}>
         <NavbarWrapper />
         <AnnouncementBar />
-        <main style={{width:"100%", overflow:"hidden"}}><div style={{paddingTop:"60px"}}>{children}</div></main>
+        <main style={{width:"100%", overflow:"hidden"}}><div style={{paddingTop:"60px", position:"relative", zIndex:1}}>{children}</div></main>
         <footer style={{background:"#1C1917", padding:"72px 8vw 40px"}}>
           <div style={{display:"grid", gridTemplateColumns:"1.5fr 1fr 1fr 1fr", gap:"48px", marginBottom:"64px", paddingBottom:"48px", borderBottom:"1px solid rgba(200,184,154,0.12)"}}>
             <div>

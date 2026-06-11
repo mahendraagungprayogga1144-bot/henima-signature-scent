@@ -22,7 +22,7 @@ export default async function HomePage() {
     <div style={{background:"#FAF8F4", color:"#1C1917"}}>
 
       {/* ── HERO FULL SCREEN ── */}
-      <section style={{position:"relative", width:"100%", minHeight:"95vh", overflow:"hidden", display:"flex", alignItems:"center"}}>
+      <section style={{position:"relative", width:"100%", minHeight:"calc(95vh)", overflow:"hidden", display:"flex", alignItems:"center"}}>
         <div style={{position:"absolute", inset:0, zIndex:0}}>
           <HeroCarousel
             images={(company as any).heroImages?.length ? (company as any).heroImages : products.length > 0 && products[0].photo ? [products[0].photo] : []}
@@ -58,7 +58,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── MARQUEE ── */}
-      <div style={{background:"#1C1917", padding:"16px 0", overflow:"hidden", whiteSpace:"nowrap"}}>
+      <div style={{background:"#1C1917", padding:"16px 0", overflow:"hidden", whiteSpace:"nowrap", position:"relative", zIndex:1}}>
         <div style={{display:"inline-flex", animation:"marquee 25s linear infinite"}}>
           {["Free Shipping above Rp 150.000","Afternoon","The Distance","Extrait de Parfum","Made in Indonesia","Crafted to be Remembered","Afternoon","The Distance","Extrait de Parfum","Made in Indonesia","Crafted to be Remembered"].map((item, i) => (
             <span key={i} style={{fontFamily:"var(--font-cormorant)", fontSize:"13px", fontStyle:"italic", color:"rgba(200,184,154,0.5)", letterSpacing:"2px", padding:"0 40px"}}>{item}</span>
