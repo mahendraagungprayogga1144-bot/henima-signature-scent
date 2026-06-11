@@ -1,4 +1,5 @@
-export default function AnnouncementBar({ items }: { items?: string[] }) {
+with open("src/components/AnnouncementBar.tsx", "w") as f:
+    f.write('''export default function AnnouncementBar({ items }: { items?: string[] }) {
   const marqueeItems = items && items.length > 0
     ? items
     : ["Afternoon", "The Distance", "Extrait de Parfum", "Made in Indonesia", "Crafted to be Remembered"];
@@ -24,3 +25,5 @@ export default function AnnouncementBar({ items }: { items?: string[] }) {
     </div>
   );
 }
+''')
+print("Done!")
