@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import PhotoCarousel from "@/components/PhotoCarousel";
 import HeroCarousel from "@/components/HeroCarousel";
 import { getCurrentUserSafe } from "@/lib/session";
@@ -56,6 +57,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <AnnouncementBar items={(company as any).marqueeItems || []} />
 
       {/* ── OUR STORY — HMNS dark style ── */}
       <ScrollReveal direction="up" delay={0}>
