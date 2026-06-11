@@ -1,4 +1,5 @@
-"use client";
+with open("src/components/SplashScreen.tsx", "w") as f:
+    f.write('''"use client";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
@@ -69,3 +70,5 @@ export default function SplashScreen() {
     </div>
   );
 }
+''')
+print("Done!")
