@@ -28,6 +28,8 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
   const [heroFile, setHeroFile] = useState<File | null>(null);
   const [heroImages, setHeroImages] = useState<string[]>((settings.company as any).heroImages || (settings.company.heroImage ? [settings.company.heroImage] : []));
   const [galleryImages, setGalleryImages] = useState<string[]>((settings.company as any).galleryImages || []);
+  const [marqueeItems, setMarqueeItems] = useState<string[]>((settings.company as any).marqueeItems || ["Afternoon","The Distance","Extrait de Parfum","Made in Indonesia","Crafted to be Remembered"]);
+  const [newMarqueeItem, setNewMarqueeItem] = useState("");
   const [heroUploading, setHeroUploading] = useState(false);
   const [qrisFile, setQrisFile] = useState<File | null>(null);
   const [banks, setBanks] = useState<BankAccount[]>(() => {
@@ -96,6 +98,7 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
       fd.set("heroUrl", heroUrl);
       fd.set("heroImages", JSON.stringify(heroImages.length > 0 ? heroImages : heroUrl ? [heroUrl] : []));
       fd.set("galleryImages", JSON.stringify(galleryImages));
+      fd.set("marqueeItems", JSON.stringify(marqueeItems));
       fd.set("qrisUrl", qrisUrl);
 
       const res = await fetch("/api/admin/settings", { method: "POST", body: fd });
@@ -391,6 +394,38 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
                 </label>
               </div>
             </div>
+        </div>
+      </div>
+
+      {/* Marquee */}
+      <div className="card space-y-4">
+        <h2 className="text-lg font-semibold text-ink-50">Running Text (Marquee)</h2>
+        <p className="text-xs text-ink-400">Teks yang berjalan di bawah navbar. Tambah, edit, atau hapus item.</p>
+        <div className="space-y-2">
+          {marqueeItems.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              <input
+                type="text"
+                value={item}
+                onChange={(e) => setMarqueeItems(prev => prev.map((x, i) => i === idx ? e.target.value : x))}
+                className="input-field flex-1"
+              />
+              <button type="button" onClick={() => setMarqueeItems(prev => prev.filter((_, i) => i !== idx))}
+                className="text-red-400 hover:text-red-300 text-lg px-2">×</button>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Tambah item baru..."
+            value={newMarqueeItem}
+            onChange={(e) => setNewMarqueeItem(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && newMarqueeItem.trim()) { setMarqueeItems(prev => [...prev, newMarqueeItem.trim()]); setNewMarqueeItem(""); }}}
+            className="input-field flex-1"
+          />
+          <button type="button" onClick={() => { if (newMarqueeItem.trim()) { setMarqueeItems(prev => [...prev, newMarqueeItem.trim()]); setNewMarqueeItem(""); }}}
+            className="btn-secondary px-4">+ Tambah</button>
         </div>
       </div>
 

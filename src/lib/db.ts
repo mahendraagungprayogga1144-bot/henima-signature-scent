@@ -178,6 +178,8 @@ export async function getDatabase(): Promise<Database> {
         payment: settingsData.payment as Settings["payment"],
         catalog: settingsData.catalog as any,
         gallery: settingsData.gallery as any,
+        marqueeItems: settingsData.marquee_items as any,
+        marqueeItems: settingsData.marquee_items as any,
       }
     : DEFAULT_SETTINGS;
 

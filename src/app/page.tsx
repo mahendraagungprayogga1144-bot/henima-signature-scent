@@ -60,7 +60,7 @@ export default async function HomePage() {
       {/* ── MARQUEE ── */}
       <div style={{background:"#1C1917", padding:"16px 0", overflow:"hidden", whiteSpace:"nowrap", position:"relative", zIndex:1}}>
         <div style={{display:"inline-flex", animation:"marquee 25s linear infinite"}}>
-          {["Free Shipping above Rp 150.000","Afternoon","The Distance","Extrait de Parfum","Made in Indonesia","Crafted to be Remembered","Afternoon","The Distance","Extrait de Parfum","Made in Indonesia","Crafted to be Remembered"].map((item, i) => (
+          {([...(company as any).marqueeItems || ["Afternoon","The Distance","Extrait de Parfum","Made in Indonesia","Crafted to be Remembered"], ...(company as any).marqueeItems || ["Afternoon","The Distance","Extrait de Parfum","Made in Indonesia","Crafted to be Remembered"]]).map((item: string, i: number) => (
             <span key={i} style={{fontFamily:"var(--font-cormorant)", fontSize:"13px", fontStyle:"italic", color:"rgba(200,184,154,0.5)", letterSpacing:"2px", padding:"0 40px"}}>{item}</span>
           ))}
         </div>
