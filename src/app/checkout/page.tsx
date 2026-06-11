@@ -162,15 +162,17 @@ export default function CheckoutPage() {
                   {showCityDropdown && cities.length > 0 && (
                     <div style={{position:"absolute", top:"100%", left:0, right:0, background:"#fff", border:"1px solid rgba(28,25,23,0.15)", zIndex:100, maxHeight:"200px", overflowY:"auto", boxShadow:"0 4px 12px rgba(0,0,0,0.08)"}}>
                       {cities.map((c:any) => (
-                        <div key={c.city_id}
+                        <div key={c.id || c.city_id}
                           onClick={() => {
-                            setSelectedCityId(c.city_id);
-                            setCity(c.city_name);
-                            setCitySearch(c.type + " " + c.city_name + " — " + c.province);
+                            setSelectedCityId(String(c.id || c.city_id));
+                            setCity(c.city_name || c.district_name || "");
+                            setProvince(c.province_name || c.province || "");
+                            setPostalCode(c.zip_code || "");
+                            setCitySearch(c.label || (c.type + " " + c.city_name + " — " + c.province));
                             setShowCityDropdown(false);
                           }}
                           style={{padding:"12px 16px", cursor:"pointer", fontSize:"13px", color:"#1C1917", borderBottom:"1px solid rgba(28,25,23,0.06)"}}>
-                          {c.type} {c.city_name} <span style={{color:"#9A8F82"}}>— {c.province}</span>
+                          {c.label || (c.type + " " + c.city_name)} <span style={{color:"#9A8F82"}}>— {c.province_name || c.province}</span>
                         </div>
                       ))}
                     </div>
