@@ -18,7 +18,7 @@ export default function OurStoryPage() {
         <p style={{ fontSize: "15px", color: "rgba(240,235,227,0.6)", lineHeight: 1.9, maxWidth: "480px", margin: "0 auto", fontWeight: 300 }}>A love story from two cities. A fragrance born from courage.</p>
       </section>
 
-      <section style={{ maxWidth: "720px", margin: "0 auto", padding: "100px 32px" }}>
+      <section data-reveal="up" style={{ maxWidth: "720px", margin: "0 auto", padding: "100px 32px" }}>
         <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#B5935A", marginBottom: "24px", fontWeight: 600 }}>The Beginning</p>
         <h2 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "clamp(32px,5vw,52px)", fontWeight: 300, color: "#1C1917", lineHeight: 1.15, fontStyle: "italic", marginBottom: "40px" }}>Jakarta. Surabaya.<br />One love story.</h2>
         <div style={{ width: "40px", height: "1px", background: "#B5935A", marginBottom: "40px" }} />
@@ -31,7 +31,7 @@ export default function OurStoryPage() {
 
       <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0 32px" }}><div style={{ height: "1px", background: "#E8E0D5" }} /></div>
 
-      <section style={{ maxWidth: "720px", margin: "0 auto", padding: "100px 32px" }}>
+      <section data-reveal="up" style={{ maxWidth: "720px", margin: "0 auto", padding: "100px 32px" }}>
         <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#B5935A", marginBottom: "24px", fontWeight: 600 }}>Values</p>
         <h2 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "clamp(32px,5vw,52px)", fontWeight: 300, color: "#1C1917", lineHeight: 1.15, fontStyle: "italic", marginBottom: "60px" }}>What we stand for.</h2>
 
@@ -59,7 +59,7 @@ export default function OurStoryPage() {
         </div>
       </section>
 
-      <section style={{ background: "#1C1917", padding: "100px 32px", textAlign: "center" }}>
+      <section data-reveal="fade" style={{ background: "#1C1917", padding: "100px 32px", textAlign: "center" }}>
         <p style={{ fontSize: "10px", letterSpacing: "4px", textTransform: "uppercase", color: "rgba(200,184,154,0.6)", marginBottom: "24px" }}>Henima Signature Scent</p>
         <h2 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "clamp(36px,6vw,64px)", fontWeight: 300, color: "#F5F0E8", fontStyle: "italic", lineHeight: 1.1, marginBottom: "32px" }}>Every fragrance<br />carries a memory.</h2>
         <div style={{ width: "40px", height: "1px", background: "rgba(200,184,154,0.4)", margin: "0 auto 40px" }} />

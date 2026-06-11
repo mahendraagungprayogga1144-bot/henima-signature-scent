@@ -137,7 +137,7 @@ export default async function BlogPage({
             }}
           >
             {posts.map((post) => (
-              <div key={post.id} style={{ display: "flex", flexDirection: "column" }}>
+              <div key={post.id} data-reveal="up" style={{ display: "flex", flexDirection: "column" }}>
                 {/* Image */}
                 <Link href={"/blog/" + post.slug} style={{ textDecoration: "none", display: "block" }}>
                   <div
