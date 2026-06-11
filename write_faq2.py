@@ -1,4 +1,5 @@
-import Reveal from "@/components/Reveal";
+with open("src/app/faq/page.tsx", "w") as f:
+    f.write('''import Reveal from "@/components/Reveal";
 import Link from "next/link";
 
 const FAQS = [
@@ -98,3 +99,5 @@ export default function FAQPage() {
     </div>
   );
 }
+''')
+print("Done!")
