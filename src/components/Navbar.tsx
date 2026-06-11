@@ -1,4 +1,5 @@
 "use client";
+import SubscribeForm from "./SubscribeForm";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 
@@ -218,22 +219,7 @@ export default function Navbar({ user }: { user?: any }) {
             <p style={{fontSize:"13px", color:"rgba(200,184,154,0.5)", fontWeight:300, marginBottom:"20px", fontFamily:"var(--font-jost)", lineHeight:1.6}}>
               Subscribe to our list and get exclusive promos and new product launches!
             </p>
-            <div style={{display:"flex"}}>
-              <input type="email" placeholder="Email address" style={{
-                flex:1, background:"transparent",
-                border:"1px solid rgba(255,255,255,0.15)", borderRight:"none",
-                padding:"13px 16px", fontSize:"13px", color:"#F0EBE3",
-                fontFamily:"var(--font-jost)", outline:"none",
-              }} />
-              <button style={{
-                background:"#F0EBE3", border:"1px solid #F0EBE3",
-                color:"#1C1917", padding:"13px 20px", fontSize:"11px",
-                letterSpacing:"1px", textTransform:"uppercase",
-                fontFamily:"var(--font-jost)", cursor:"pointer", fontWeight:500,
-              }}>
-                Subscribe
-              </button>
-            </div>
+  <SubscribeForm />
             <p style={{fontSize:"11px", color:"rgba(200,184,154,0.25)", marginTop:"24px", fontFamily:"var(--font-jost)", textAlign:"center"}}>
               ©️ {new Date().getFullYear()} Henima Signature Scent. All rights reserved.
             </p>
