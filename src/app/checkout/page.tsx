@@ -32,18 +32,17 @@ export default function CheckoutPage() {
   }, [router]);
 
   const subtotal = cartTotal(items);
-  const shippingCost = selectedShipping?.cost?.[0]?.value || 0;
+  const shippingCost = selectedShipping?.price || 0;
   const total = subtotal + shippingCost;
 
   async function searchCities(q: string) {
     setCitySearch(q);
     setSelectedCityId("");
     setCity("");
-    if (q.length < 2) { setCities([]); setShowCityDropdown(false); return; }
+    if (q.length < 3) { setCities([]); setShowCityDropdown(false); return; }
     try {
-      const res = await fetch("/api/cities?q=" + encodeURIComponent(q));
-      const data = await res.json();
-      const list = data.cities || [];
+      const res = await fetch("/api/biteship/locations?q=" + encodeURIComponent(q));
+      const list = await res.json();
       setCities(list);
       setShowCityDropdown(list.length > 0);
     } catch (e) {
@@ -55,10 +54,10 @@ export default function CheckoutPage() {
     if (!selectedCityId) return;
     setLoadingShipping(true);
     try {
-      const res = await fetch("/api/shipping", {
+      const res = await fetch("/api/biteship/rates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ destinationId: selectedCityId, weightGrams: items.reduce((s, i) => s + i.quantity * 250, 0) }),
+        body: JSON.stringify({ destinationAreaId: selectedCityId, weightGrams: items.reduce((s, i) => s + i.quantity * 250, 0) }),
       });
       const data = await res.json();
       setShippingOptions(data.results || []);
@@ -162,17 +161,17 @@ export default function CheckoutPage() {
                   {showCityDropdown && cities.length > 0 && (
                     <div style={{position:"absolute", top:"100%", left:0, right:0, background:"#fff", border:"1px solid rgba(28,25,23,0.15)", zIndex:100, maxHeight:"200px", overflowY:"auto", boxShadow:"0 4px 12px rgba(0,0,0,0.08)"}}>
                       {cities.map((c:any) => (
-                        <div key={c.id || c.city_id}
+                        <div key={c.id}
                           onClick={() => {
-                            setSelectedCityId(String(c.id || c.city_id));
-                            setCity(c.city_name || c.district_name || "");
-                            setProvince(c.province_name || c.province || "");
-                            setPostalCode(c.zip_code || "");
-                            setCitySearch(c.label || (c.type + " " + c.city_name + " — " + c.province));
+                            setSelectedCityId(c.id);
+                            setCity(c.administrative_division_level_3_name || "");
+                            setProvince(c.administrative_division_level_1_name || "");
+                            setPostalCode(String(c.postal_code || ""));
+                            setCitySearch(c.name);
                             setShowCityDropdown(false);
                           }}
                           style={{padding:"12px 16px", cursor:"pointer", fontSize:"13px", color:"#1C1917", borderBottom:"1px solid rgba(28,25,23,0.06)"}}>
-                          {c.label || (c.type + " " + c.city_name)} <span style={{color:"#9A8F82"}}>— {c.province_name || c.province}</span>
+                          {c.name}
                         </div>
                       ))}
                     </div>
