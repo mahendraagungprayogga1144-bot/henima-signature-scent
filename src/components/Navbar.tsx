@@ -151,6 +151,7 @@ export default function Navbar({ user }: { user?: any }) {
               <>
                 {[
                   ["/shop","Shop"],
+                  ["/tracking","Track Order"],
                   ["/katalog-digital","Collection"],
                   ["/galeri","Gallery"],
                   ["/blog","Journal"],
