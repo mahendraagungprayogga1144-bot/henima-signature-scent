@@ -101,8 +101,7 @@ export default function FAQPage() {
               href="https://wa.me/6285190311230"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ display: "inline-block", background: "#1C1917", color: "#FAF8F4", padding: "14px 40px", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", textDecoration: "none", fontWeight: 500 }}
-            >
+              style={{ display: "inline-block", background: "#1C1917", color: "#FAF8F4", padding: "14px 40px", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", textDecoration: "none", fontWeight: 500 }}>
               Chat WhatsApp
             </a>
           </div>
