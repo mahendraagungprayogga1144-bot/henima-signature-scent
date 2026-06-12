@@ -152,6 +152,7 @@ export default function Navbar({ user }: { user?: any }) {
                   ["/katalog-digital","Collection"],
                   ["/galeri","Gallery"],
                   ["/quiz","Scent Quiz"],
+                  ["/wishlist","Wishlist"],
                   ["/blog","Journal"],
                 ].map(([href, label]) => (
                   <Link key={href} href={href} onClick={() => setOpen(false)} style={{

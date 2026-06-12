@@ -1,4 +1,5 @@
 "use client";
+import WishlistButton from "@/components/WishlistButton";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -138,10 +139,11 @@ export default function ShopClient({ products, waNumber }: { products: Product[]
                   key={product.id}
                   href={"/shop/" + toSlug(product.name)}
                   style={{background:"#FAF8F4", cursor:"pointer", textDecoration:"none", color:"#1C1917", display:"block"}}
-                  onMouseEnter={() => setHoveredId(product.id)}
+                  onMouseEnter={() => setHoveredId(product.id)} style={{position:"relative"}}
                   onMouseLeave={() => setHoveredId(null)}
                 >
                   <div style={{position:"relative", aspectRatio:"3/4", background:"#F0EBE3", overflow:"hidden"}}>
+                    <WishlistButton productId={product.id} />
                     {product.photo ? (
                       <Image
                         src={product.photo}
