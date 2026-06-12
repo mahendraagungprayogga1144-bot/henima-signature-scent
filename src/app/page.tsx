@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Suspense } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
-import dynamic from "next/dynamic";
-const LoveLettersSection = dynamic(() => import("@/components/LoveLettersSection"), { ssr: false });
+import LoveLettersSection from "@/components/LoveLettersSection";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import PhotoCarousel from "@/components/PhotoCarousel";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -105,7 +105,7 @@ export default async function HomePage() {
       )}
 
       {/* ── LOVE LETTERS ── */}
-      <LoveLettersSection />
+      <Suspense fallback={null}><LoveLettersSection /></Suspense>
 
       {/* ── PHOTO CAROUSEL ── */}
       <PhotoCarousel images={(company as any).galleryImages || []} />
