@@ -48,14 +48,16 @@ export async function POST(
       .eq("id", id)
       .single();
 
-    if (order && order.email && STATUS_MESSAGES[status]) {
+    const customerEmail = order.email || order.customer?.email || (typeof order.customer === 'string' ? JSON.parse(order.customer)?.email : order.customer?.email);
+    const customerName = order.name || order.customer?.name || (typeof order.customer === 'string' ? JSON.parse(order.customer)?.name : order.customer?.name) || 'Pelanggan';
+    if (order && customerEmail && STATUS_MESSAGES[status]) {
       const resend = new Resend(process.env.RESEND_API_KEY);
       const label = STATUS_LABELS[status] || status;
       const message = STATUS_MESSAGES[status];
 
       await resend.emails.send({
         from: "Henima Signature Scent <noreply@henimaofficial.com>",
-        to: order.email,
+        to: customerEmail,
         subject: `${label} - ${id}`,
         html: `
           <!DOCTYPE html>
