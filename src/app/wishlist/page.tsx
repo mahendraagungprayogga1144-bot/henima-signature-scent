@@ -2,28 +2,42 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { createClient } from '@supabase/supabase-js'
 import { formatRupiah } from '@/lib/format'
 
+const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 type Product = { id:string; name:string; description:string; photo:string; discountPrice:number; originalPrice:number; active:boolean }
 
 export default function WishlistPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [wishlist, setWishlist] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [userId, setUserId] = useState<string|null>(null)
 
   useEffect(()=>{
-    const w = JSON.parse(localStorage.getItem('henima-wishlist') || '[]')
-    setWishlist(w)
-    fetch('/api/products-public').then(r=>r.json()).then((data:any)=>{
+    fetch('/api/products-public').then(r=>r.json()).then(async (data:any)=>{
       if(Array.isArray(data)) setProducts(data)
+      const {data: auth} = await sb.auth.getUser()
+      const uid = auth.user?.id || null
+      setUserId(uid)
+      if(uid){
+        const {data: wl} = await sb.from('wishlists').select('product_id').eq('user_id', uid)
+        setWishlist(wl?.map((w:any)=>w.product_id) || [])
+      } else {
+        setWishlist(JSON.parse(localStorage.getItem('henima-wishlist') || '[]'))
+      }
       setLoading(false)
     })
   },[])
 
-  const remove = (id:string) => {
-    const next = wishlist.filter(x=>x!==id)
-    localStorage.setItem('henima-wishlist', JSON.stringify(next))
-    setWishlist(next)
+  const remove = async (id:string) => {
+    if(userId){
+      await sb.from('wishlists').delete().eq('user_id', userId).eq('product_id', id)
+    } else {
+      const next = wishlist.filter(x=>x!==id)
+      localStorage.setItem('henima-wishlist', JSON.stringify(next))
+    }
+    setWishlist(prev => prev.filter(x=>x!==id))
   }
 
   const saved = products.filter(p=>wishlist.includes(p.id))
@@ -55,6 +69,7 @@ export default function WishlistPage() {
     .wl-empty p{font-size:14px;color:var(--muted);margin-bottom:32px}
     .wl-shop-btn{display:inline-block;padding:14px 40px;background:var(--black);color:#FAF8F4;font-size:10px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;font-family:var(--sans)}
     .wl-count{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:32px}
+    .wl-login-note{font-size:12px;color:var(--muted);text-align:center;margin-bottom:32px;padding:16px;background:var(--bg2);border:1px solid var(--border)}
     @media(max-width:600px){.wl-body{padding:60px 5vw}}
   `}</style>
   <div className="wl">
@@ -65,6 +80,11 @@ export default function WishlistPage() {
       <p>{saved.length > 0 ? `${saved.length} produk tersimpan` : 'Belum ada produk yang disimpan'}</p>
     </div>
     <div className="wl-body">
+      {!userId && (
+        <div className="wl-login-note">
+          <Link href="/masuk" style={{color:'var(--black)',fontWeight:500}}>Masuk</Link> atau <Link href="/daftar" style={{color:'var(--black)',fontWeight:500}}>daftar</Link> untuk menyimpan wishlist di semua perangkat.
+        </div>
+      )}
       {loading ? (
         <p style={{textAlign:'center',color:'var(--muted)',fontSize:14}}>Memuat...</p>
       ) : saved.length === 0 ? (

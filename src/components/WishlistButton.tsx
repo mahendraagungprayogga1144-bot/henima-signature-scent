@@ -1,21 +1,44 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
+
+const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 export default function WishlistButton({ productId }: { productId: string }) {
   const [saved, setSaved] = useState(false)
+  const [userId, setUserId] = useState<string|null>(null)
 
   useEffect(()=>{
-    const w = JSON.parse(localStorage.getItem('henima-wishlist') || '[]')
-    setSaved(w.includes(productId))
+    sb.auth.getUser().then(({data})=>{
+      const uid = data.user?.id || null
+      setUserId(uid)
+      if(uid){
+        sb.from('wishlists').select('id').eq('user_id', uid).eq('product_id', productId).single()
+          .then(({data})=> setSaved(!!data))
+      } else {
+        const w = JSON.parse(localStorage.getItem('henima-wishlist') || '[]')
+        setSaved(w.includes(productId))
+      }
+    })
   },[productId])
 
-  const toggle = (e: React.MouseEvent) => {
+  const toggle = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    const w: string[] = JSON.parse(localStorage.getItem('henima-wishlist') || '[]')
-    const next = w.includes(productId) ? w.filter(x=>x!==productId) : [...w, productId]
-    localStorage.setItem('henima-wishlist', JSON.stringify(next))
-    setSaved(next.includes(productId))
+    if(userId){
+      if(saved){
+        await sb.from('wishlists').delete().eq('user_id', userId).eq('product_id', productId)
+        setSaved(false)
+      } else {
+        await sb.from('wishlists').insert({user_id: userId, product_id: productId})
+        setSaved(true)
+      }
+    } else {
+      const w: string[] = JSON.parse(localStorage.getItem('henima-wishlist') || '[]')
+      const next = w.includes(productId) ? w.filter(x=>x!==productId) : [...w, productId]
+      localStorage.setItem('henima-wishlist', JSON.stringify(next))
+      setSaved(next.includes(productId))
+    }
   }
 
   return (
@@ -24,7 +47,7 @@ export default function WishlistButton({ productId }: { productId: string }) {
       width:'36px', height:'36px', borderRadius:'50%',
       background:'rgba(250,248,244,0.92)', border:'1px solid rgba(28,25,23,0.1)',
       display:'flex', alignItems:'center', justifyContent:'center',
-      cursor:'pointer', transition:'transform .2s, background .2s',
+      cursor:'pointer', transition:'transform .2s',
       backdropFilter:'blur(4px)'
     }}
     onMouseEnter={e=>(e.currentTarget.style.transform='scale(1.1)')}
