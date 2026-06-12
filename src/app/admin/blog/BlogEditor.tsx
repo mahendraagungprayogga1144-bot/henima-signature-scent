@@ -15,8 +15,8 @@ export default function BlogEditor({ post }: { post: any }) {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
 
-  function generateSlug(title: string) {
-    return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  function generateSlug(t: string) {
+    return t.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
   }
 
   async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -38,72 +38,96 @@ export default function BlogEditor({ post }: { post: any }) {
   async function handleSave() {
     if (!title) { setMsg("Judul wajib diisi"); return; }
     if (!slug) { setMsg("Slug wajib diisi"); return; }
-    setSaving(true);
-    setMsg("");
+    setSaving(true); setMsg("");
     try {
       const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
       const data = { title, slug, excerpt, content, cover_image: coverImage, published, updated_at: new Date().toISOString() };
-      if (post?.id) {
-        await sb.from("blog_posts").update(data).eq("id", post.id);
-      } else {
-        await sb.from("blog_posts").insert({ ...data, id: Date.now().toString() });
-      }
-      setMsg("Artikel berhasil disimpan! ✅");
+      if (post?.id) await sb.from("blog_posts").update(data).eq("id", post.id);
+      else await sb.from("blog_posts").insert({ ...data, id: Date.now().toString() });
+      setMsg("Artikel berhasil disimpan!");
       setTimeout(() => router.push("/admin/blog"), 1000);
     } catch(e: any) { setMsg("Gagal: " + e.message); }
     finally { setSaving(false); }
   }
 
   async function handleDelete() {
-    if (!post?.id) return;
-    if (!confirm("Hapus artikel ini?")) return;
+    if (!post?.id || !confirm("Hapus artikel ini?")) return;
     const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
     await sb.from("blog_posts").delete().eq("id", post.id);
     router.push("/admin/blog");
   }
 
+  const s = {
+    wrap: { fontFamily:"var(--font-jost,sans-serif)", color:"#1C1917", maxWidth:"800px" } as React.CSSProperties,
+    label: { display:"block", fontSize:"10px", letterSpacing:"2.5px", textTransform:"uppercase" as const, color:"#9A8F82", marginBottom:"8px", fontWeight:400 },
+    input: { width:"100%", border:"none", borderBottom:"1px solid rgba(28,25,23,0.15)", padding:"10px 0", fontSize:"15px", color:"#1C1917", background:"transparent", outline:"none", fontFamily:"var(--font-jost,sans-serif)", boxSizing:"border-box" as const, transition:"border-color .2s" },
+    textarea: { width:"100%", border:"1px solid rgba(28,25,23,0.1)", padding:"16px", fontSize:"14px", color:"#1C1917", background:"#fff", outline:"none", fontFamily:"var(--font-jost,sans-serif)", resize:"vertical" as const, lineHeight:1.8, boxSizing:"border-box" as const },
+    field: { marginBottom:"32px" },
+    hint: { fontSize:"11px", color:"#9A8F82", marginTop:"6px", letterSpacing:"0.5px" },
+    divider: { border:"none", borderTop:"1px solid rgba(28,25,23,0.08)", margin:"8px 0 32px" },
+    btnPrimary: { background:"#1C1917", color:"#FAF8F4", border:"none", padding:"14px 40px", fontSize:"10px", letterSpacing:"2.5px", textTransform:"uppercase" as const, cursor:"pointer", fontFamily:"var(--font-jost,sans-serif)", transition:"opacity .2s" },
+    btnSecondary: { background:"transparent", color:"#cc0000", border:"1px solid rgba(204,0,0,0.3)", padding:"14px 24px", fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase" as const, cursor:"pointer", fontFamily:"var(--font-jost,sans-serif)" },
+    toggle: { display:"flex", alignItems:"center", gap:"12px", cursor:"pointer" },
+    track: (on: boolean) => ({ width:"44px", height:"24px", borderRadius:"12px", background:on?"#1C1917":"rgba(28,25,23,0.12)", position:"relative" as const, transition:"background .3s", cursor:"pointer", flexShrink:0 }),
+    thumb: (on: boolean) => ({ position:"absolute" as const, top:"3px", left:on?"23px":"3px", width:"18px", height:"18px", borderRadius:"50%", background:"#fff", transition:"left .3s", boxShadow:"0 1px 4px rgba(0,0,0,.2)" }),
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="card space-y-4">
-        <div>
-          <label className="label">Judul Artikel</label>
-          <input className="input-field" value={title} onChange={(e) => { setTitle(e.target.value); if (!post) setSlug(generateSlug(e.target.value)); }} placeholder="Judul artikel..." />
-        </div>
-        <div>
-          <label className="label">Slug (URL)</label>
-          <input className="input-field" value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="judul-artikel" />
-          <p className="mt-1 text-xs text-ink-400">henimaofficial.com/blog/{slug || "judul-artikel"}</p>
-        </div>
-        <div>
-          <label className="label">Excerpt (ringkasan singkat)</label>
-          <textarea className="input-field" rows={2} value={excerpt} onChange={(e) => setExcerpt(e.target.value)} placeholder="Ringkasan artikel..." />
-        </div>
-        <div>
-          <label className="label">Cover Image</label>
-          <input type="file" accept="image/*" onChange={handleCoverUpload} disabled={uploading}
-            className="block w-full text-sm text-ink-300 file:mr-4 file:rounded-lg file:border-0 file:bg-ink-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink-50" />
-          {uploading && <p className="text-xs text-gold-300 mt-1">Mengupload...</p>}
-          {coverImage && <p className="text-xs text-green-400 mt-1">✅ Cover terpasang</p>}
-        </div>
-        <div>
-          <label className="label">Isi Artikel</label>
-          <textarea className="input-field font-mono text-sm" rows={15} value={content} onChange={(e) => setContent(e.target.value)} placeholder="Tulis isi artikel di sini... (tekan Enter untuk paragraf baru)" />
-        </div>
-        <label className="flex items-center gap-2 text-sm text-ink-200">
-          <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} />
-          Publish (tampilkan di blog publik)
+    <div style={s.wrap}>
+      <div style={s.field}>
+        <label style={s.label}>Judul Artikel</label>
+        <input style={{...s.input, fontSize:"22px", fontFamily:"var(--font-cormorant,serif)", fontWeight:400}}
+          value={title} onChange={e=>{ setTitle(e.target.value); if(!post) setSlug(generateSlug(e.target.value)); }}
+          placeholder="Tulis judul artikel..."/>
+      </div>
+
+      <div style={s.field}>
+        <label style={s.label}>Slug (URL)</label>
+        <input style={s.input} value={slug} onChange={e=>setSlug(e.target.value)} placeholder="judul-artikel"/>
+        <p style={s.hint}>henimaofficial.com/blog/{slug||"judul-artikel"}</p>
+      </div>
+
+      <div style={s.field}>
+        <label style={s.label}>Excerpt (ringkasan singkat)</label>
+        <textarea style={{...s.textarea, height:"80px"}} value={excerpt} onChange={e=>setExcerpt(e.target.value)} placeholder="Ringkasan singkat artikel yang muncul di halaman blog..."/>
+      </div>
+
+      <div style={s.field}>
+        <label style={s.label}>Cover Image</label>
+        {coverImage && <img src={coverImage} alt="cover" style={{width:"100%", height:"200px", objectFit:"cover", marginBottom:"12px", border:"1px solid rgba(28,25,23,0.08)"}}/>}
+        <label style={{display:"inline-flex", alignItems:"center", gap:"8px", border:"1px solid rgba(28,25,23,0.2)", padding:"10px 20px", cursor:"pointer", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase" as const, color:"#1C1917", fontFamily:"var(--font-jost,sans-serif)"}}>
+          {uploading ? "Mengupload..." : coverImage ? "Ganti Gambar" : "Upload Cover"}
+          <input type="file" accept="image/*" style={{display:"none"}} onChange={handleCoverUpload} disabled={uploading}/>
         </label>
       </div>
 
-      {msg && <p className="text-sm text-gold-300">{msg}</p>}
+      <hr style={s.divider}/>
 
-      <div className="flex gap-3">
-        <button onClick={handleSave} disabled={saving} className="btn-primary flex-1">
-          {saving ? "Menyimpan..." : "Simpan Artikel"}
+      <div style={s.field}>
+        <label style={s.label}>Isi Artikel</label>
+        <p style={{...s.hint, marginBottom:"10px"}}>Tulis artikel dengan paragraf biasa. Enter untuk baris baru.</p>
+        <textarea style={{...s.textarea, height:"400px", fontSize:"15px", lineHeight:1.9}} value={content} onChange={e=>setContent(e.target.value)} placeholder="Tulis isi artikel di sini...&#10;&#10;Setiap aroma punya cerita. Dan setiap cerita layak untuk diceritakan..."/>
+      </div>
+
+      <hr style={s.divider}/>
+
+      <div style={{...s.field, display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+        <div>
+          <p style={{...s.label, marginBottom:"4px"}}>Status Publikasi</p>
+          <p style={{fontSize:"13px", color:published?"#2E7D32":"#9A8F82"}}>{published?"Artikel akan tampil di blog publik":"Draft — hanya terlihat oleh admin"}</p>
+        </div>
+        <div style={s.track(published)} onClick={()=>setPublished(!published)}>
+          <div style={s.thumb(published)}/>
+        </div>
+      </div>
+
+      {msg && <p style={{fontSize:"13px", color:msg.includes("berhasil")?"#2E7D32":"#cc0000", marginBottom:"20px", letterSpacing:"0.5px"}}>{msg}</p>}
+
+      <div style={{display:"flex", gap:"12px"}}>
+        <button onClick={handleSave} disabled={saving} style={{...s.btnPrimary, opacity:saving?.5:1}}>
+          {saving?"Menyimpan...":"Simpan Artikel"}
         </button>
-        {post?.id && (
-          <button onClick={handleDelete} className="btn-secondary !text-red-400 !border-red-900">Hapus</button>
-        )}
+        {post?.id && <button onClick={handleDelete} style={s.btnSecondary}>Hapus Artikel</button>}
       </div>
     </div>
   );
