@@ -13,7 +13,7 @@ export default function ShareStoryPage() {
 
   useEffect(()=>{
     fetch('/api/products-public').then(r=>r.json()).then((data:any)=>{
-      if(Array.isArray(data)) setProducts(data.filter((p:any)=>p.active).map((p:any)=>p.name))
+      if(Array.isArray(data)) setProducts(data.map((p:any)=>p.name))
     }).catch(()=>setProducts([]))
   },[])
 
