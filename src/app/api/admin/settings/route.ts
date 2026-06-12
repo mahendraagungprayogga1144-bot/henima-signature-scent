@@ -106,7 +106,7 @@ export async function POST(request: Request) {
     const heroVideoVal = String(form.get("heroVideo") || "").trim();
     if (heroVideoVal) (db.settings.company as any).heroVideo = heroVideoVal;
     else (db.settings.company as any).heroVideo = "";
-    else if (heroPath) (db.settings.company as any).heroImages = [heroPath];
+    if (heroPath && heroImages.length === 0) (db.settings.company as any).heroImages = [heroPath];
     const marqueeRaw = String(form.get("marqueeItems") || "").trim();
     let marqueeItems: string[] = [];
     if (marqueeRaw) { try { marqueeItems = JSON.parse(marqueeRaw); } catch {} }
