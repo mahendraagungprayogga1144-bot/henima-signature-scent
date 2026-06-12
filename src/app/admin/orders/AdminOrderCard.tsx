@@ -35,7 +35,7 @@ export default function AdminOrderCard({ order }: { order: any }) {
         body: JSON.stringify({ status, resi }),
       });
       if (res.ok) setMsg("Tersimpan!");
-      else setMsg("Gagal simpan");
+      else { const err = await res.text(); console.error('Error:', err); setMsg('Gagal: ' + err); }
     } catch { setMsg("Error"); }
     finally { setSaving(false); }
   }
