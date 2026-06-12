@@ -3,6 +3,7 @@ import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import PhotoCarousel from "@/components/PhotoCarousel";
+import LoveLettersSection from "@/components/LoveLettersSection";
 import HeroCarousel from "@/components/HeroCarousel";
 import { getCurrentUserSafe } from "@/lib/session";
 import { redirect } from "next/navigation";
@@ -103,7 +104,7 @@ export default async function HomePage() {
       )}
 
       {/* ── LOVE LETTERS ── */}
-      {/* LoveLettersSection disabled */}
+      <LoveLettersSection />
 
       {/* ── PHOTO CAROUSEL ── */}
       <PhotoCarousel images={(company as any).galleryImages || []} />
