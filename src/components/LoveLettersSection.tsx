@@ -2,12 +2,12 @@
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-type Story = {id:string;name:string;city:string;story:string;perfume:string;admin_reply?:string}
+type Story = {id:string;name:string;city:string;story:string;perfume:string;admin_reply?:string;avatar_url?:string}
 export default function LoveLettersSection() {
   const [stories, setStories] = useState<Story[]>([])
   const trackRef = useRef<HTMLDivElement>(null)
   useEffect(()=>{
-    supabase.from('love_stories').select('id,name,city,story,perfume,admin_reply').eq('status','approved').eq('show_on_homepage',true).order('created_at',{ascending:false}).limit(10).then(({data})=>setStories(data||[]))
+    supabase.from('love_stories').select('id,name,city,story,perfume,admin_reply,avatar_url').eq('status','approved').eq('show_on_homepage',true).order('created_at',{ascending:false}).limit(10).then(({data})=>setStories(data||[]))
   },[])
   const scroll=(dir:number)=>{
     if(trackRef.current) trackRef.current.scrollBy({left:dir*340,behavior:'smooth'})
@@ -34,7 +34,7 @@ export default function LoveLettersSection() {
             </div>
             <p style={{fontFamily:"var(--font-cormorant)",fontStyle:"italic",fontSize:"17px",lineHeight:1.8,color:"#F0EBE3",fontWeight:300,marginBottom:"28px",minHeight:"120px"}}>&#8220;{s.story}&#8221;</p>
             <div style={{borderTop:"1px solid rgba(255,255,255,0.08)",paddingTop:"20px",display:"flex",alignItems:"center",gap:"12px"}}>
-              <div style={{width:"34px",height:"34px",borderRadius:"50%",background:"rgba(255,255,255,0.06)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--font-cormorant)",fontSize:"14px",color:"rgba(255,255,255,0.5)",flexShrink:0}}>{s.name.charAt(0).toUpperCase()}</div>
+              {(s as any).avatar_url ? <img src={(s as any).avatar_url} alt={s.name} style={{width:"34px",height:"34px",borderRadius:"50%",objectFit:"cover",flexShrink:0}}/> : <div style={{width:"34px",height:"34px",borderRadius:"50%",background:"rgba(255,255,255,0.06)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--font-cormorant)",fontSize:"14px",color:"rgba(255,255,255,0.5)",flexShrink:0}}>{s.name.charAt(0).toUpperCase()}</div>}
               <div>
                 <p style={{fontFamily:"var(--font-cormorant)",fontSize:"14px",fontWeight:400,color:"rgba(255,255,255,0.8)",marginBottom:"2px"}}>{s.name}</p>
                 <p style={{fontSize:"10px",color:"rgba(255,255,255,0.3)",letterSpacing:"2px",textTransform:"uppercase",fontFamily:"var(--font-jost)",fontWeight:300}}>{s.city}{s.perfume&&s.perfume!=="Belum punya Henima"?` — ${s.perfume}`:""}</p>
