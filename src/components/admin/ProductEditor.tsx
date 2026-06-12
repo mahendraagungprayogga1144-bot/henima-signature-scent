@@ -23,6 +23,8 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   const [originalPrice, setOriginalPrice] = useState(product.originalPrice);
   const [discountPrice, setDiscountPrice] = useState(product.discountPrice);
   const [variants, setVariants] = useState<VariantDraft[]>(sortVariants(product.variants));
+  const [notifSending, setNotifSending] = useState(false);
+  const [notifMsg, setNotifMsg] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [topNotes, setTopNotes] = useState((product as any).topNotes || "");
   const [comingSoon, setComingSoon] = useState((product as any).comingSoon || false);
@@ -112,6 +114,20 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
       ([30, 50, 100] as const).forEach((s) => { if (!sizes.has(s)) next.push(newVariant(product.id, s)); });
       return sortVariants(next);
     });
+  }
+
+  async function sendStockNotif() {
+    setNotifSending(true); setNotifMsg("");
+    try {
+      const res = await fetch("/api/admin/stock-notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id, productName: product.name })
+      });
+      const data = await res.json();
+      setNotifMsg(data.sent > 0 ? data.sent + " email terkirim!" : "Tidak ada yang mendaftar notifikasi.");
+    } catch(e) { setNotifMsg("Gagal kirim notifikasi."); }
+    finally { setNotifSending(false); }
   }
 
   return (
@@ -249,6 +265,8 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button type="submit" className="btn-primary" disabled={saving}>{saving ? "Menyimpan..." : "Simpan Produk"}</button>
         <button type="button" className="btn-secondary" disabled={saving} onClick={handleDelete}>Hapus Produk</button>
+        <button type="button" className="btn-secondary" disabled={notifSending} onClick={sendStockNotif}>{notifSending ? "Mengirim..." : "Kirim Notif Restock"}</button>
+        {notifMsg && <p className="text-sm text-gold-300 mt-2">{notifMsg}</p>}
       </div>
     </form>
   );
