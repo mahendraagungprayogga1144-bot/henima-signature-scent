@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const user = await getCurrentUserSafe();
   if (user?.role === "admin") redirect("/admin");
-  if (user?.role === "reseller") redirect("/katalog");
+  if (user?.role === "reseller") redirect("/shop");
 
   const db = await getDatabase();
   const company = db.settings.company;
