@@ -105,7 +105,7 @@ export default async function HomePage() {
       )}
 
       {/* ── LOVE LETTERS ── */}
-      <Suspense fallback={null}><LoveLettersSection /></Suspense>
+      {/* LoveLettersSection disabled */}
 
       {/* ── PHOTO CAROUSEL ── */}
       <PhotoCarousel images={(company as any).galleryImages || []} />
