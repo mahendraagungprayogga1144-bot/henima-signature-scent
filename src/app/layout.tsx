@@ -21,7 +21,9 @@ const jost = Jost({
 
 export const metadata: Metadata = {
   title: "Henima Signature Scent",
-  description: "Luxury fragrance crafted in Indonesia. Extrait de Parfum.",
+  description: "Henima Signature Scent — wewangian luxury buatan Indonesia. Lahir dari kisah cinta nyata, setiap tetes menyimpan cerita. Extrait de Parfum.",
+  keywords: ["parfum lokal indonesia", "henima signature scent", "parfum luxury indonesia", "extrait de parfum"],
+  openGraph: { title: "Henima Signature Scent", description: "Wewangian luxury buatan Indonesia, lahir dari kisah cinta nyata.", url: "https://henimaofficial.com" },
   icons: {
     icon: "/favicon.png",
     shortcut: "/favicon.png",
