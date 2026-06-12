@@ -115,6 +115,7 @@ export default async function AdminDashboardPage() {
           { href: "/admin/broadcast", icon: "📣", label: "Broadcast Email", desc: "Kirim email promo atau info terbaru ke semua subscriber" },
           { href: "/admin/blog", icon: "✍️", label: "Blog / Journal", desc: "Tulis artikel, tips parfum, cerita brand untuk halaman journal" },
           { href: "/admin/galeri", icon: "🖼️", label: "Galeri Foto", desc: "Upload dan kelola foto produk untuk halaman galeri publik" },
+          { href: "/admin/stories", icon: "💛", label: "Love Stories", desc: "Kelola cerita cinta pelanggan, approve, balas, dan tampilkan di homepage" },
           { href: "/admin/ganti-password", icon: "🔒", label: "Ganti Password", desc: "Update password akun admin" },
         ].map((m) => (
           <Link key={m.href} href={m.href} style={s.menuCard}>
