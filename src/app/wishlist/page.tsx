@@ -107,7 +107,7 @@ export default function WishlistPage() {
                   <p className="wl-name">{p.name}</p>
                   <p className="wl-desc">{p.description}</p>
                   <p className="wl-price"><s>{formatRupiah(p.originalPrice)}</s>{formatRupiah(p.discountPrice)}</p>
-                  <Link href={`/shop/${p.id}`} className="wl-btn">Lihat Produk</Link>
+                  <Link href={`/shop/${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`} className="wl-btn">Lihat Produk</Link>
                 </div>
               </div>
             ))}
