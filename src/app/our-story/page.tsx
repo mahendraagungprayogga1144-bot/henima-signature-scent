@@ -439,13 +439,6 @@ export default function OurStoryPage() {
       <div className="os-wrap">
         <div className="os-progress" ref={progressRef} />
 
-        <nav className="os-nav" ref={navRef}>
-          <a href="/" className="os-nav-logo">Henima</a>
-          <div className="os-nav-links">
-            <a href="/shop"    className="os-nav-link">Koleksi</a>
-            <a href="/contact" className="os-nav-link">Kontak</a>
-          </div>
-        </nav>
 
         {/* ── HERO ── */}
         <section className="os-hero">
