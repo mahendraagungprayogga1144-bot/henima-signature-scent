@@ -3,6 +3,7 @@ import { getDatabase } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
+import StockNotifyButton from "@/components/StockNotifyButton";
 import ProductGallery from "@/components/ProductGallery";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,7 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const variants = product.variants.filter((v) => v.active);
+  const totalStock = variants.reduce((sum, v) => sum + (v.stock || 0), 0);
   const photos = (product as any).photos?.length > 0 ? (product as any).photos : product.photo ? [product.photo] : [];
 
   return (
@@ -68,7 +70,14 @@ export default async function ProductDetailPage({
           </div>
 
           {/* Add to Cart */}
-          {(product as any).comingSoon ? (
+          {!((product as any).comingSoon) && totalStock === 0 ? (
+            <div style={{marginBottom:"40px"}}>
+              <div style={{border:"1px solid rgba(28,25,23,0.1)",padding:"12px 16px",textAlign:"center",marginBottom:"12px"}}>
+                <p style={{fontSize:"11px",letterSpacing:"2px",textTransform:"uppercase",color:"#9A8F82"}}>Stok Habis</p>
+              </div>
+              <StockNotifyButton productId={product.id} productName={product.name}/>
+            </div>
+          ) : (product as any).comingSoon ? (
             <div style={{border:"1px solid rgba(28,25,23,0.15)", padding:"16px", textAlign:"center", marginBottom:"32px"}}>
               <p style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82"}}>Coming Soon</p>
             </div>
