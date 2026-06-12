@@ -41,3 +41,13 @@ export async function getRates(
   const json = await res.json();
   return json.pricing ?? [];
 }
+
+export async function trackOrder(resi: string, courierCode?: string) {
+  const res = await fetch(
+    `${BASE}/trackings/${resi}${courierCode ? `?courier_code=${courierCode}` : ''}`,
+    { headers: { Authorization: KEY }, cache: "no-store" }
+  );
+  if (!res.ok) return null;
+  const json = await res.json();
+  return json;
+}
