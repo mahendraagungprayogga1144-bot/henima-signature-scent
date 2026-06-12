@@ -17,7 +17,7 @@ export default function PhotoCarousel({ images }: { images: string[] }) {
 
   const handleDragStart = (clientX: number) => {
     startX.current = clientX;
-    containerWidth.current = containerRef.current?.offsetWidth || window.innerWidth;
+    containerWidth.current = containerRef.current?.offsetWidth || (typeof window !== "undefined" ? window.innerWidth : 375);
     setIsDragging(true);
   };
 
@@ -37,7 +37,7 @@ export default function PhotoCarousel({ images }: { images: string[] }) {
     setIsDragging(false);
   };
 
-  const translateX = -(current * 100) + (dragOffset / (containerWidth.current || window.innerWidth)) * 100;
+  const translateX = -(current * 100) + (dragOffset / (containerWidth.current || (typeof window !== "undefined" ? window.innerWidth : 375))) * 100;
 
   return (
     <section style={{ background: "#FAF8F4", borderTop: "1px solid rgba(28,25,23,0.06)" }}>
