@@ -48,16 +48,13 @@ export async function POST(
   const updated = latest.orders.find((o) => o.id === id)!;
 
   // Attempt automatic WhatsApp + email backup, but keep wa.me fallback link.
-  const waResult = await notifyResellerOrderStatus({
+  await notifyResellerOrderStatus({
     db: latest,
     order: updated,
     newStatus: status,
     note,
   });
-  const whatsappUrl =
-    waResult.ok
-      ? getWhatsAppNotifyUrl(updated, status, note)
-      : waResult.fallbackUrl;
+  const whatsappUrl = getWhatsAppNotifyUrl(updated, status, note);
 
   return NextResponse.redirect(
     new URL(
