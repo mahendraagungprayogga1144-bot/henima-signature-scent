@@ -40,6 +40,8 @@ export default async function RootLayout({
     <html lang="id">
       <SplashScreen />
       <ScrollObserver />
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-SGW9TFDQTX"></script>
+      <script dangerouslySetInnerHTML={{__html: `window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date()); gtag("config", "G-SGW9TFDQTX");`}}/>
       <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Organization',
