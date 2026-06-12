@@ -40,7 +40,16 @@ export default async function RootLayout({
     <html lang="id">
       <SplashScreen />
       <ScrollObserver />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(jsonLd)}}/>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Henima Signature Scent',
+        url: 'https://henimaofficial.com',
+        logo: 'https://henimaofficial.com/favicon.png',
+        description: 'Wewangian luxury buatan Indonesia, lahir dari kisah cinta nyata.',
+        sameAs: ['https://www.instagram.com/henima.id'],
+        contactPoint: { '@type': 'ContactPoint', telephone: '+6285190311230', contactType: 'customer service' }
+      })}}/>
       <body className={`min-h-screen font-sans antialiased ${jost.variable} ${cormorant.variable}`} style={{background:"#FAF8F4", color:"#1C1917", overflowX:"hidden"}}>
         <NavbarWrapper />
         <main style={{width:"100%", overflow:"hidden"}}>{children}</main>
