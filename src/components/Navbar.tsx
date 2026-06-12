@@ -64,6 +64,7 @@ export default function Navbar({ user }: { user?: any }) {
                 <Link href="/shop" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#2C2825", textDecoration:"none", fontFamily:"var(--font-jost)", fontWeight:400}}>Shop</Link>
                 <Link href="/katalog-digital" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#2C2825", textDecoration:"none", fontFamily:"var(--font-jost)", fontWeight:400}}>Collection</Link>
                 <Link href="/galeri" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#2C2825", textDecoration:"none", fontFamily:"var(--font-jost)", fontWeight:400}}>Gallery</Link>
+                <Link href="/quiz" style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", color:"#2C2825", textDecoration:"none", fontFamily:"var(--font-jost)", fontWeight:400}}>Scent Quiz</Link>
               </>
             )}
 
@@ -150,6 +151,7 @@ export default function Navbar({ user }: { user?: any }) {
                   ["/tracking","Track Order"],
                   ["/katalog-digital","Collection"],
                   ["/galeri","Gallery"],
+                  ["/quiz","Scent Quiz"],
                   ["/blog","Journal"],
                 ].map(([href, label]) => (
                   <Link key={href} href={href} onClick={() => setOpen(false)} style={{
