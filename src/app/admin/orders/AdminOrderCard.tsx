@@ -32,7 +32,7 @@ export default function AdminOrderCard({ order }: { order: any }) {
       const res = await fetch("/api/admin/retail-orders/" + order.id, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status, resi }),
+        body: JSON.stringify({ status, resi, courier_code: order.courier_code }),,
       });
       if (res.ok) setMsg("Tersimpan!");
       else { const err = await res.text(); console.error('Error:', err); setMsg('Gagal: ' + err); }

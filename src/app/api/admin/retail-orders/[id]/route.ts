@@ -31,11 +31,11 @@ export async function POST(
   const user = await getCurrentUser();
   if (!user || user.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { status, resi, note } = await request.json();
+  const { status, resi, note, courier_code } = await request.json();
 
   const { error } = await supabase
     .from("retail_orders")
-    .update({ status, resi, updated_at: new Date().toISOString() })
+    .update({ status, resi, courier_code, updated_at: new Date().toISOString() })
     .eq("id", id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
