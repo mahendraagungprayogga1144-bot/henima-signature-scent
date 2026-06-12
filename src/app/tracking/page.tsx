@@ -20,7 +20,7 @@ export default function TrackingPage() {
       const data = await res.json();
       setOrder(data);
       if (data.resi) {
-        const tr = await fetch("/api/tracking?resi=" + data.resi + (data.courier_code ? "&courier=" + data.courier_code : ""));
+        const tr = await fetch("/api/tracking?resi=" + data.resi + (data.courier_code || data.courier ? "&courier=" + (data.courier_code || data.courier) : ""));
         if (tr.ok) setTracking(await tr.json());
       }
     } catch { setError("Terjadi kesalahan. Coba lagi."); }
