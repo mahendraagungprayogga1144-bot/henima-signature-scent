@@ -30,6 +30,8 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
   const [galleryImages, setGalleryImages] = useState<string[]>((settings.company as any).galleryImages || []);
   const [marqueeItems, setMarqueeItems] = useState<string[]>((settings.company as any).marqueeItems || ["Afternoon","The Distance","Extrait de Parfum","Made in Indonesia","Crafted to be Remembered"]);
   const [newMarqueeItem, setNewMarqueeItem] = useState("");
+  const [heroVideoUrl, setHeroVideoUrl] = useState((settings.company).heroVideo || "");
+  const [heroVideoUploading, setHeroVideoUploading] = useState(false);
   const [heroUploading, setHeroUploading] = useState(false);
   const [qrisFile, setQrisFile] = useState<File | null>(null);
   const [banks, setBanks] = useState<BankAccount[]>(() => {
@@ -228,6 +230,23 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
               )}
             </div>
           </div>
+            <div className="rounded-2xl border border-ink-800 bg-ink-950/20 p-4 mt-3">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-ink-100">Hero Video (Opsional)</p>
+                {heroVideoUrl && <span className="text-xs text-green-400">Video aktif</span>}
+              </div>
+              <p className="text-xs text-ink-400 mb-3">Upload video MP4 untuk menggantikan foto hero. Maks 50MB.</p>
+              {heroVideoUrl && (
+                <div className="relative mb-3">
+                  <video src={heroVideoUrl} className="w-full h-32 object-cover rounded-lg" muted autoPlay loop playsInline/>
+                  <button type="button" onClick={()=>setHeroVideoUrl('')} className="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center">x</button>
+                </div>
+              )}
+              <label className="h-20 rounded-lg border-2 border-dashed border-ink-700 flex flex-col items-center justify-center cursor-pointer hover:border-gold-400/50 transition-colors block">
+                {heroVideoUploading ? <span className="text-xs text-ink-400">Uploading...</span> : <><span className="text-2xl text-ink-500">&#9654;</span><span className="text-xs text-ink-400 mt-1">{heroVideoUrl ? 'Ganti video' : 'Upload video MP4'}</span></>}
+                <input type="file" accept="video/mp4,video/*" className="hidden" disabled={heroVideoUploading} onChange={async(e)=>{const f=e.target.files?.[0];if(!f)return;setHeroVideoUploading(true);try{const url=await uploadToSupabase(f,'hero-video');setHeroVideoUrl(url);}catch(err){alert('Upload gagal: '+err.message);}finally{setHeroVideoUploading(false);}}}/>
+              </label>
+            </div>
             <div className="rounded-2xl border border-ink-800 bg-ink-950/20 p-4">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-semibold text-ink-100">Gallery Images (Homepage Carousel)</p>
