@@ -624,10 +624,6 @@ export default function OurStoryPage() {
           <a href="/contact" className="os-cta-sub os-reveal">Atau ceritakan kisahmu kepada kami →</a>
         </section>
 
-        <footer className="os-footer">
-          <p>© 2025 Henima Signature Scent</p>
-          <p>Jakarta · Surabaya · Dibuat dengan cinta di Indonesia</p>
-        </footer>
       </div>
     </>
   )
