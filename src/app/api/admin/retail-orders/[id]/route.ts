@@ -14,6 +14,8 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_MESSAGES: Record<string, string> = {
+  paid: "Pembayaran kamu telah kami terima. Pesanan sedang kami siapkan.",
+  processing: "Pesanan kamu sedang kami kemas dengan penuh perhatian.",
   confirmed: "Pembayaran kamu telah kami konfirmasi. Pesanan sedang kami siapkan.",
   packed: "Pesanan kamu sedang kami kemas dengan penuh perhatian.",
   shipped: "Pesanan kamu sudah dalam perjalanan menuju kamu!",
