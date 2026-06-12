@@ -99,6 +99,7 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
       fd.set("heroImages", JSON.stringify(heroImages.length > 0 ? heroImages : heroUrl ? [heroUrl] : []));
       fd.set("galleryImages", JSON.stringify(galleryImages));
       fd.set("marqueeItems", JSON.stringify(marqueeItems));
+      fd.set("heroVideo", heroVideoUrl);
       fd.set("qrisUrl", qrisUrl);
 
       const res = await fetch("/api/admin/settings", { method: "POST", body: fd });
@@ -223,7 +224,7 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
                   </label>
                 )}
               </div>
-              {heroImages.length === 0 && (
+              {heroImages.length === 0 {heroImages.length === 0 && ({heroImages.length === 0 && ( (
                 <p className="text-xs text-amber-400">⚠ Belum ada foto hero. Tambah minimal 1 foto.</p>
               )}
             </div>

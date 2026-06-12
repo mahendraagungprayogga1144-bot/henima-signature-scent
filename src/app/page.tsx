@@ -27,7 +27,7 @@ export default async function HomePage() {
       <section style={{position:"relative", width:"100%", minHeight:"calc(95vh)", overflow:"hidden", display:"flex", alignItems:"center"}}>
         <div style={{position:"absolute", inset:0, zIndex:0}}>
           <HeroCarousel
-            images={(company as any).heroImages?.length ? (company as any).heroImages : products.length > 0 && products[0].photo ? [products[0].photo] : []}
+            images={(company as any).heroImages?.length ? (company as any).heroImages : products.length > 0 && products[0].photo ? [products[0].photo] : []} heroVideo={(company as any).heroVideo}
             productName={products.length > 0 ? products[0].name : undefined}
           />
         </div>

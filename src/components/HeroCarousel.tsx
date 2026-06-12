@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState, useRef, useEffect, useCallback } from "react";
 
-export default function HeroCarousel({ images, productName }: { images: string[]; productName?: string }) {
+export default function HeroCarousel({ images, productName, heroVideo }: { images: string[]; productName?: string; heroVideo?: string }) {
   const [current, setCurrent] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
@@ -69,6 +69,10 @@ export default function HeroCarousel({ images, productName }: { images: string[]
       el.removeEventListener("touchend", onEnd);
     };
   }, [total, goNext, goPrev]);
+
+  if (heroVideo) return (
+    <video src={heroVideo} autoPlay muted loop playsInline style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",zIndex:0}}/>
+  );
 
   if (!images.length) return (
     <div style={{position:"absolute", inset:0, background:"linear-gradient(160deg,#2C2420,#1A1210)", display:"flex", alignItems:"center", justifyContent:"center"}}>
