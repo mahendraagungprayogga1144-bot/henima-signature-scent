@@ -621,7 +621,7 @@ export default function OurStoryPage() {
           <h2 className="os-reveal">Temukan wewangian yang<br /><em>menceritakan kisahmu.</em></h2>
           <p className="os-reveal">Setiap koleksi Henima membawa sebuah cerita.<br />Temukan yang paling dekat dengan hatimu.</p>
           <a href="/shop"    className="os-cta-btn os-reveal"><span>Jelajahi Koleksi</span></a>
-          <a href="/contact" className="os-cta-sub os-reveal">Atau ceritakan kisahmu kepada kami →</a>
+          <a href="/share-story" className="os-cta-sub os-reveal">Atau ceritakan kisahmu kepada kami →</a>
         </section>
 
       </div>
