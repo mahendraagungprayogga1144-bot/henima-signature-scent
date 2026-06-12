@@ -224,8 +224,7 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
                   </label>
                 )}
               </div>
-              {heroImages.length === 0 {heroImages.length === 0 {heroImages.length === 0 && ({heroImages.length === 0 && ( ({heroImages.length === 0 {heroImages.length === 0 && ({heroImages.length === 0 && ( ( (
-                <p className="text-xs text-amber-400">⚠ Belum ada foto hero. Tambah minimal 1 foto.</p>
+              {heroImages.length === 0 && (<p className="text-xs text-amber-400">⚠ Belum ada foto hero. Tambah minimal 1 foto.</p>
               )}
             </div>
           </div>
