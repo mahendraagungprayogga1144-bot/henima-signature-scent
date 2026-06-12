@@ -1,8 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Suspense } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
-import LoveLettersSection from "@/components/LoveLettersSection";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import PhotoCarousel from "@/components/PhotoCarousel";
 import HeroCarousel from "@/components/HeroCarousel";
