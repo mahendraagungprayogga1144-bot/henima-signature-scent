@@ -40,6 +40,7 @@ export default async function RootLayout({
     <html lang="id">
       <SplashScreen />
       <ScrollObserver />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(jsonLd)}}/>
       <body className={`min-h-screen font-sans antialiased ${jost.variable} ${cormorant.variable}`} style={{background:"#FAF8F4", color:"#1C1917", overflowX:"hidden"}}>
         <NavbarWrapper />
         <main style={{width:"100%", overflow:"hidden"}}>{children}</main>
