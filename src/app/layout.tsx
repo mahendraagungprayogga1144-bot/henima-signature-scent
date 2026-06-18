@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import { getDatabase } from "@/lib/db";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -89,6 +90,7 @@ export default async function RootLayout({
             <span>Privacy Policy · Terms of Service</span>
           </div>
         </footer>
+        <SpeedInsights />
       </body>
     </html>
   );
