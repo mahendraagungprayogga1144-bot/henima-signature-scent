@@ -6,6 +6,8 @@ import NavbarWrapper from "@/components/NavbarWrapper";
 import { getDatabase } from "@/lib/db";
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
