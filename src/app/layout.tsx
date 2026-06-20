@@ -86,7 +86,7 @@ export default async function RootLayout({
           </div>
           <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:"11px", color:"rgba(200,184,154,0.25)", fontWeight:300, letterSpacing:"0.5px", flexWrap:"wrap", gap:"12px"}}>
             <span>© {new Date().getFullYear()} Henima Signature Scent. All rights reserved.</span>
-            <span>Privacy Policy · Terms of Service</span>
+            <span><a href="/syarat-ketentuan" style={{color:"inherit", textDecoration:"none"}}>Privacy Policy</a> · <a href="/syarat-ketentuan" style={{color:"inherit", textDecoration:"none"}}>Terms of Service</a></span>
           </div>
         </footer>
       </body>
