@@ -1,4 +1,5 @@
 import SplashScreen from "@/components/SplashScreen";
+import ChatWidget from "@/components/ChatWidget";
 import ScrollObserver from "@/components/ScrollObserver";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
@@ -123,6 +124,7 @@ export default async function RootLayout({
             <span style={{display:"flex", gap:"8px"}}><a href="/syarat-ketentuan" style={{color:"inherit", textDecoration:"none"}}>Privacy Policy</a><span>·</span><a href="/syarat-ketentuan" style={{color:"inherit", textDecoration:"none"}}>Terms of Service</a></span>
           </div>
         </footer>
+        <ChatWidget />
       </body>
     </html>
   );
