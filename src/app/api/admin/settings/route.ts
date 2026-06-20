@@ -119,6 +119,10 @@ export async function POST(request: Request) {
     if (advantages) db.settings.company.advantages = advantages;
     if (bankAccounts) db.settings.payment.bankAccounts = bankAccounts;
     if (qrisPath) db.settings.payment.qrisImage = qrisPath;
+    const socialLinksRaw = String(form.get("socialLinks") || "").trim();
+    if (socialLinksRaw) {
+      try { (db.settings.company as any).socialLinks = JSON.parse(socialLinksRaw); } catch {}
+    }
   });
 
   return NextResponse.json({ ok: true });

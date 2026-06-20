@@ -30,6 +30,7 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
   const [galleryImages, setGalleryImages] = useState<string[]>((settings.company as any).galleryImages || []);
   const [marqueeItems, setMarqueeItems] = useState<string[]>((settings.company as any).marqueeItems || ["Afternoon","The Distance","Extrait de Parfum","Made in Indonesia","Crafted to be Remembered"]);
   const [newMarqueeItem, setNewMarqueeItem] = useState("");
+  const [socialLinks, setSocialLinks] = useState<Record<string, string>>((settings.company as any).socialLinks || { instagram: "", tiktok: "", whatsapp: "", youtube: "", facebook: "" });
   const [heroVideoUrl, setHeroVideoUrl] = useState((settings.company).heroVideo || "");
   const [heroVideoUploading, setHeroVideoUploading] = useState(false);
   const [heroUploading, setHeroUploading] = useState(false);
@@ -103,6 +104,8 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
       fd.set("marqueeItems", JSON.stringify(marqueeItems));
       fd.set("heroVideo", heroVideoUrl);
       fd.set("qrisUrl", qrisUrl);
+      fd.set("socialLinks", JSON.stringify(socialLinks));
+      fd.set("socialLinks", JSON.stringify(socialLinks));
 
       const res = await fetch("/api/admin/settings", { method: "POST", body: fd });
       if (!res.ok) { const text = await res.text(); setMessage(text || "Gagal menyimpan"); return; }
@@ -477,6 +480,34 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Social Media */}
+      <div className="card space-y-4">
+        <h2 className="text-lg font-semibold text-ink-50">Sosial Media</h2>
+        <p className="text-sm text-ink-400">Isi link lengkap (contoh: https://instagram.com/henimaofficial). Kosongkan jika belum punya akun, ikon tidak akan ditampilkan di footer.</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label">Instagram</label>
+            <input className="input-field" placeholder="https://instagram.com/username" value={socialLinks.instagram} onChange={(e) => setSocialLinks((prev) => ({ ...prev, instagram: e.target.value }))} />
+          </div>
+          <div>
+            <label className="label">TikTok</label>
+            <input className="input-field" placeholder="https://tiktok.com/@username" value={socialLinks.tiktok} onChange={(e) => setSocialLinks((prev) => ({ ...prev, tiktok: e.target.value }))} />
+          </div>
+          <div>
+            <label className="label">WhatsApp</label>
+            <input className="input-field" placeholder="https://wa.me/6285190311230" value={socialLinks.whatsapp} onChange={(e) => setSocialLinks((prev) => ({ ...prev, whatsapp: e.target.value }))} />
+          </div>
+          <div>
+            <label className="label">YouTube</label>
+            <input className="input-field" placeholder="https://youtube.com/@username" value={socialLinks.youtube} onChange={(e) => setSocialLinks((prev) => ({ ...prev, youtube: e.target.value }))} />
+          </div>
+          <div>
+            <label className="label">Facebook</label>
+            <input className="input-field" placeholder="https://facebook.com/username" value={socialLinks.facebook} onChange={(e) => setSocialLinks((prev) => ({ ...prev, facebook: e.target.value }))} />
+          </div>
         </div>
       </div>
 
