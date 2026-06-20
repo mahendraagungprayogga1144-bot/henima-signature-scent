@@ -75,6 +75,31 @@ export async function POST(
               <p style="font-size:14px;color:#6B5E52;line-height:1.8;margin-bottom:32px;">
                 Halo <strong>${order.name || 'Pelanggan'}</strong>, ${message}
               </p>
+              ${order.items && order.items.length > 0 ? `
+              <div style="margin-bottom:32px;">
+                <p style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#9A8F82;margin-bottom:12px;">Rincian Pesanan</p>
+                <table style="width:100%;border-collapse:collapse;">
+                  ${order.items.map((item: any) => `
+                  <tr>
+                    <td style="padding:8px 0;border-bottom:1px solid #E8E0D5;font-size:13px;color:#1C1917;">${item.name || item.productName} ${item.size ? '(' + item.size + ')' : ''} x${item.qty || item.quantity || 1}</td>
+                    <td style="padding:8px 0;border-bottom:1px solid #E8E0D5;font-size:13px;color:#1C1917;text-align:right;">Rp ${((item.price || 0) * (item.qty || item.quantity || 1)).toLocaleString('id-ID')}</td>
+                  </tr>
+                  `).join('')}
+                  <tr>
+                    <td style="padding:8px 0;font-size:13px;color:#6B5E52;">Subtotal</td>
+                    <td style="padding:8px 0;font-size:13px;color:#6B5E52;text-align:right;">Rp ${(order.subtotal || 0).toLocaleString('id-ID')}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px 0;font-size:13px;color:#6B5E52;">Ongkos Kirim</td>
+                    <td style="padding:8px 0;font-size:13px;color:#6B5E52;text-align:right;">Rp ${(order.shipping_cost || 0).toLocaleString('id-ID')}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px 0 0;font-size:15px;color:#1C1917;font-weight:bold;border-top:2px solid #1C1917;">Total</td>
+                    <td style="padding:12px 0 0;font-size:15px;color:#1C1917;font-weight:bold;text-align:right;border-top:2px solid #1C1917;">Rp ${(order.total || 0).toLocaleString('id-ID')}</td>
+                  </tr>
+                </table>
+              </div>
+              ` : ''}
               ${resi && status === 'shipped' ? `
               <div style="background:#1C1917;padding:24px;margin-bottom:32px;color:#F0EBE3;text-align:center;">
                 <p style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#C8B89A;margin-bottom:8px;">Nomor Resi</p>
