@@ -129,7 +129,7 @@ export default function ChatWidget() {
               disabled={loading}
               style={{
                 flex: 1, border: '1px solid rgba(28,25,23,0.15)', padding: '10px 12px',
-                fontSize: '13px', outline: 'none', background: '#fff',
+                fontSize: '16px', outline: 'none', background: '#fff',
               }}
             />
             <button
