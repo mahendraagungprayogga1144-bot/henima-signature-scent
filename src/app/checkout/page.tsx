@@ -232,7 +232,7 @@ export default function CheckoutPage() {
                         <div style={{width:"16px", height:"16px", borderRadius:"50%", border: selectedShipping?.courier_service_code === opt.courier_service_code ? "5px solid #1C1917" : "1px solid rgba(28,25,23,0.3)", flexShrink:0}} />
                         <div>
                           <p style={{fontSize:"14px", color:"#1C1917", fontWeight:500}}>{opt.courier_service_name?.includes(opt.courier_name) ? opt.courier_service_name : `${opt.courier_name} ${opt.courier_service_name}`}</p>
-                          <p style={{fontSize:"12px", color:"#9A8F82"}}>{opt.min_day && opt.max_day ? `${opt.min_day}-${opt.max_day} hari` : "Estimasi tidak tersedia"}</p>
+                          <p style={{fontSize:"12px", color:"#9A8F82"}}>{opt.duration || "Estimasi tidak tersedia"}</p>
                         </div>
                       </div>
                       <p style={{fontSize:"14px", fontWeight:600, color:"#1C1917"}}>
