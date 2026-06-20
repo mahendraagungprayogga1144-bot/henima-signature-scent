@@ -57,7 +57,7 @@ export default function CheckoutPage() {
       const res = await fetch("/api/biteship/rates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ destinationAreaId: selectedCityId, weightGrams: items.reduce((s, i) => s + i.quantity * 250, 0) }),
+        body: JSON.stringify({ destinationAreaId: selectedCityId, weightGrams: items.reduce((s, i) => s + i.quantity * 380, 0) }),
       });
       const data = await res.json();
       setShippingOptions(Array.isArray(data) ? data : (data.pricing || data.results || []));
@@ -71,7 +71,7 @@ export default function CheckoutPage() {
     setShippingOptions([]);
     setSelectedShipping(null);
     try {
-      const weight = items.reduce((s, i) => s + i.quantity * 250, 0);
+      const weight = items.reduce((s, i) => s + i.quantity * 380, 0);
       const res = await fetch("/api/biteship/rates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
