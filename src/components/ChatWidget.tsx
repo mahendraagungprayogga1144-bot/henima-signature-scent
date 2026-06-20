@@ -49,7 +49,7 @@ export default function ChatWidget() {
         <button
           onClick={() => setOpen(true)}
           style={{
-            position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999,
+            position: 'fixed', bottom: '24px', right: '24px', zIndex: 50,
             width: '56px', height: '56px', borderRadius: '50%',
             background: '#1C1917', border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -67,7 +67,7 @@ export default function ChatWidget() {
       {open && (
         <div
           style={{
-            position: 'fixed', bottom: '24px', right: '24px', zIndex: 9999,
+            position: 'fixed', bottom: '24px', right: '24px', zIndex: 50,
             width: '360px', maxWidth: 'calc(100vw - 32px)', height: '520px', maxHeight: 'calc(100vh - 100px)',
             background: '#FAF8F4', border: '1px solid rgba(28,25,23,0.1)',
             display: 'flex', flexDirection: 'column',
