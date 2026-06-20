@@ -226,17 +226,17 @@ export default function CheckoutPage() {
               ) : (
                 <div style={{display:"flex", flexDirection:"column", gap:"8px"}}>
                   {shippingOptions.map((opt: any) => (
-                    <label key={opt.service} onClick={() => setSelectedShipping(opt)}
-                      style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px", border: selectedShipping?.service === opt.service ? "1px solid #1C1917" : "1px solid rgba(28,25,23,0.12)", cursor:"pointer", background: selectedShipping?.service === opt.service ? "#F0EBE3" : "#FAF8F4"}}>
+                    <label key={opt.courier_service_code} onClick={() => setSelectedShipping(opt)}
+                      style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px", border: selectedShipping?.courier_service_code === opt.courier_service_code ? "1px solid #1C1917" : "1px solid rgba(28,25,23,0.12)", cursor:"pointer", background: selectedShipping?.courier_service_code === opt.courier_service_code ? "#F0EBE3" : "#FAF8F4"}}>
                       <div style={{display:"flex", alignItems:"center", gap:"12px"}}>
-                        <div style={{width:"16px", height:"16px", borderRadius:"50%", border: selectedShipping?.service === opt.service ? "5px solid #1C1917" : "1px solid rgba(28,25,23,0.3)", flexShrink:0}} />
+                        <div style={{width:"16px", height:"16px", borderRadius:"50%", border: selectedShipping?.courier_service_code === opt.courier_service_code ? "5px solid #1C1917" : "1px solid rgba(28,25,23,0.3)", flexShrink:0}} />
                         <div>
-                          <p style={{fontSize:"14px", color:"#1C1917", fontWeight:500}}>{opt.service}</p>
-                          <p style={{fontSize:"12px", color:"#9A8F82"}}>{opt.description} · {opt.cost?.[0]?.etd} days</p>
+                          <p style={{fontSize:"14px", color:"#1C1917", fontWeight:500}}>{opt.courier_name} {opt.courier_service_name}</p>
+                          <p style={{fontSize:"12px", color:"#9A8F82"}}>{opt.min_day}-{opt.max_day} hari</p>
                         </div>
                       </div>
                       <p style={{fontSize:"14px", fontWeight:600, color:"#1C1917"}}>
-                        Rp {opt.cost?.[0]?.value?.toLocaleString("id-ID")}
+                        Rp {opt.price?.toLocaleString("id-ID")}
                       </p>
                     </label>
                   ))}
