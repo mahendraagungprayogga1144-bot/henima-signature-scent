@@ -1,4 +1,5 @@
-"use client";
+with open("src/app/tracking/page.tsx", "w") as f:
+    f.write('''"use client";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -308,3 +309,5 @@ export default function TrackingPage() {
     </div>
   );
 }
+''')
+print("Done!")
