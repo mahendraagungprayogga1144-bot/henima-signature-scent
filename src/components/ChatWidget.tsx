@@ -106,9 +106,9 @@ export default function ChatWidget() {
       {/* Chat window */}
       {open && (
         <div style={{
-          position: "fixed", bottom: "24px", right: "24px", zIndex: 9999,
-          width: "360px", maxWidth: "calc(100vw - 32px)",
-          height: "540px", maxHeight: "calc(100vh - 100px)",
+          position: "fixed", bottom: "16px", right: "8px", zIndex: 9999,
+          width: "360px", maxWidth: "calc(100vw - 16px)",
+          height: "min(540px, calc(100dvh - 100px))", maxHeight: "calc(100dvh - 80px)",
           background: "#FAF8F4",
           border: "0.5px solid rgba(28,25,23,0.12)",
           display: "flex", flexDirection: "column",
