@@ -186,14 +186,12 @@ export default function ChatWidget() {
               <div className="henima-msg" style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
                 <span style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#C8B89A", marginLeft: "2px" }}>Aldo</span>
                 <div style={{
-                  background: "#fff", padding: "12px 16px",
+                  background: "#fff", padding: "10px 14px",
                   borderRadius: "2px 12px 12px 12px",
                   border: "0.5px solid rgba(28,25,23,0.08)",
-                  display: "flex", gap: "4px", alignItems: "center",
+                  fontSize: "12px", color: "#9A8F82", fontStyle: "italic",
                 }}>
-                  <span className="typing-dot" style={{ animationDelay: "0s" }}></span>
-                  <span className="typing-dot" style={{ animationDelay: "0.2s" }}></span>
-                  <span className="typing-dot" style={{ animationDelay: "0.4s" }}></span>
+                  Aldo sedang mengetik...
                 </div>
               </div>
             )}
