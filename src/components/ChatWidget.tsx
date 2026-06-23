@@ -137,10 +137,10 @@ export default function ChatWidget() {
                 </svg>
               </div>
               <div>
-                <p style={{ fontFamily: "Georgia,serif", fontSize: "13px", letterSpacing: "3px", color: "#F0EBE3", margin: 0, fontWeight: 400 }}>HENIMA</p>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: "13px", letterSpacing: "3px", color: "#F0EBE3", margin: 0, fontWeight: 400 }}>Aldo</p>
                 <div style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "1px" }}>
                   <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#4CAF50" }}></div>
-                  <p style={{ fontSize: "10px", letterSpacing: "1px", color: "rgba(200,184,154,0.6)", margin: 0 }}>Customer Service · Online</p>
+                  <p style={{ fontSize: "10px", letterSpacing: "1px", color: "rgba(200,184,154,0.6)", margin: 0 }}>Customer Service Henima · Online</p>
                 </div>
               </div>
             </div>
@@ -169,7 +169,7 @@ export default function ChatWidget() {
                 display: "flex", flexDirection: "column", gap: "3px",
               }}>
                 {m.role === "assistant" && (
-                  <span style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#C8B89A", marginLeft: "2px" }}>HENIMA</span>
+                  <span style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#C8B89A", marginLeft: "2px" }}>Aldo</span>
                 )}
                 <div style={{
                   background: m.role === "user" ? "#1C1917" : "#fff",
@@ -184,7 +184,7 @@ export default function ChatWidget() {
             ))}
             {loading && (
               <div className="henima-msg" style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
-                <span style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#C8B89A", marginLeft: "2px" }}>HENIMA</span>
+                <span style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#C8B89A", marginLeft: "2px" }}>Aldo</span>
                 <div style={{
                   background: "#fff", padding: "12px 16px",
                   borderRadius: "2px 12px 12px 12px",
