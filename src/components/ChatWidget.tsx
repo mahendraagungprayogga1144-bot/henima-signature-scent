@@ -1,14 +1,22 @@
-'use client'
-import { useState, useRef, useEffect } from 'react'
+"use client"
+import { useState, useRef, useEffect } from "react"
 
-type Message = { role: 'user' | 'assistant'; content: string }
+type Message = { role: "user" | "assistant"; content: string }
+
+function formatMessage(text: string) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/
+/g, "<br/>")
+}
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Halo! Selamat datang di Henima Signature Scent. Ada yang bisa saya bantu seputar produk, pesanan, atau pengiriman?' }
+    { role: "assistant", content: "Halo! Selamat datang di Henima Signature Scent.\n\nAda yang bisa saya bantu seputar produk, pesanan, atau pengiriman?" }
   ])
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -21,22 +29,20 @@ export default function ChatWidget() {
   async function sendMessage() {
     const text = input.trim()
     if (!text || loading) return
-
-    const newMessages: Message[] = [...messages, { role: 'user', content: text }]
+    const newMessages: Message[] = [...messages, { role: "user", content: text }]
     setMessages(newMessages)
-    setInput('')
+    setInput("")
     setLoading(true)
-
     try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: newMessages }),
       })
       const data = await res.json()
-      setMessages([...newMessages, { role: 'assistant', content: data.reply || 'Maaf, terjadi kesalahan.' }])
+      setMessages([...newMessages, { role: "assistant", content: data.reply || "Maaf, terjadi kesalahan." }])
     } catch {
-      setMessages([...newMessages, { role: 'assistant', content: 'Maaf, terjadi kesalahan. Silakan hubungi WhatsApp 085190311230.' }])
+      setMessages([...newMessages, { role: "assistant", content: "Maaf, terjadi kesalahan. Silakan hubungi WhatsApp 085190311230." }])
     } finally {
       setLoading(false)
     }
@@ -44,106 +50,200 @@ export default function ChatWidget() {
 
   return (
     <>
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes typingDot {
+          0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+          40% { transform: scale(1); opacity: 1; }
+        }
+        .henima-chat-btn {
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .henima-chat-btn:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 24px rgba(0,0,0,0.35) !important;
+        }
+        .henima-msg {
+          animation: fadeUp 0.25s ease both;
+        }
+        .henima-input:focus {
+          border-color: rgba(28,25,23,0.4) !important;
+        }
+        .henima-scroll::-webkit-scrollbar { width: 4px; }
+        .henima-scroll::-webkit-scrollbar-track { background: transparent; }
+        .henima-scroll::-webkit-scrollbar-thumb { background: rgba(28,25,23,0.1); border-radius: 2px; }
+        .typing-dot {
+          display: inline-block;
+          width: 5px; height: 5px;
+          border-radius: 50%;
+          background: #9A8F82;
+          animation: typingDot 1.2s infinite ease-in-out;
+        }
+      `}</style>
+
       {/* Floating button */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
+          className="henima-chat-btn"
           style={{
-            position: 'fixed', bottom: '24px', right: '24px', zIndex: 50, fontFamily: 'var(--font-jost)', fontFamily: 'var(--font-jost)',
-            width: '56px', height: '56px', borderRadius: '50%',
-            background: '#1C1917', border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+            position: "fixed", bottom: "24px", right: "24px", zIndex: 9999,
+            width: "56px", height: "56px", borderRadius: "50%",
+            background: "#1C1917", border: "1.5px solid rgba(200,184,154,0.3)",
+            cursor: "pointer", display: "flex", alignItems: "center",
+            justifyContent: "center", boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
           }}
           aria-label="Buka chat"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F0EBE3" strokeWidth="1.8">
-            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" strokeLinecap="round" strokeLinejoin="round" />
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C8B89A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
           </svg>
         </button>
       )}
 
       {/* Chat window */}
       {open && (
-        <div
-          style={{
-            position: 'fixed', bottom: '24px', right: '24px', zIndex: 50, fontFamily: 'var(--font-jost)', fontFamily: 'var(--font-jost)',
-            width: '360px', maxWidth: 'calc(100vw - 32px)', height: '520px', maxHeight: 'calc(100vh - 100px)',
-            background: '#FAF8F4', border: '1px solid rgba(28,25,23,0.1)',
-            display: 'flex', flexDirection: 'column',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-          }}
-        >
+        <div style={{
+          position: "fixed", bottom: "24px", right: "24px", zIndex: 9999,
+          width: "360px", maxWidth: "calc(100vw - 32px)",
+          height: "540px", maxHeight: "calc(100vh - 100px)",
+          background: "#FAF8F4",
+          border: "0.5px solid rgba(28,25,23,0.12)",
+          display: "flex", flexDirection: "column",
+          boxShadow: "0 12px 48px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.1)",
+          fontFamily: "var(--font-jost)",
+          animation: "fadeUp 0.25s ease both",
+          overflow: "hidden",
+        }}>
+
           {/* Header */}
           <div style={{
-            background: '#1C1917', padding: '16px 20px',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            background: "#1C1917",
+            padding: "14px 18px",
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            borderBottom: "1px solid rgba(200,184,154,0.15)",
           }}>
-            <div>
-              <p style={{ fontFamily: 'Georgia,serif', fontSize: '15px', letterSpacing: '2px', color: '#F0EBE3', margin: 0 }}>HENIMA</p>
-              <p style={{ fontSize: '10px', letterSpacing: '1px', color: 'rgba(200,184,154,0.7)', margin: 0, marginTop: '2px' }}>Customer Service</p>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div style={{
+                width: "32px", height: "32px", borderRadius: "50%",
+                background: "rgba(200,184,154,0.15)",
+                border: "1px solid rgba(200,184,154,0.3)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8B89A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                </svg>
+              </div>
+              <div>
+                <p style={{ fontFamily: "Georgia,serif", fontSize: "13px", letterSpacing: "3px", color: "#F0EBE3", margin: 0, fontWeight: 400 }}>HENIMA</p>
+                <div style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "1px" }}>
+                  <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#4CAF50" }}></div>
+                  <p style={{ fontSize: "10px", letterSpacing: "1px", color: "rgba(200,184,154,0.6)", margin: 0 }}>Customer Service · Online</p>
+                </div>
+              </div>
             </div>
             <button
               onClick={() => setOpen(false)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#F0EBE3', fontSize: '20px', padding: '4px 8px' }}
+              style={{
+                background: "rgba(255,255,255,0.08)", border: "none", cursor: "pointer",
+                color: "#C8B89A", width: "28px", height: "28px", borderRadius: "50%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "16px", transition: "background 0.2s",
+              }}
               aria-label="Tutup chat"
-            >
-              ×
-            </button>
+            >×</button>
           </div>
 
           {/* Messages */}
-          <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div ref={scrollRef} className="henima-scroll" style={{
+            flex: 1, overflowY: "auto", padding: "16px",
+            display: "flex", flexDirection: "column", gap: "10px",
+            background: "#FAF8F4",
+          }}>
             {messages.map((m, i) => (
-              <div
-                key={i}
-                style={{
-                  alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-                  maxWidth: '85%',
-                  background: m.role === 'user' ? '#1C1917' : 'rgba(28,25,23,0.06)',
-                  color: m.role === 'user' ? '#F0EBE3' : '#1C1917',
-                  padding: '10px 14px',
-                  fontSize: '13px',
-                  lineHeight: 1.6,
-                  borderRadius: '4px',
-                  whiteSpace: 'pre-wrap',
-                }}
-              >
-                {m.content}
+              <div key={i} className="henima-msg" style={{
+                alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+                maxWidth: "82%",
+                display: "flex", flexDirection: "column", gap: "3px",
+              }}>
+                {m.role === "assistant" && (
+                  <span style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#C8B89A", marginLeft: "2px" }}>HENIMA</span>
+                )}
+                <div style={{
+                  background: m.role === "user" ? "#1C1917" : "#fff",
+                  color: m.role === "user" ? "#F0EBE3" : "#1C1917",
+                  padding: "10px 14px",
+                  fontSize: "13px", lineHeight: 1.7,
+                  borderRadius: m.role === "user" ? "12px 12px 2px 12px" : "2px 12px 12px 12px",
+                  border: m.role === "user" ? "none" : "0.5px solid rgba(28,25,23,0.08)",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+                }} dangerouslySetInnerHTML={{ __html: formatMessage(m.content) }} />
               </div>
             ))}
             {loading && (
-              <div style={{ alignSelf: 'flex-start', fontSize: '12px', color: '#9A8F82', padding: '6px 14px' }}>
-                Sedang mengetik...
+              <div className="henima-msg" style={{ alignSelf: "flex-start", maxWidth: "82%" }}>
+                <span style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#C8B89A", marginLeft: "2px" }}>HENIMA</span>
+                <div style={{
+                  background: "#fff", padding: "12px 16px",
+                  borderRadius: "2px 12px 12px 12px",
+                  border: "0.5px solid rgba(28,25,23,0.08)",
+                  display: "flex", gap: "4px", alignItems: "center",
+                }}>
+                  <span className="typing-dot" style={{ animationDelay: "0s" }}></span>
+                  <span className="typing-dot" style={{ animationDelay: "0.2s" }}></span>
+                  <span className="typing-dot" style={{ animationDelay: "0.4s" }}></span>
+                </div>
               </div>
             )}
           </div>
 
           {/* Input */}
-          <div style={{ borderTop: '1px solid rgba(28,25,23,0.1)', padding: '12px 16px', display: 'flex', gap: '8px' }}>
+          <div style={{
+            borderTop: "0.5px solid rgba(28,25,23,0.08)",
+            padding: "12px 14px",
+            display: "flex", gap: "8px",
+            background: "#fff",
+          }}>
             <input
+              className="henima-input"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') sendMessage() }}
+              onKeyDown={(e) => { if (e.key === "Enter") sendMessage() }}
               placeholder="Tulis pesan..."
               disabled={loading}
               style={{
-                flex: 1, border: '1px solid rgba(28,25,23,0.15)', padding: '10px 12px',
-                fontSize: '16px', outline: 'none', background: '#fff',
+                flex: 1,
+                border: "0.5px solid rgba(28,25,23,0.15)",
+                padding: "10px 14px",
+                fontSize: "13px",
+                outline: "none",
+                background: "#FAF8F4",
+                fontFamily: "var(--font-jost)",
+                color: "#1C1917",
+                borderRadius: "4px",
+                transition: "border-color 0.2s",
               }}
             />
             <button
               onClick={sendMessage}
               disabled={loading || !input.trim()}
               style={{
-                background: '#1C1917', border: 'none', color: '#F0EBE3',
-                padding: '10px 16px', cursor: 'pointer', fontSize: '13px',
-                opacity: loading || !input.trim() ? 0.5 : 1,
+                background: loading || !input.trim() ? "rgba(28,25,23,0.3)" : "#1C1917",
+                border: "none", color: "#F0EBE3",
+                padding: "10px 16px", cursor: loading || !input.trim() ? "not-allowed" : "pointer",
+                fontSize: "11px", letterSpacing: "1.5px",
+                fontFamily: "var(--font-jost)",
+                borderRadius: "4px",
+                transition: "background 0.2s",
               }}
             >
-              Kirim
+              KIRIM
             </button>
           </div>
+
         </div>
       )}
     </>
