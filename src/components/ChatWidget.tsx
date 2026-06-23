@@ -50,6 +50,22 @@ export default function ChatWidget() {
   return (
     <>
       <style>{`
+        @media (max-width: 480px) {
+          .henima-chat-window {
+            bottom: 0 !important;
+            right: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 65vh !important;
+            max-height: 65vh !important;
+            border-radius: 20px 20px 0 0 !important;
+          }
+          .henima-chat-btn {
+            bottom: 16px !important;
+            right: 16px !important;
+          }
+        }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
