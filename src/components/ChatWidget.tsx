@@ -105,10 +105,16 @@ export default function ChatWidget() {
         }
       `}</style>
 
-      {/* Floating button */}
+      {/* Floating button — mobile redirect to /chat, desktop open widget */}
       {!open && (
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            if (window.innerWidth < 768) {
+              window.location.href = "/chat";
+            } else {
+              setOpen(true);
+            }
+          }}
           className="henima-chat-btn"
           style={{
             position: "fixed", bottom: "24px", right: "24px", zIndex: 9999,
