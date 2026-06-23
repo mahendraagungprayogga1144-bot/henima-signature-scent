@@ -27,9 +27,12 @@ PRODUK UNGGULAN:
    - Cocok untuk: pria yang percaya diri dan berkarakter kuat
 
 3. THE DISTANCE
-   - Jenis: Extrait de Parfum  
-   - Karakter: terinspirasi dari kerinduan dan jarak
-   - Cocok untuk: unisex, pengguna yang menyukai wangi emosional
+   - Jenis: Extrait de Parfum
+   - Karakter: Sweet Warm Oriental, mewah dan hangat
+   - Scent Family: Oriental
+   - Longevity: 24 jam
+   - Cocok untuk: unisex, cocok untuk malam hari dan acara spesial
+   - Harga: 50ml = Rp 185.000
 
 INFORMASI PEMESANAN:
 - Checkout langsung di henimaofficial.com/shop
