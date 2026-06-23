@@ -1,7 +1,7 @@
 import SplashScreen from "@/components/SplashScreen";
 import ChatWidget from "@/components/ChatWidget";
 import ScrollObserver from "@/components/ScrollObserver";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import { getDatabase } from "@/lib/db";
@@ -21,6 +21,13 @@ const jost = Jost({
   weight: ["300", "400", "500", "600"],
   variable: "--font-jost",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "Henima Signature Scent",
