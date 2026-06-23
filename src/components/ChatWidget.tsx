@@ -25,6 +25,12 @@ export default function ChatWidget() {
     }
   }, [messages, loading])
 
+  useEffect(() => {
+    const handler = () => setOpen(true);
+    window.addEventListener("henima-open-chat", handler);
+    return () => window.removeEventListener("henima-open-chat", handler);
+  }, [])
+
   async function sendMessage() {
     const text = input.trim()
     if (!text || loading) return

@@ -5,6 +5,13 @@ import { useState, useEffect, useRef } from "react";
 
 export default function Navbar({ user }: { user?: any }) {
   const [open, setOpen] = useState(false);
+
+  function openChat() {
+    setOpen(false);
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("henima-open-chat"));
+    }, 300);
+  }
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
@@ -164,6 +171,16 @@ export default function Navbar({ user }: { user?: any }) {
                     {label}
                   </Link>
                 ))}
+                <button onClick={openChat} style={{
+                    fontFamily:"var(--font-jost)", fontSize:"clamp(28px,7vw,42px)",
+                    fontWeight:300, color:"rgba(200,184,154,0.7)", textDecoration:"none",
+                    lineHeight:1.4, letterSpacing:"2px", textTransform:"uppercase",
+                    borderBottom:"1px solid rgba(255,255,255,0.06)", paddingBottom:"14px", marginBottom:"4px",
+                    background:"none", border:"none", borderBottom:"1px solid rgba(255,255,255,0.06)",
+                    cursor:"pointer", textAlign:"left", width:"100%", paddingBottom:"14px",
+                  }}>
+                    Chat CS
+                  </button>
                 <div style={{marginTop:"24px", display:"flex", gap:"16px"}}>
                   <Link href="/masuk" onClick={() => setOpen(false)} style={{
                     fontFamily:"var(--font-jost)", fontSize:"13px", fontWeight:300,
