@@ -6,7 +6,7 @@ export async function getProductReviews(productId: string) {
     .from("product_reviews")
     .select("*")
     .eq("product_id", productId)
-    .eq("is_approved", true)
+    .eq("approved", true)
     .order("created_at", { ascending: false });
   return data || [];
 }

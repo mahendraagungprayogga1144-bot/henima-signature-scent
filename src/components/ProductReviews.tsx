@@ -7,7 +7,7 @@ interface Review {
   rating: number;
   comment: string;
   created_at: string;
-  admin_reply?: string;
+  reply?: string;
 }
 
 export default function ProductReviews({ reviews, productName }: { reviews: Review[]; productName: string }) {
@@ -150,11 +150,11 @@ export default function ProductReviews({ reviews, productName }: { reviews: Revi
                   <span style={{fontFamily:"monospace", fontSize:"11px", color:"#9A8F82"}}>{new Date(r.created_at).toLocaleDateString("id-ID", {day:"2-digit", month:"2-digit", year:"2-digit"})}</span>
                 </div>
               </div>
-              <p style={{fontSize:"14px", color:"#4A4440", lineHeight:1.75, margin:0, fontWeight:300}}>{r.comment}</p>
-              {r.admin_reply && (
+              <p style={{fontSize:"14px", color:"#4A4440", lineHeight:1.75, margin:0, fontWeight:300}}>{r.review}</p>
+              {r.reply && (
                 <div style={{marginTop:"12px", borderLeft:"1.5px solid #B5935A", padding:"8px 12px", background:"rgba(181,147,90,0.05)", borderRadius:"0 6px 6px 0"}}>
                   <p style={{fontFamily:"monospace", fontSize:"11px", color:"#B5935A", margin:"0 0 3px"}}>// henima.reply</p>
-                  <p style={{fontSize:"13px", color:"#4A4440", margin:0, lineHeight:1.7, fontWeight:300}}>{r.admin_reply}</p>
+                  <p style={{fontSize:"13px", color:"#4A4440", margin:0, lineHeight:1.7, fontWeight:300}}>{r.reply}</p>
                 </div>
               )}
             </div>
