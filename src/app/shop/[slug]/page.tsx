@@ -5,6 +5,8 @@ import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
 import StockNotifyButton from "@/components/StockNotifyButton";
 import ProductGallery from "@/components/ProductGallery";
+import ProductReviews from "@/components/ProductReviews";
+import { getProductReviews } from "@/lib/reviews";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,8 @@ export default async function ProductDetailPage({
   const products = db.products.filter((p) => p.active);
   const product = products.find((p) => toSlug(p.name) === slug);
   if (!product) notFound();
+
+  const reviews = await getProductReviews(product.id);
 
   const variants = product.variants.filter((v) => v.active);
   const totalStock = variants.reduce((sum, v) => sum + (v.stock || 0), 0);
@@ -188,6 +192,11 @@ export default async function ProductDetailPage({
 
           </div>
         </div>
+      </div>
+
+      {/* REVIEWS */}
+      <div style={{padding:"0 8vw"}}>
+        <ProductReviews reviews={reviews} productName={product.name} />
       </div>
 
       {/* YOU MAY ALSO LIKE */}
