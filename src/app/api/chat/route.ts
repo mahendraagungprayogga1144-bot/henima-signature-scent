@@ -17,7 +17,7 @@ PRODUK UNGGULAN:
    - Middle Notes: Violet, Cardamom
    - Base Notes: Sandalwood, Musk, Vanilla
    - Sillage: Medium-strong | Projection: ±2m | Longevity: 24 jam
-   - Harga: 50ml = Rp 185.000 | 30ml = Rp 135.000
+   - Harga: 50ml = Rp 185.000
    - Cocok untuk: aktivitas kantor, acara formal, nongkrong malam
    - Rating: 5.0/5.0 dari 13 ulasan verified
 
