@@ -49,8 +49,10 @@ export default function ChatPage() {
 
   return (
     <div style={{
+      position: "fixed", inset: 0,
       height: "100dvh", display: "flex", flexDirection: "column",
       background: "#FAF8F4", fontFamily: "var(--font-jost)",
+      overflow: "hidden",
     }}>
       <style>{`
         @keyframes floatIn {
