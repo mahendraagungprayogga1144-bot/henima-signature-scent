@@ -61,7 +61,16 @@ export default function FlashSaleSection() {
   useEffect(() => {
     fetch("/api/flash-sale")
       .then(r => r.json())
-      .then(setSales)
+      .then(async (sales) => {
+        // Fetch foto produk
+        const productsRes = await fetch("/api/products-public");
+        const products = await productsRes.json();
+        const salesWithPhoto = sales.map((s: any) => {
+          const product = products.find((p: any) => p.id === s.product_id);
+          return { ...s, photo: product?.photos?.[0] || product?.photo || "" };
+        });
+        setSales(salesWithPhoto);
+      })
       .catch(() => {});
   }, []);
 
@@ -100,11 +109,24 @@ export default function FlashSaleSection() {
           return (
             <div key={sale.id} onClick={() => buyNow(sale)} style={{ textDecoration: "none", background: "#1C1917", display: "block", transition: "background 0.2s", cursor: "pointer" }}>
               <div style={{ padding: "20px" }}>
-                {/* Badge */}
+                {/* Foto Produk */}
+                {sale.photo && (
+                  <div style={{ width: "100%", aspectRatio: "1/1", marginBottom: "12px", overflow: "hidden", borderRadius: "4px", position: "relative" }}>
+                    <img src={sale.photo} alt={sale.product_name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <div style={{ position: "absolute", top: "8px", left: "8px" }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", background: "#E53935", color: "#fff", fontSize: "10px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px" }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        {sale.discount_type === "percent" ? `-${sale.discount_value}%` : `Hemat Rp ${sale.discount_value?.toLocaleString("id-ID")}`}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {!sale.photo && (
                 <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", background: "#E53935", color: "#fff", fontSize: "10px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px", marginBottom: "12px" }}>
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                   {sale.discount_type === "percent" ? `-${sale.discount_value}%` : `Hemat Rp ${sale.discount_value?.toLocaleString("id-ID")}`}
                 </div>
+                )}
 
                 <p style={{ fontSize: "14px", fontWeight: 500, color: "#F0EBE3", margin: "0 0 6px" }}>{sale.product_name}</p>
 
