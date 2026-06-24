@@ -11,15 +11,19 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div style={{
       display: "flex",
       minHeight: "100vh",
-      background: "#0F1117",
+      background: "#F8F8F8",
       fontFamily: "var(--font-jost)",
     }}>
+      <style>{`
+        header, footer, .henima-chat-btn { display: none !important; }
+        body { background: #F8F8F8 !important; overflow-x: hidden; }
+      `}</style>
       <AdminSidebar user={user} />
       <main style={{
         flex: 1,
         marginLeft: "240px",
         minHeight: "100vh",
-        background: "#0F1117",
+        background: "#F8F8F8",
         overflowX: "hidden",
       }}>
         {children}
