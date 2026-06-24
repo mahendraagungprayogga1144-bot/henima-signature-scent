@@ -12,7 +12,7 @@ function formatMessage(text: string) {
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Halo! Saya Aldo dari Henima Signature Scent.\n\nAda yang bisa saya bantu seputar produk, pesanan, atau pengiriman?" }
+    { role: "assistant", content: "Halo kak! Saya Aldo, CS Henima. Ada yang bisa saya bantu? 😊" }
   ])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
