@@ -22,6 +22,10 @@ export default function CheckoutPage() {
   const [selectedShipping, setSelectedShipping] = useState<any>(null);
   const [loadingShipping, setLoadingShipping] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [voucherCode, setVoucherCode] = useState("");
+  const [voucher, setVoucher] = useState<any>(null);
+  const [voucherMsg, setVoucherMsg] = useState("");
+  const [voucherLoading, setVoucherLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -33,7 +37,34 @@ export default function CheckoutPage() {
 
   const subtotal = cartTotal(items);
   const shippingCost = selectedShipping?.price || selectedShipping?.shipping_fee || 0;
-  const total = subtotal + shippingCost;
+  const voucherDiscount = voucher ? (
+    voucher.type === "discount_percent" ? Math.floor(subtotal * voucher.value / 100) :
+    voucher.type === "discount_fixed" ? voucher.value :
+    voucher.type === "free_shipping" ? shippingCost : 0
+  ) : 0;
+  const total = subtotal + shippingCost - voucherDiscount;
+
+  async function applyVoucher() {
+    if (!voucherCode.trim()) return;
+    setVoucherLoading(true);
+    setVoucherMsg("");
+    try {
+      const res = await fetch("/api/voucher/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: voucherCode.toUpperCase(), subtotal }),
+      });
+      const data = await res.json();
+      if (res.ok && data.voucher) {
+        setVoucher(data.voucher);
+        setVoucherMsg("Voucher berhasil dipakai!");
+      } else {
+        setVoucher(null);
+        setVoucherMsg(data.error || "Voucher tidak valid");
+      }
+    } catch { setVoucherMsg("Gagal memvalidasi voucher"); }
+    finally { setVoucherLoading(false); }
+  }
 
   async function searchCities(q: string) {
     setCitySearch(q);
@@ -95,7 +126,7 @@ export default function CheckoutPage() {
           items, name, phone, email, address, city, province, postalCode,
           courier: selectedShipping.service,
           courierName: selectedShipping.description,
-          shippingCost, subtotal, total,
+          shippingCost, subtotal, total, voucher_code: voucher?.code, voucher_discount: voucherDiscount,
         }),
       });
       const data = await res.json();
@@ -300,9 +331,22 @@ export default function CheckoutPage() {
             <div style={{height:"1px", background:"rgba(28,25,23,0.08)", margin:"16px 0"}} />
 
             {/* Voucher */}
-            <div style={{display:"flex", gap:"0", marginBottom:"16px"}}>
-              <input placeholder="Kode voucher" style={{flex:1, padding:"12px 16px", border:"1px solid rgba(28,25,23,0.15)", background:"transparent", fontSize:"13px", color:"#1C1917", fontFamily:"var(--font-jost)", outline:"none"}} />
-              <button type="button" style={{padding:"12px 20px", background:"#1C1917", color:"#FAF8F4", border:"none", fontSize:"12px", letterSpacing:"1px", textTransform:"uppercase", cursor:"pointer", fontFamily:"var(--font-jost)"}}>Apply</button>
+            <div style={{marginBottom:"16px"}}>
+              <div style={{display:"flex", gap:"0"}}>
+                <input
+                  value={voucherCode}
+                  onChange={e => { setVoucherCode(e.target.value.toUpperCase()); setVoucher(null); setVoucherMsg(""); }}
+                  placeholder="Kode voucher"
+                  style={{flex:1, padding:"12px 16px", border:"1px solid rgba(28,25,23,0.15)", background:"transparent", fontSize:"13px", color:"#1C1917", fontFamily:"var(--font-jost)", outline:"none"}}
+                />
+                <button type="button" onClick={applyVoucher} disabled={voucherLoading}
+                  style={{padding:"12px 20px", background:"#1C1917", color:"#FAF8F4", border:"none", fontSize:"12px", letterSpacing:"1px", textTransform:"uppercase", cursor:"pointer", fontFamily:"var(--font-jost)"}}>
+                  {voucherLoading ? "..." : "Apply"}
+                </button>
+              </div>
+              {voucherMsg && (
+                <p style={{fontSize:"12px", color: voucher ? "#2E7D32" : "#cc0000", marginTop:"6px"}}>{voucherMsg}</p>
+              )}
             </div>
 
             <div style={{height:"1px", background:"rgba(28,25,23,0.08)", margin:"16px 0"}} />
@@ -311,12 +355,18 @@ export default function CheckoutPage() {
               <span style={{fontSize:"13px", color:"#6B6560"}}>Subtotal</span>
               <span style={{fontSize:"13px", color:"#1C1917"}}>Rp {subtotal.toLocaleString("id-ID")}</span>
             </div>
-            <div style={{display:"flex", justifyContent:"space-between", marginBottom:"20px"}}>
+            <div style={{display:"flex", justifyContent:"space-between", marginBottom:"8px"}}>
               <span style={{fontSize:"13px", color:"#6B6560"}}>Shipping</span>
               <span style={{fontSize:"13px", color: shippingCost > 0 ? "#1C1917" : "#9A8F82"}}>
                 {shippingCost > 0 ? "Rp " + shippingCost.toLocaleString("id-ID") : "Calculated at next step"}
               </span>
             </div>
+            {voucherDiscount > 0 && (
+              <div style={{display:"flex", justifyContent:"space-between", marginBottom:"8px"}}>
+                <span style={{fontSize:"13px", color:"#2E7D32"}}>Diskon ({voucherCode})</span>
+                <span style={{fontSize:"13px", color:"#2E7D32"}}>- Rp {voucherDiscount.toLocaleString("id-ID")}</span>
+              </div>
+            )}
 
             <div style={{height:"1px", background:"rgba(28,25,23,0.08)", marginBottom:"20px"}} />
 
