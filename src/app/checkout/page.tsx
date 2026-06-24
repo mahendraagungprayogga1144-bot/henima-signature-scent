@@ -27,6 +27,18 @@ export default function CheckoutPage() {
   const router = useRouter();
 
   useEffect(() => {
+    document.body.style.overflow = "auto";
+    const style = document.createElement("style");
+    style.id = "checkout-style";
+    style.innerHTML = "header, footer, .henima-chat-btn { display: none !important; }";
+    document.head.appendChild(style);
+    return () => {
+      const el = document.getElementById("checkout-style");
+      if (el) el.remove();
+    };
+  }, []);
+
+  useEffect(() => {
     const cart = getCart();
     if (cart.length === 0) router.push("/shop");
     setItems(cart);
