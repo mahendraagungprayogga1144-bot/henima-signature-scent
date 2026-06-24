@@ -19,6 +19,7 @@ const MENUS = [
   ]},
   { group: "MARKETING", items: [
     { href: "/admin/broadcast", icon: "send", label: "Broadcast" },
+    { href: "/admin/subscribers", icon: "users", label: "Subscribers" },
     { href: "/admin/reseller", icon: "users", label: "Reseller" },
   ]},
   { group: "SISTEM", items: [
