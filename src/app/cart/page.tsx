@@ -8,6 +8,17 @@ export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
+    const style = document.createElement("style");
+    style.id = "cart-style";
+    style.innerHTML = "header, footer, .henima-chat-btn { display: none !important; }";
+    document.head.appendChild(style);
+    return () => {
+      const el = document.getElementById("cart-style");
+      if (el) el.remove();
+    };
+  }, []);
+
+  useEffect(() => {
     setItems(getCart());
     const onUpdate = () => setItems(getCart());
     window.addEventListener("cart-updated", onUpdate);
