@@ -43,7 +43,22 @@ export default function AdminNotifier() {
     return () => clearInterval(interval);
   }, []);
 
-  if (!show || newOrders.length === 0) return null;
+  function testNotif() {
+    playSound();
+    setNewOrders([{ id: "ORD-TEST-001", total: 185000, customer: JSON.stringify({ name: "Test Customer" }) }]);
+    setShow(true);
+  }
+
+  return (
+    <>
+      <button onClick={testNotif} style={{
+        position: "fixed", bottom: "20px", left: "260px", zIndex: 9999,
+        background: "rgba(181,147,90,0.15)", border: "1px solid rgba(181,147,90,0.3)",
+        color: "#B5935A", fontSize: "10px", letterSpacing: "1px",
+        padding: "6px 12px", borderRadius: "20px", cursor: "pointer",
+        fontFamily: "var(--font-jost)",
+      }}>🔔 Test Notif</button>
+      {show && newOrders.length > 0 && (
 
   return (
     <div style={{
@@ -85,5 +100,7 @@ export default function AdminNotifier() {
         fontWeight: 600,
       }}>Lihat Orders →</a>
     </div>
+      )}
+    </>
   );
 }
