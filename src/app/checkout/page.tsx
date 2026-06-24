@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getCart, cartTotal, type CartItem } from "@/lib/cart";
 import Image from "next/image";
+import AddressForm from "@/components/AddressForm";
 import Link from "next/link";
 
 export default function CheckoutPage() {
@@ -10,14 +11,11 @@ export default function CheckoutPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [province, setProvince] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [cities, setCities] = useState<any[]>([]);
-  const [citySearch, setCitySearch] = useState("");
-  const [showCityDropdown, setShowCityDropdown] = useState(false);
-  const [selectedCityId, setSelectedCityId] = useState("");
+  const [addressData, setAddressData] = useState({
+    address: "", province: "", provinceId: "", city: "", cityId: "",
+    district: "", districtId: "", village: "", villageId: "",
+    postalCode: "", biteshipAreaId: "",
+  });
   const [shippingOptions, setShippingOptions] = useState<any[]>([]);
   const [selectedShipping, setSelectedShipping] = useState<any>(null);
   const [loadingShipping, setLoadingShipping] = useState(false);
@@ -36,6 +34,11 @@ export default function CheckoutPage() {
   }, [router]);
 
   const subtotal = cartTotal(items);
+  const address = addressData.address;
+  const city = addressData.city;
+  const province = addressData.province;
+  const postalCode = addressData.postalCode;
+  const selectedCityId = addressData.biteshipAreaId;
   const shippingCost = selectedShipping?.price || selectedShipping?.shipping_fee || 0;
   const voucherDiscount = voucher ? (
     voucher.type === "discount_percent" ? Math.floor(subtotal * voucher.value / 100) :
@@ -192,51 +195,16 @@ export default function CheckoutPage() {
             <div style={{marginBottom:"40px"}}>
               <h2 style={{fontSize:"18px", fontWeight:600, color:"#1C1917", marginBottom:"20px"}}>Shipping Address</h2>
               <div style={{display:"flex", flexDirection:"column", gap:"0"}}>
-                <textarea required value={address} onChange={e => setAddress(e.target.value)}
-                  placeholder="Alamat lengkap (jalan, RT/RW, nama rumah/patokan)"
-                  rows={3}
-                  style={{...inp, resize:"none", paddingTop:"14px"}} />
-                <div style={{position:"relative"}}>
-                  <input
-                    value={citySearch}
-                    onChange={e => searchCities(e.target.value)}
-                    onFocus={() => citySearch.length >= 2 && setShowCityDropdown(true)}
-                    placeholder="Cari kecamatan (contoh: Taman, Nganjuk, Gubeng...)"
-                    style={inp}
-                    autoComplete="off"
-                  />
-                  {showCityDropdown && cities.length > 0 && (
-                    <div style={{position:"absolute", top:"100%", left:0, right:0, background:"#fff", border:"1px solid rgba(28,25,23,0.15)", zIndex:100, maxHeight:"220px", overflowY:"auto", boxShadow:"0 4px 12px rgba(0,0,0,0.08)"}}>
-                      {cities.map((c:any) => (
-                        <div key={c.id}
-                          onClick={() => {
-                            setSelectedCityId(c.id);
-                            setCity(c.administrative_division_level_3_name || c.administrative_division_level_2_name || "");
-                            setProvince(c.administrative_division_level_1_name || "");
-                            setPostalCode(String(c.postal_code || ""));
-                            setCitySearch(c.name);
-                            setShowCityDropdown(false);
-                            setTimeout(() => checkShippingById(c.id), 100);
-                          }}
-                          style={{padding:"12px 16px", cursor:"pointer", fontSize:"13px", color:"#1C1917", borderBottom:"1px solid rgba(28,25,23,0.06)"}}>
-                          <p style={{margin:0, fontWeight:500}}>{c.administrative_division_level_3_name || c.name}</p>
-                          <p style={{margin:"2px 0 0", fontSize:"11px", color:"#9A8F82"}}>{c.administrative_division_level_2_name}, {c.administrative_division_level_1_name} {c.postal_code}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div style={{display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"12px"}} className="name-grid">
-                  <input readOnly value={city}
-                    placeholder="Kota/Kab (otomatis)"
-                    style={{...inp, background: city ? "#F0EBE3" : "transparent", color: city ? "#1C1917" : "#9A8F82"}} />
-                  <input readOnly value={province}
-                    placeholder="Provinsi (otomatis)"
-                    style={{...inp, background: province ? "#F0EBE3" : "transparent", color: province ? "#1C1917" : "#9A8F82"}} />
-                  <input readOnly value={postalCode}
-                    placeholder="Kode Pos (otomatis)"
-                    style={{...inp, background: postalCode ? "#F0EBE3" : "transparent", color: postalCode ? "#1C1917" : "#9A8F82"}} />
-                </div>
+                <AddressForm
+                  value={addressData}
+                  onChange={(data) => {
+                    setAddressData(data);
+                    if (data.biteshipAreaId) {
+                      setTimeout(() => checkShippingById(data.biteshipAreaId), 100);
+                    }
+                  }}
+                  inputStyle={inp}
+                />
                 <input value={phone} readOnly placeholder="Phone" style={{...inp, color:"#9A8F82"}} />
               </div>
               <label style={{display:"flex", alignItems:"center", gap:"10px", marginTop:"16px", fontSize:"13px", color:"#6B6560", cursor:"pointer"}}>
