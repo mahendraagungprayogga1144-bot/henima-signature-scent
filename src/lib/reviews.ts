@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase";
-import ProductReviews from "@/components/ProductReviews";
 
 export async function getProductReviews(productId: string) {
   const { data } = await supabase
