@@ -75,12 +75,12 @@ export default function FlashSaleSection() {
       </div>
 
       {/* Products */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "2px", background: "rgba(200,184,154,0.08)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 200px))", gap: "2px", background: "rgba(200,184,154,0.08)", justifyContent: "start" }}>
         {sales.map(sale => {
           const progress = sale.stock_limit > 0 ? Math.min(100, Math.round(sale.sold_count / sale.stock_limit * 100)) : 0;
           const remaining = sale.stock_limit - sale.sold_count;
           return (
-            <Link key={sale.id} href="/shop" style={{ textDecoration: "none", background: "#1C1917", display: "block", transition: "background 0.2s" }}>
+            <Link key={sale.id} href={"/shop/" + (sale.product_id === "prod-afternoon" ? "afternoon" : sale.product_id === "prod-distance" ? "the-distance" : "brave-man-intense")} style={{ textDecoration: "none", background: "#1C1917", display: "block", transition: "background 0.2s" }}>
               <div style={{ padding: "20px" }}>
                 {/* Badge */}
                 <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", background: "#E53935", color: "#fff", fontSize: "10px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px", marginBottom: "12px" }}>
