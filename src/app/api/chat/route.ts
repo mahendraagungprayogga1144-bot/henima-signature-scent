@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rateLimit";
 import Anthropic from "@anthropic-ai/sdk";
 import { supabase } from "@/lib/supabase";
 
@@ -117,6 +118,10 @@ async function cekStatusPesanan(orderId: string) {
 }
 
 export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!rateLimit(ip, 20, 60000)) {
+    return NextResponse.json({ error: "Terlalu banyak request. Coba lagi dalam 1 menit." }, { status: 429 });
+  }
   try {
     const { messages } = await request.json();
 

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rateLimit";
 import Anthropic from "@anthropic-ai/sdk";
 import { supabase } from "@/lib/supabase";
 
@@ -69,6 +70,10 @@ async function checkOrder(orderId: string) {
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    if (!rateLimit(ip, 30, 60000)) {
+      return NextResponse.json({ status: "rate limited" }, { status: 429 });
+    }
     const body = await request.json();
     
     const message = body.message || body.text || "";
