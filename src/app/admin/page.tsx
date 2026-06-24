@@ -27,6 +27,11 @@ export default async function AdminDashboardPage() {
   const shippedOrders = allOrders.filter(o => o.status === "shipped").length;
   const totalOrders = allOrders.length;
 
+  // Shipping cost
+  const shippingToday = allOrders.filter(o => o.created_at?.startsWith(todayKey)).reduce((s, o) => s + (o.shipping_cost || 0), 0);
+  const thisMonthKey = new Date().toISOString().slice(0, 7);
+  const shippingThisMonth = allOrders.filter(o => o.created_at?.startsWith(thisMonthKey)).reduce((s, o) => s + (o.shipping_cost || 0), 0);
+
   // Revenue 7 hari terakhir
   const now = Date.now();
   const dayMs = 86400000;
@@ -52,6 +57,8 @@ export default async function AdminDashboardPage() {
       pendingOrders={pendingOrders}
       processingOrders={processingOrders}
       shippedOrders={shippedOrders}
+      shippingToday={shippingToday}
+      shippingThisMonth={shippingThisMonth}
       revenueByDay={revenueByDay}
       recentOrders={recentOrders}
       totalUlasan={totalUlasan || 0}

@@ -14,7 +14,8 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 
 export default function AdminDashboardClient({
   totalRevenue, revenueToday, totalOrders, pendingOrders,
-  processingOrders, shippedOrders, revenueByDay, recentOrders, totalUlasan
+  processingOrders, shippedOrders, revenueByDay, recentOrders, totalUlasan,
+  shippingToday, shippingThisMonth
 }: any) {
   const kpis = [
     { label: "Total Revenue", value: fmt(totalRevenue), sub: "Semua waktu", color: "#B5935A", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B5935A" strokeWidth="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
@@ -24,6 +25,8 @@ export default function AdminDashboardClient({
     { label: "Diproses", value: processingOrders, sub: "Sedang dikemas", color: "#8B5CF6", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" strokeWidth="1.8"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> },
     { label: "Dikirim", value: shippedOrders, sub: "Dalam pengiriman", color: "#10B981", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> },
     { label: "Total Ulasan", value: totalUlasan, sub: "Sudah approved", color: "#F472B6", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F472B6" strokeWidth="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> },
+    { label: "Ongkir Hari Ini", value: fmt(shippingToday), sub: "Dibayar customer", color: "#06B6D4", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06B6D4" strokeWidth="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> },
+    { label: "Ongkir Bulan Ini", value: fmt(shippingThisMonth), sub: "Total bulan ini", color: "#0EA5E9", icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" strokeWidth="1.8"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
   ];
 
   return (
