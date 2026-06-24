@@ -83,6 +83,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ status: "ignored" });
     }
 
+    // Filter keyword — Aldo hanya balas pesan yang relevan dengan Henima
+    const keywords = [
+      "parfum", "wangi", "harga", "beli", "order", "pesanan", "produk",
+      "henima", "afternoon", "distance", "brave", "ongkir", "kirim",
+      "bayar", "transfer", "cod", "resi", "tracking", "refund", "retur",
+      "tanya", "info", "mau", "minta", "tolong", "halo", "hai", "hi",
+      "hello", "min", "kak", "gan", "boss", "aldo", "cs", "admin"
+    ];
+    
+    const messageLower = message.toLowerCase();
+    const isRelevant = keywords.some(kw => messageLower.includes(kw));
+    
+    if (!isRelevant) {
+      console.log("Pesan tidak relevan, skip:", message);
+      return NextResponse.json({ status: "ignored - not relevant" });
+    }
+
     // Cek apakah ada Order ID di pesan
     const orderIdMatch = message.match(/ORD-[A-Z0-9\-]+/i);
     let orderContext = "";
