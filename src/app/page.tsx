@@ -8,6 +8,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import { getCurrentUserSafe } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { getDatabase } from "@/lib/db";
+import FlashSaleSection from "@/components/FlashSaleSection";
 
 export const dynamic = "force-dynamic";
 
@@ -104,6 +105,7 @@ export default async function HomePage() {
       )}
 
       {/* ── LOVE LETTERS ── */}
+      <FlashSaleSection />
       <LoveLettersSection />
 
       {/* ── PHOTO CAROUSEL ── */}
