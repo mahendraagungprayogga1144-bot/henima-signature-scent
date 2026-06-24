@@ -28,7 +28,8 @@ export default function VoucherClient({ vouchers: initialVouchers }: { vouchers:
   }
 
   async function saveVoucher() {
-    if (!form.code || !form.value) return;
+    if (!form.code) return;
+    if (form.type !== "free_shipping" && !form.value) return;
     setSaving(true);
     setMsg("");
     try {
