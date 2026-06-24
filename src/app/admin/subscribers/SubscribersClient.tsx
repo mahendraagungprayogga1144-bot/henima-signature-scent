@@ -3,11 +3,17 @@ import { useState } from "react";
 
 export default function SubscribersClient({ subscribers }: { subscribers: any[] }) {
   const [search, setSearch] = useState("");
+  const [filterMonth, setFilterMonth] = useState("");
+  const [filterYear, setFilterYear] = useState("");
 
-  const filtered = subscribers.filter(s =>
-    s.email?.toLowerCase().includes(search.toLowerCase()) ||
-    s.name?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = subscribers.filter(s => {
+    const matchSearch = s.email?.toLowerCase().includes(search.toLowerCase()) ||
+      s.name?.toLowerCase().includes(search.toLowerCase());
+    const date = new Date(s.created_at);
+    const matchMonth = filterMonth ? (date.getMonth() + 1) === parseInt(filterMonth) : true;
+    const matchYear = filterYear ? date.getFullYear() === parseInt(filterYear) : true;
+    return matchSearch && matchMonth && matchYear;
+  });
 
   function exportCSV() {
     const header = "Nama,Email,Tanggal Daftar";
@@ -55,17 +61,36 @@ export default function SubscribersClient({ subscribers }: { subscribers: any[] 
           ))}
         </div>
 
-        {/* Search */}
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Cari nama atau email..."
-          style={{
-            width: "100%", border: "1px solid #e0e0e0", padding: "10px 14px",
-            fontSize: "13px", marginBottom: "16px", outline: "none",
-            background: "#fff", boxSizing: "border-box", borderRadius: "4px",
-          }}
-        />
+        {/* Search + Filter */}
+        <div style={{ display: "flex", gap: "10px", marginBottom: "16px", flexWrap: "wrap" }}>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Cari nama atau email..."
+            style={{
+              flex: 2, minWidth: "200px", border: "1px solid #e0e0e0", padding: "10px 14px",
+              fontSize: "13px", outline: "none", background: "#fff", borderRadius: "4px",
+            }}
+          />
+          <select value={filterMonth} onChange={e => setFilterMonth(e.target.value)} style={{
+            flex: 1, minWidth: "130px", border: "1px solid #e0e0e0", padding: "10px 14px",
+            fontSize: "13px", outline: "none", background: "#fff", borderRadius: "4px", color: filterMonth ? "#1a1a1a" : "#aaa",
+          }}>
+            <option value="">Semua Bulan</option>
+            {["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"].map((m, i) => (
+              <option key={i} value={i + 1}>{m}</option>
+            ))}
+          </select>
+          <select value={filterYear} onChange={e => setFilterYear(e.target.value)} style={{
+            flex: 1, minWidth: "110px", border: "1px solid #e0e0e0", padding: "10px 14px",
+            fontSize: "13px", outline: "none", background: "#fff", borderRadius: "4px", color: filterYear ? "#1a1a1a" : "#aaa",
+          }}>
+            <option value="">Semua Tahun</option>
+            {[2024, 2025, 2026, 2027].map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
 
         {/* Table */}
         <div style={{ background: "#fff", border: "1px solid #e5e5e5", borderRadius: "6px", overflow: "hidden" }}>
