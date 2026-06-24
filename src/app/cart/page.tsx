@@ -83,9 +83,22 @@ export default function CartPage() {
                       )}
                     </div>
                     <div>
-                      <p style={{fontSize:"15px", fontWeight:500, color:"#1C1917", marginBottom:"4px"}}>{item.productName}</p>
+                      <div style={{display:"flex", alignItems:"center", gap:"8px", marginBottom:"4px"}}>
+                        <p style={{fontSize:"15px", fontWeight:500, color:"#1C1917", margin:0}}>{item.productName}</p>
+                        {item.isFlashSale && (
+                          <span style={{display:"inline-flex", alignItems:"center", gap:"3px", background:"#FFEBEE", color:"#E53935", fontSize:"10px", fontWeight:600, padding:"2px 8px", borderRadius:"20px"}}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="#E53935"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            FLASH SALE
+                          </span>
+                        )}
+                      </div>
                       <p style={{fontSize:"12px", color:"#9A8F82"}}>{item.sizeMl}ml · Extrait de Parfum</p>
-                      <p style={{fontSize:"13px", color:"#1C1917", marginTop:"4px"}}>Rp {item.price.toLocaleString("id-ID")}</p>
+                      <div style={{display:"flex", alignItems:"center", gap:"8px", marginTop:"4px"}}>
+                        <p style={{fontSize:"13px", color: item.isFlashSale ? "#E53935" : "#1C1917", fontWeight: item.isFlashSale ? 600 : 400, margin:0}}>Rp {item.price.toLocaleString("id-ID")}</p>
+                        {item.isFlashSale && item.originalPrice && (
+                          <p style={{fontSize:"12px", color:"#9A8F82", textDecoration:"line-through", margin:0}}>Rp {item.originalPrice.toLocaleString("id-ID")}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
 

@@ -36,6 +36,8 @@ export default function AddToCartButton({ productId, productName, productPhoto, 
       variantId: variant.id,
       sizeMl: variant.sizeMl,
       price: flashPrice || variant.originalPrice,
+      isFlashSale: !!flashPrice,
+      originalPrice: variant.originalPrice,
       quantity: qty,
     });
     setAdded(true);

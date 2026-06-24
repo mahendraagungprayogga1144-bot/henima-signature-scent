@@ -7,6 +7,8 @@ export interface CartItem {
   sizeMl: number;
   price: number;
   quantity: number;
+  isFlashSale?: boolean;
+  originalPrice?: number;
 }
 
 export function getCart(): CartItem[] {

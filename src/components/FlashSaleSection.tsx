@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { addToCart } from "@/lib/cart";
 
 function Countdown({ endAt }: { endAt: string }) {
   const [time, setTime] = useState({ h: "00", m: "00", s: "00" });
@@ -39,6 +40,23 @@ function Countdown({ endAt }: { endAt: string }) {
 
 export default function FlashSaleSection() {
   const [sales, setSales] = useState<any[]>([]);
+  const router = useRouter();
+
+  function buyNow(sale: any) {
+    addToCart({
+      productId: sale.product_id,
+      productName: sale.product_name,
+      productPhoto: "",
+      variantId: sale.product_id + "-50ml",
+      sizeMl: 50,
+      price: sale.flash_price,
+      quantity: 1,
+      isFlashSale: true,
+      originalPrice: sale.original_price,
+    });
+    window.dispatchEvent(new Event("cart-updated"));
+    router.push("/cart");
+  }
 
   useEffect(() => {
     fetch("/api/flash-sale")
@@ -80,7 +98,7 @@ export default function FlashSaleSection() {
           const progress = sale.stock_limit > 0 ? Math.min(100, Math.round(sale.sold_count / sale.stock_limit * 100)) : 0;
           const remaining = sale.stock_limit - sale.sold_count;
           return (
-            <Link key={sale.id} href={"/shop/" + (sale.product_id === "prod-afternoon" ? "afternoon" : sale.product_id === "prod-distance" ? "the-distance" : "brave-man-intense")} style={{ textDecoration: "none", background: "#1C1917", display: "block", transition: "background 0.2s" }}>
+            <div key={sale.id} onClick={() => buyNow(sale)} style={{ textDecoration: "none", background: "#1C1917", display: "block", transition: "background 0.2s", cursor: "pointer" }}>
               <div style={{ padding: "20px" }}>
                 {/* Badge */}
                 <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", background: "#E53935", color: "#fff", fontSize: "10px", fontWeight: 600, padding: "3px 10px", borderRadius: "20px", marginBottom: "12px" }}>
@@ -105,7 +123,7 @@ export default function FlashSaleSection() {
                   {remaining > 0 ? `Sisa ${remaining} lagi` : "Habis"}
                 </p>
               </div>
-            </Link>
+            </div>
           );
         })}
       </div>
