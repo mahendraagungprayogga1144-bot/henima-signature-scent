@@ -5,7 +5,6 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import FooterSubscribe from "@/components/FooterSubscribe";
-import FooterSubscribe from "@/components/FooterSubscribe";
 import { getDatabase } from "@/lib/db";
 import "./globals.css";
 
