@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminNotifier from "@/components/admin/AdminNotifier";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -19,6 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         body { background: #F8F8F8 !important; overflow-x: hidden; }
       `}</style>
       <AdminSidebar user={user} />
+      <AdminNotifier />
       <main style={{
         flex: 1,
         marginLeft: "240px",
