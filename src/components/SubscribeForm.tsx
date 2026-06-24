@@ -4,7 +4,6 @@ import { useState } from "react";
 export default function SubscribeForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"idle"|"loading"|"success"|"error">("idle");
   const [msg, setMsg] = useState("");
 
@@ -15,13 +14,13 @@ export default function SubscribeForm() {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name, phone }),
+        body: JSON.stringify({ email, name }),
       });
       const data = await res.json();
       if (res.ok) {
         setStatus("success");
         setMsg("Thank you for subscribing!");
-        setEmail(""); setName(""); setPhone("");
+        setEmail(""); setName("");
       } else {
         setStatus("error");
         setMsg(data.error || "Terjadi kesalahan");
@@ -54,13 +53,6 @@ export default function SubscribeForm() {
         value={email}
         onChange={e => setEmail(e.target.value)}
         placeholder="Email address"
-        style={{background:"transparent", border:"1px solid rgba(255,255,255,0.15)", padding:"12px 16px", fontSize:"13px", color:"#F0EBE3", fontFamily:"var(--font-jost)", outline:"none"}}
-      />
-      <input
-        type="tel"
-        value={phone}
-        onChange={e => setPhone(e.target.value)}
-        placeholder="WhatsApp number (08xx)"
         style={{background:"transparent", border:"1px solid rgba(255,255,255,0.15)", padding:"12px 16px", fontSize:"13px", color:"#F0EBE3", fontFamily:"var(--font-jost)", outline:"none"}}
       />
       <button
