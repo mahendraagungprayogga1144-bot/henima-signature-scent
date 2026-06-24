@@ -14,7 +14,6 @@ export default async function AdminGaleriPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <Link href="/admin" className="text-sm text-gold-300 hover:underline">← Dashboard</Link>
       <h1 className="mt-4 text-2xl font-bold">Kelola Galeri</h1>
       <p className="mt-1 text-ink-300">Upload foto produk, packaging, dan momen brand.</p>
       <div className="mt-8">

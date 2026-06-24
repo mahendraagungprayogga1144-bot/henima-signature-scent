@@ -24,7 +24,6 @@ export default async function AdminOrdersPage() {
 
   return (
     <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "40px 24px", fontFamily: "var(--font-jost)" }}>
-      <Link href="/admin" style={{ fontSize: "12px", color: "#888", textDecoration: "none" }}>← Dashboard</Link>
       <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1a1a1a", marginTop: "16px", marginBottom: "8px" }}>Retail Orders</h1>
 
       {/* Stats */}

@@ -20,7 +20,6 @@ export default async function AdminProductsPage({
   return (
     <div>
       <Link href="/admin" className="text-sm text-gold-300 hover:text-gold-200 hover:underline">
-        ← Dashboard
       </Link>
       <h1 className="mt-4 text-2xl font-bold">Kelola Produk</h1>
       {saved && (

@@ -21,7 +21,6 @@ export default async function BroadcastPage() {
 
   return (
     <div style={{ maxWidth: "860px", margin: "0 auto", padding: "40px 24px", fontFamily: "var(--font-jost)" }}>
-      <Link href="/admin" style={{ fontSize: "12px", color: "#888", textDecoration: "none" }}>← Dashboard</Link>
       <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1a1a1a", marginTop: "16px", marginBottom: "8px" }}>Broadcast</h1>
       <p style={{ fontSize: "13px", color: "#888", marginBottom: "40px" }}>{count || 0} subscriber · {waCount} punya nomor WA</p>
 

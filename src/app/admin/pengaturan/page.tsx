@@ -14,7 +14,6 @@ export default async function AdminSettingsPage() {
   return (
     <div className="mx-auto max-w-3xl">
       <Link href="/admin" className="text-sm text-gold-300 hover:text-gold-200 hover:underline">
-        ← Dashboard
       </Link>
       <h1 className="mt-4 text-2xl font-bold">Pengaturan</h1>
       <p className="mt-1 text-ink-300">Kelola info perusahaan, QRIS, dan rekening bank.</p>

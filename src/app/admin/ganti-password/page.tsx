@@ -10,7 +10,6 @@ export default async function GantiPasswordPage() {
 
   return (
     <div className="mx-auto max-w-md">
-      <Link href="/admin" className="text-sm text-gold-300 hover:underline">← Dashboard</Link>
       <h1 className="mt-4 text-2xl font-bold">Ganti Password</h1>
       <p className="mt-1 text-ink-300">Update password akun admin kamu.</p>
       <div className="mt-8">

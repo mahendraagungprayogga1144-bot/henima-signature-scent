@@ -30,7 +30,6 @@ export default async function AdminMembersPage() {
         href="/admin"
         style={{ fontSize: "12px", color: "#888", textDecoration: "none", letterSpacing: "1px" }}
       >
-        ← Dashboard
       </Link>
 
       <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1a1a1a", marginTop: "16px", marginBottom: "4px" }}>

@@ -32,7 +32,6 @@ export default async function AdminBlogPage() {
 
   return (
     <div style={s.page}>
-      <Link href="/admin" style={s.back}>← Dashboard</Link>
       <div style={s.header}>
         <div>
           <h1 style={s.title}>Journal & Blog</h1>

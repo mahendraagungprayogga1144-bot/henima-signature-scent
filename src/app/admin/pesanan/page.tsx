@@ -32,7 +32,6 @@ export default async function AdminOrdersPage({
   return (
     <div>
       <Link href="/admin" className="text-sm text-brand-700 hover:underline">
-        ← Dashboard
       </Link>
       <h1 className="mt-4 text-2xl font-bold">Kelola Pesanan</h1>
 
