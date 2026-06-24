@@ -11,6 +11,8 @@ export default function VoucherClient({ vouchers: initialVouchers }: { vouchers:
   const [vouchers, setVouchers] = useState(initialVouchers);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<any>({});
   const [msg, setMsg] = useState("");
   const [form, setForm] = useState({
     code: "",
@@ -55,6 +57,43 @@ export default function VoucherClient({ vouchers: initialVouchers }: { vouchers:
         setMsg("Gagal: " + data.error);
       }
     } catch { setMsg("Error"); }
+    finally { setSaving(false); }
+  }
+
+  function startEdit(v: any) {
+    setEditingId(v.id);
+    setEditForm({
+      code: v.code,
+      type: v.type,
+      value: v.value || "",
+      min_order: v.min_order || "",
+      max_uses: v.max_uses || "",
+      expires_at: v.expires_at ? v.expires_at.slice(0, 10) : "",
+    });
+  }
+
+  async function saveEdit() {
+    if (!editingId) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/voucher/" + editingId, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: editForm.code.toUpperCase(),
+          type: editForm.type,
+          value: parseInt(editForm.value) || 0,
+          min_order: parseInt(editForm.min_order) || 0,
+          max_uses: parseInt(editForm.max_uses) || 100,
+          expires_at: editForm.expires_at || null,
+        }),
+      });
+      if (res.ok) {
+        setVouchers(v => v.map(x => x.id === editingId ? { ...x, ...editForm, value: parseInt(editForm.value) || 0, min_order: parseInt(editForm.min_order) || 0, max_uses: parseInt(editForm.max_uses) || 100 } : x));
+        setEditingId(null);
+        setMsg("Voucher berhasil diupdate!");
+      }
+    } catch {}
     finally { setSaving(false); }
   }
 
@@ -176,6 +215,13 @@ export default function VoucherClient({ vouchers: initialVouchers }: { vouchers:
                 </p>
               </div>
               <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={() => startEdit(v)} style={{
+                  background: "#e3f2fd", color: "#1565C0",
+                  border: "1px solid #90CAF9",
+                  padding: "6px 14px", fontSize: "11px", cursor: "pointer", borderRadius: "4px",
+                }}>
+                  Edit
+                </button>
                 <button onClick={() => toggleActive(v.id, v.active)} style={{
                   background: v.active ? "#fff3e0" : "#e8f5e9", color: v.active ? "#e65100" : "#2E7D32",
                   border: "1px solid", borderColor: v.active ? "#ffcc02" : "#a5d6a7",
@@ -190,6 +236,57 @@ export default function VoucherClient({ vouchers: initialVouchers }: { vouchers:
                   Hapus
                 </button>
               </div>
+            {editingId === v.id && (
+              <div style={{ marginTop: "16px", padding: "16px", background: "#f9f9f9", borderRadius: "6px", border: "1px solid #e0e0e0" }}>
+                <p style={{ fontSize: "12px", fontWeight: 600, color: "#1a1a1a", marginBottom: "12px" }}>Edit Voucher</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <div>
+                    <label style={{ fontSize: "10px", color: "#aaa", display: "block", marginBottom: "4px" }}>KODE</label>
+                    <input value={editForm.code} onChange={e => setEditForm((f: any) => ({ ...f, code: e.target.value.toUpperCase() }))}
+                      style={{ width: "100%", border: "1px solid #e0e0e0", padding: "8px 10px", fontSize: "13px", outline: "none", boxSizing: "border-box", fontFamily: "monospace" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "10px", color: "#aaa", display: "block", marginBottom: "4px" }}>TIPE</label>
+                    <select value={editForm.type} onChange={e => setEditForm((f: any) => ({ ...f, type: e.target.value }))}
+                      style={{ width: "100%", border: "1px solid #e0e0e0", padding: "8px 10px", fontSize: "13px", outline: "none", background: "#fff" }}>
+                      <option value="discount_percent">Diskon %</option>
+                      <option value="discount_fixed">Diskon Rp</option>
+                      <option value="free_shipping">Gratis Ongkir</option>
+                    </select>
+                  </div>
+                  {editForm.type !== "free_shipping" && (
+                    <div>
+                      <label style={{ fontSize: "10px", color: "#aaa", display: "block", marginBottom: "4px" }}>NILAI</label>
+                      <input value={editForm.value} onChange={e => setEditForm((f: any) => ({ ...f, value: e.target.value }))}
+                        type="number" style={{ width: "100%", border: "1px solid #e0e0e0", padding: "8px 10px", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+                    </div>
+                  )}
+                  <div>
+                    <label style={{ fontSize: "10px", color: "#aaa", display: "block", marginBottom: "4px" }}>MIN. ORDER</label>
+                    <input value={editForm.min_order} onChange={e => setEditForm((f: any) => ({ ...f, min_order: e.target.value }))}
+                      type="number" style={{ width: "100%", border: "1px solid #e0e0e0", padding: "8px 10px", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "10px", color: "#aaa", display: "block", marginBottom: "4px" }}>MAKS. PENGGUNAAN</label>
+                    <input value={editForm.max_uses} onChange={e => setEditForm((f: any) => ({ ...f, max_uses: e.target.value }))}
+                      type="number" style={{ width: "100%", border: "1px solid #e0e0e0", padding: "8px 10px", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "10px", color: "#aaa", display: "block", marginBottom: "4px" }}>BERLAKU SAMPAI</label>
+                    <input value={editForm.expires_at} onChange={e => setEditForm((f: any) => ({ ...f, expires_at: e.target.value }))}
+                      type="date" style={{ width: "100%", border: "1px solid #e0e0e0", padding: "8px 10px", fontSize: "13px", outline: "none", boxSizing: "border-box" }} />
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+                  <button onClick={saveEdit} disabled={saving} style={{ background: "#1a1a1a", color: "#fff", border: "none", padding: "8px 20px", fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", cursor: "pointer" }}>
+                    {saving ? "..." : "Simpan"}
+                  </button>
+                  <button onClick={() => setEditingId(null)} style={{ background: "transparent", color: "#888", border: "1px solid #e0e0e0", padding: "8px 16px", fontSize: "11px", cursor: "pointer" }}>
+                    Batal
+                  </button>
+                </div>
+              </div>
+            )}
             </div>
           ))}
         </div>
