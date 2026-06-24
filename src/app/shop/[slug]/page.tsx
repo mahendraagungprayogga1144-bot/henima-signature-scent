@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
 import { getDatabase } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -21,6 +22,16 @@ export default async function ProductDetailPage({
 }) {
   const { slug } = await params;
   const db = await getDatabase();
+  
+  // Cek flash sale aktif
+  const now = new Date().toISOString();
+  const { data: flashSale } = await supabase
+    .from("flash_sales")
+    .select("*")
+    .eq("active", true)
+    .lte("start_at", now)
+    .gte("end_at", now)
+    .maybeSingle();
   const company = db.settings.company;
   const products = db.products.filter((p) => p.active);
   const product = products.find((p) => toSlug(p.name) === slug);
@@ -87,7 +98,7 @@ export default async function ProductDetailPage({
             </div>
           ) : (
             <div style={{marginBottom:"40px"}}>
-              <AddToCartButton
+              <AddToCartButton flashPrice={flashSale?.product_id === product?.id ? flashSale?.flash_price : undefined} flashSaleId={flashSale?.id}
                 productId={product.id}
                 productName={product.name}
                 productPhoto={product.photo || ""}

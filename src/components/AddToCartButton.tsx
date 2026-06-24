@@ -15,9 +15,11 @@ interface Props {
   productName: string;
   productPhoto: string;
   variants: Variant[];
+  flashPrice?: number;
+  flashSaleId?: string;
 }
 
-export default function AddToCartButton({ productId, productName, productPhoto, variants }: Props) {
+export default function AddToCartButton({ productId, productName, productPhoto, variants, flashPrice, flashSaleId }: Props) {
   const [selectedVariant, setSelectedVariant] = useState(variants[0]?.id || "");
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
@@ -33,7 +35,7 @@ export default function AddToCartButton({ productId, productName, productPhoto, 
       productPhoto,
       variantId: variant.id,
       sizeMl: variant.sizeMl,
-      price: variant.originalPrice,
+      price: flashPrice || variant.originalPrice,
       quantity: qty,
     });
     setAdded(true);
@@ -83,9 +85,24 @@ export default function AddToCartButton({ productId, productName, productPhoto, 
 
       {/* Price */}
       {variant && (
-        <p style={{fontFamily:"var(--font-cormorant)", fontSize:"28px", fontWeight:400, color:"#1C1917"}}>
-          Rp {(variant.originalPrice * qty).toLocaleString("id-ID")}
-        </p>
+        <div>
+          {flashPrice && (
+            <div style={{display:"flex", alignItems:"center", gap:"8px", marginBottom:"4px", background:"#FFEBEE", padding:"6px 12px", borderRadius:"4px", width:"fit-content"}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="#E53935"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span style={{fontSize:"11px", color:"#E53935", fontWeight:600, letterSpacing:"1px"}}>FLASH SALE</span>
+            </div>
+          )}
+          <div style={{display:"flex", alignItems:"baseline", gap:"10px"}}>
+            <p style={{fontFamily:"var(--font-cormorant)", fontSize:"28px", fontWeight:400, color: flashPrice ? "#E53935" : "#1C1917"}}>
+              Rp {((flashPrice || variant.originalPrice) * qty).toLocaleString("id-ID")}
+            </p>
+            {flashPrice && (
+              <p style={{fontFamily:"var(--font-cormorant)", fontSize:"18px", color:"#9A8F82", textDecoration:"line-through"}}>
+                Rp {(variant.originalPrice * qty).toLocaleString("id-ID")}
+              </p>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Buttons */}
