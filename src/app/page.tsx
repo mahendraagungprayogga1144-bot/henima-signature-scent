@@ -62,6 +62,8 @@ export default async function HomePage() {
 
       <AnnouncementBar items={(company as any).marqueeItems || []} />
 
+      <FlashSaleSection />
+
       {/* ── OUR STORY — HMNS dark style ── */}
       <ScrollReveal direction="up" delay={0}>
       <section style={{background:"#FAF8F4", padding:"100px 8vw", borderTop:"1px solid rgba(28,25,23,0.06)"}}>
