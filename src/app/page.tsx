@@ -105,6 +105,7 @@ export default async function HomePage() {
       )}
 
       {/* ── LOVE LETTERS ── */}
+      <FlashSaleSection />
       <LoveLettersSection />
 
       {/* ── PHOTO CAROUSEL ── */}
