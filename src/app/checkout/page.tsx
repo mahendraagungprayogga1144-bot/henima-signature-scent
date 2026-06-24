@@ -31,6 +31,17 @@ export default function CheckoutPage() {
     if (cart.length === 0) router.push("/shop");
     setItems(cart);
 
+    // Load saved data dari localStorage
+    try {
+      const saved = localStorage.getItem("henima-checkout-data");
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.name) setName(data.name);
+        if (data.phone) setPhone(data.phone);
+        if (data.email) setEmail(data.email);
+        if (data.addressData) setAddressData(data.addressData);
+      }
+    } catch {}
   }, [router]);
 
   const subtotal = cartTotal(items);
@@ -115,6 +126,14 @@ export default function CheckoutPage() {
       setShippingOptions(Array.isArray(data) ? data : []);
     } catch (e) { console.error(e); }
     finally { setLoadingShipping(false); }
+  }
+
+  function saveToLocal() {
+    try {
+      localStorage.setItem("henima-checkout-data", JSON.stringify({
+        name, phone, email, addressData
+      }));
+    } catch {}
   }
 
   async function handleSubmit(e: React.FormEvent) {
