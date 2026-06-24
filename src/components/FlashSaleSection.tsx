@@ -55,7 +55,7 @@ export default function FlashSaleSection() {
       originalPrice: sale.original_price,
     });
     window.dispatchEvent(new Event("cart-updated"));
-    router.push("/cart");
+    router.push("/checkout");
   }
 
   useEffect(() => {
