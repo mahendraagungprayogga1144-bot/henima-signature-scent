@@ -6,13 +6,11 @@ export const dynamic = "force-dynamic";
 
 function resolveHeroImage(
   catalog: { images?: string[]; heroImage?: string } | undefined,
-  companyHero: string | undefined,
-  productPhotos: string[]
+  companyHero: string | undefined
 ): string | null {
   if (catalog?.heroImage) return catalog.heroImage;
   if (catalog?.images?.length) return catalog.images[0];
   if (companyHero) return companyHero;
-  if (productPhotos.length > 0) return productPhotos[0];
   return null;
 }
 
@@ -23,33 +21,22 @@ export default async function KatalogDigitalPage() {
   const products = db.products.filter((p) => p.active);
   const waNumber = company.whatsappNumber || "6285190311230";
   const productPhotos = products.map((p) => p.photo).filter(Boolean);
-  const heroImage = resolveHeroImage(catalog, company.heroImage, productPhotos);
+  const heroImage = resolveHeroImage(catalog, company.heroImage);
 
   return (
     <div className="catalog-page">
-      {/* HERO */}
+      {/* HERO — full-bleed image + white text panel (HMNS style) */}
       <header className="catalog-hero">
-        <div className="catalog-hero-content">
-          <p className="catalog-hero-eyebrow">Henima</p>
-          <h1 className="catalog-hero-title">
-            Catalog of
-            <br />
-            Henima
-          </h1>
-        </div>
-
-        <div className="catalog-hero-visual">
+        <div className="catalog-hero-media">
           {heroImage ? (
-            <div className="catalog-hero-image-wrap">
-              <Image
-                src={heroImage}
-                alt="Henima fragrance collection"
-                fill
-                className="object-cover object-center"
-                priority
-                sizes="(max-width: 900px) 100vw, 55vw"
-              />
-            </div>
+            <Image
+              src={heroImage}
+              alt="Henima fragrance collection"
+              fill
+              className="object-cover object-center"
+              priority
+              sizes="100vw"
+            />
           ) : productPhotos.length > 1 ? (
             <div className="catalog-hero-collage">
               {productPhotos.slice(0, 4).map((photo, i) => (
@@ -59,7 +46,7 @@ export default async function KatalogDigitalPage() {
                     alt=""
                     fill
                     className="object-cover object-center"
-                    sizes="25vw"
+                    sizes="50vw"
                   />
                 </div>
               ))}
@@ -69,23 +56,32 @@ export default async function KatalogDigitalPage() {
               <span>Upload foto koleksi di Admin → Katalog Digital</span>
             </div>
           )}
-
-          {catalog?.pdfUrl ? (
-            <a
-              href={catalog.pdfUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="catalog-hero-download"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              Download Catalog
-            </a>
-          ) : null}
         </div>
+
+        <div className="catalog-hero-panel">
+          <p className="catalog-hero-eyebrow">Henima</p>
+          <h1 className="catalog-hero-title">
+            Catalog of
+            <br />
+            Henima
+          </h1>
+        </div>
+
+        {catalog?.pdfUrl ? (
+          <a
+            href={catalog.pdfUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="catalog-hero-download"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download Catalog
+          </a>
+        ) : null}
       </header>
 
       {/* PRODUCTS */}
@@ -119,20 +115,34 @@ export default async function KatalogDigitalPage() {
           min-height: 100vh;
           color: #1C1917;
           font-family: var(--font-jost);
+          overflow-x: hidden;
         }
 
-        /* ── Hero ── */
+        /* ── Hero (full-bleed HMNS style) ── */
         .catalog-hero {
-          display: grid;
-          grid-template-columns: 1fr 1.4fr;
-          min-height: 60vh;
+          position: relative;
+          width: 100vw;
+          margin-left: calc(50% - 50vw);
+          min-height: max(72vh, 520px);
+          overflow: hidden;
           border-bottom: 2px solid #1C1917;
         }
-        .catalog-hero-content {
+        .catalog-hero-media {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+        }
+        .catalog-hero-panel {
+          position: relative;
+          z-index: 1;
+          background: #ffffff;
+          width: clamp(300px, 42vw, 520px);
+          height: 100%;
+          min-height: inherit;
+          padding: 80px clamp(32px, 6vw, 96px);
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding: 80px 8vw;
         }
         .catalog-hero-eyebrow {
           font-size: 11px;
@@ -150,21 +160,10 @@ export default async function KatalogDigitalPage() {
           line-height: 0.95;
           letter-spacing: -2px;
         }
-        .catalog-hero-visual {
-          position: relative;
-          min-height: 360px;
-          background: #F5F5F5;
-        }
-        .catalog-hero-image-wrap {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          min-height: inherit;
-        }
         .catalog-hero-download {
           position: absolute;
-          right: 24px;
-          bottom: 24px;
+          right: 32px;
+          bottom: 32px;
           z-index: 2;
           display: inline-flex;
           align-items: center;
@@ -187,12 +186,11 @@ export default async function KatalogDigitalPage() {
           grid-template-columns: 1fr 1fr;
           width: 100%;
           height: 100%;
-          min-height: inherit;
           gap: 2px;
         }
         .catalog-hero-collage-item {
           position: relative;
-          min-height: 160px;
+          min-height: 200px;
         }
         .catalog-hero-image-placeholder {
           display: flex;
@@ -200,12 +198,12 @@ export default async function KatalogDigitalPage() {
           justify-content: center;
           width: 100%;
           height: 100%;
-          min-height: inherit;
           background: #F0F0F0;
           color: #9A8F82;
           font-size: 13px;
-          letter-spacing: 2px;
-          text-transform: uppercase;
+          letter-spacing: 1px;
+          text-align: center;
+          padding: 24px;
         }
 
         /* ── Products list ── */
@@ -351,14 +349,23 @@ export default async function KatalogDigitalPage() {
 
         @media (max-width: 900px) {
           .catalog-hero {
-            grid-template-columns: 1fr;
+            min-height: auto;
+            display: flex;
+            flex-direction: column;
           }
-          .catalog-hero-visual {
-            min-height: 280px;
-            order: -1;
+          .catalog-hero-media {
+            position: relative;
+            min-height: 50vw;
+            order: 1;
           }
-          .catalog-hero-content {
-            padding: 48px 6vw 64px;
+          .catalog-hero-panel {
+            width: 100%;
+            padding: 48px 6vw 56px;
+            order: 2;
+          }
+          .catalog-hero-download {
+            right: 16px;
+            bottom: 16px;
           }
           .catalog-product-section {
             padding: 80px 6vw;
