@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 export default function CatalogManager({ catalog }: { catalog: any }) {
   const router = useRouter();
   const [images, setImages] = useState<string[]>(catalog.images || []);
+  const [heroImage, setHeroImage] = useState<string>(catalog.heroImage || "");
   const [pdfUrl, setPdfUrl] = useState(catalog.pdfUrl || "");
   const [title, setTitle] = useState(catalog.title || "Katalog Produk");
   const [uploading, setUploading] = useState(false);
@@ -38,6 +39,30 @@ export default function CatalogManager({ catalog }: { catalog: any }) {
     finally { setUploading(false); }
   }
 
+  async function handleHeroUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setMsg("");
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const sb = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const ext = file.name.split(".").pop() || "jpg";
+      const filename = `catalog-hero-${Date.now()}.${ext}`;
+      const { error } = await sb.storage
+        .from("brand-assets")
+        .upload(`catalog/${filename}`, file, { contentType: file.type, upsert: true });
+      if (error) { setMsg("Error: " + error.message); return; }
+      const { data: urlData } = sb.storage.from("brand-assets").getPublicUrl(`catalog/${filename}`);
+      setHeroImage(urlData.publicUrl);
+      setMsg("Foto hero katalog berhasil diupload!");
+    } catch(e: any) { setMsg("Gagal upload: " + (e?.message || String(e))); }
+    finally { setUploading(false); }
+  }
+
   async function handleSave() {
     setSaving(true);
     setMsg("");
@@ -45,6 +70,7 @@ export default function CatalogManager({ catalog }: { catalog: any }) {
       const fd = new FormData();
       fd.set("action", "save");
       fd.set("images", JSON.stringify(images));
+      fd.set("heroImage", heroImage);
       fd.set("pdfUrl", pdfUrl);
       fd.set("title", title);
       await fetch("/api/admin/catalog", { method: "POST", body: fd });
@@ -85,6 +111,23 @@ export default function CatalogManager({ catalog }: { catalog: any }) {
           <input className="input-field" value={pdfUrl} onChange={(e) => setPdfUrl(e.target.value)} placeholder="https://..." />
           <p className="mt-1 text-xs text-ink-400">Upload PDF ke Google Drive lalu paste link-nya.</p>
         </div>
+      </div>
+      <div className="card space-y-4">
+        <h2 className="font-semibold text-ink-50">Foto Hero Katalog</h2>
+        <p className="text-sm text-ink-400">
+          Upload foto koleksi botol Henima — beberapa botol disusun dengan background terang
+          dan lighting natural, seperti referensi katalog HMNS. Foto ini tampil di sebelah kanan
+          judul &quot;Catalog of Henima&quot;.
+        </p>
+        <p className="text-xs text-ink-500">Rekomendasi: landscape, minimal 1600px lebar, format JPG atau PNG.</p>
+        <input type="file" accept="image/*" onChange={handleHeroUpload} disabled={uploading}
+          className="block w-full text-sm text-ink-300 file:mr-4 file:rounded-lg file:border-0 file:bg-ink-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink-50" />
+        {heroImage && (
+          <div className="relative h-48 overflow-hidden rounded-2xl border border-ink-800">
+            <Image src={heroImage} alt="Hero katalog" fill className="object-cover" />
+            <button onClick={() => setHeroImage("")} className="absolute right-2 top-2 rounded bg-red-900/70 px-2 py-1 text-xs text-red-200">Hapus</button>
+          </div>
+        )}
       </div>
       <div className="card space-y-4">
         <h2 className="font-semibold text-ink-50">Upload Halaman Katalog</h2>

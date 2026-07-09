@@ -38,12 +38,13 @@ export async function POST(req: NextRequest) {
 
   if (action === "save") {
     const images = JSON.parse(form.get("images") as string || "[]");
+    const heroImage = form.get("heroImage") as string || "";
     const pdfUrl = form.get("pdfUrl") as string || "";
     const title = form.get("title") as string || "Katalog Produk";
 
     const { error } = await supabase
       .from("settings")
-      .update({ catalog: { images, pdfUrl, title } })
+      .update({ catalog: { images, heroImage, pdfUrl, title } })
       .eq("id", 1);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 

@@ -156,6 +156,7 @@ export interface CompanySettings {
 
 export interface CatalogSettings {
   images: string[];
+  heroImage?: string;
   pdfUrl?: string;
   title?: string;
 }
