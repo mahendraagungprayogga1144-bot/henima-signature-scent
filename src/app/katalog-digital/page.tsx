@@ -24,15 +24,6 @@ export default async function KatalogDigitalPage() {
   return (
     <div className="catalog-page">
       <header className="catalog-hero">
-        <div className="catalog-hero-panel">
-          <p className="catalog-hero-eyebrow">Henima</p>
-          <h1 className="catalog-hero-title">
-            Catalog of
-            <br />
-            Henima
-          </h1>
-        </div>
-
         <div className="catalog-hero-media">
           {heroImage ? (
             <Image
@@ -62,23 +53,32 @@ export default async function KatalogDigitalPage() {
               <span>Upload foto koleksi di Admin → Katalog Digital</span>
             </div>
           )}
-
-          {catalog?.pdfUrl ? (
-            <a
-              href={catalog.pdfUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="catalog-hero-download"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              Download Catalog
-            </a>
-          ) : null}
         </div>
+
+        <div className="catalog-hero-overlay">
+          <p className="catalog-hero-eyebrow">Henima</p>
+          <h1 className="catalog-hero-title">
+            Catalog of
+            <br />
+            Henima
+          </h1>
+        </div>
+
+        {catalog?.pdfUrl ? (
+          <a
+            href={catalog.pdfUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="catalog-hero-download"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download Catalog
+          </a>
+        ) : null}
       </header>
 
       {/* PRODUCTS */}
@@ -117,30 +117,33 @@ export default async function KatalogDigitalPage() {
           padding: 0;
         }
 
-        /* ── Hero: teks kiri rapat, foto 65% kanan ── */
+        /* ── Hero: gambar full + teks overlay di atas (HMNS) ── */
         .catalog-hero {
-          display: grid;
-          grid-template-columns: minmax(240px, 35fr) minmax(0, 65fr);
+          position: relative;
           width: 100%;
           min-height: calc(100svh - 60px);
+          overflow: hidden;
           border-bottom: 2px solid #1C1917;
         }
-        .catalog-hero-panel {
-          background: #ffffff;
-          padding-top: clamp(40px, 10vh, 100px);
-          padding-bottom: clamp(40px, 10vh, 100px);
-          padding-right: clamp(12px, 2vw, 32px);
-          padding-left: 24px;
+        .catalog-hero-media {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          background: #F5F5F5;
+        }
+        .catalog-hero-overlay {
+          position: relative;
+          z-index: 1;
           display: flex;
           flex-direction: column;
           justify-content: center;
+          min-height: calc(100svh - 60px);
+          padding: clamp(40px, 10vh, 100px) clamp(24px, 5vw, 80px);
+          max-width: min(560px, 48vw);
+          pointer-events: none;
         }
-        .catalog-hero-media {
-          position: relative;
-          width: 100%;
-          min-height: 100%;
-          background: #F5F5F5;
-          overflow: hidden;
+        .catalog-hero-overlay * {
+          pointer-events: auto;
         }
         .catalog-hero-eyebrow {
           font-size: 11px;
@@ -149,6 +152,7 @@ export default async function KatalogDigitalPage() {
           color: #1C1917;
           margin-bottom: 24px;
           font-weight: 500;
+          text-shadow: 0 0 32px rgba(255, 255, 255, 0.95);
         }
         .catalog-hero-title {
           font-family: var(--font-jost);
@@ -157,6 +161,7 @@ export default async function KatalogDigitalPage() {
           color: #1C1917;
           line-height: 0.95;
           letter-spacing: -2px;
+          text-shadow: 0 0 40px rgba(255, 255, 255, 0.95), 0 0 80px rgba(255, 255, 255, 0.7);
         }
         .catalog-hero-download {
           position: absolute;
@@ -345,23 +350,14 @@ export default async function KatalogDigitalPage() {
           white-space: nowrap;
         }
 
-        @media (min-width: 1200px) {
-          .catalog-hero-panel {
-            padding-left: clamp(24px, 4vw, 72px);
-          }
-        }
-
         @media (max-width: 900px) {
-          .catalog-hero {
-            grid-template-columns: 1fr;
-            min-height: auto;
+          .catalog-hero,
+          .catalog-hero-overlay {
+            min-height: max(70vw, 420px);
           }
-          .catalog-hero-media {
-            min-height: 55vw;
-            order: -1;
-          }
-          .catalog-hero-panel {
-            padding: 48px 24px 56px;
+          .catalog-hero-overlay {
+            max-width: 100%;
+            padding: 48px 24px;
           }
           .catalog-hero-download {
             right: 16px;
