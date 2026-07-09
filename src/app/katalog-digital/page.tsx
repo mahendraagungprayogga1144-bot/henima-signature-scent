@@ -117,17 +117,20 @@ export default async function KatalogDigitalPage() {
           padding: 0;
         }
 
-        /* ── Hero: grid 40/60 seperti HMNS ── */
+        /* ── Hero: teks kiri rapat, foto 65% kanan ── */
         .catalog-hero {
           display: grid;
-          grid-template-columns: minmax(280px, 2fr) minmax(0, 3fr);
+          grid-template-columns: minmax(240px, 35fr) minmax(0, 65fr);
           width: 100%;
           min-height: calc(100svh - 60px);
           border-bottom: 2px solid #1C1917;
         }
         .catalog-hero-panel {
           background: #ffffff;
-          padding: clamp(48px, 8vw, 96px) clamp(32px, 6vw, 80px);
+          padding-top: clamp(40px, 10vh, 100px);
+          padding-bottom: clamp(40px, 10vh, 100px);
+          padding-right: clamp(12px, 2vw, 32px);
+          padding-left: 24px;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -342,6 +345,12 @@ export default async function KatalogDigitalPage() {
           white-space: nowrap;
         }
 
+        @media (min-width: 1200px) {
+          .catalog-hero-panel {
+            padding-left: clamp(24px, 4vw, 72px);
+          }
+        }
+
         @media (max-width: 900px) {
           .catalog-hero {
             grid-template-columns: 1fr;
@@ -352,7 +361,7 @@ export default async function KatalogDigitalPage() {
             order: -1;
           }
           .catalog-hero-panel {
-            padding: 48px 6vw 56px;
+            padding: 48px 24px 56px;
           }
           .catalog-hero-download {
             right: 16px;
