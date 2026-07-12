@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { awardPointsForDeliveredOrder } from "@/lib/membership";
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Menunggu",
@@ -47,6 +48,15 @@ export async function POST(request: Request) {
         .from("retail_orders")
         .update({ status: newStatus, updated_at: new Date().toISOString() })
         .eq("id", order.id);
+
+      if (newStatus === "delivered") {
+        await awardPointsForDeliveredOrder({
+          id: order.id,
+          user_id: order.user_id,
+          total: order.total,
+          points_earned: order.points_earned,
+        });
+      }
     }
 
     // Kirim notif WA ke admin

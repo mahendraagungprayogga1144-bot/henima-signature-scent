@@ -6,6 +6,19 @@ import Image from "next/image";
 import AddressForm from "@/components/AddressForm";
 import Link from "next/link";
 
+type MembershipInfo = {
+  loggedIn: boolean;
+  tier?: string;
+  tierLabel?: string;
+  tierColor?: string;
+  totalPoints?: number;
+  discountPct?: number;
+  freeShipping?: boolean;
+  name?: string;
+  email?: string;
+  phone?: string;
+};
+
 export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [name, setName] = useState("");
@@ -24,6 +37,7 @@ export default function CheckoutPage() {
   const [voucher, setVoucher] = useState<any>(null);
   const [voucherMsg, setVoucherMsg] = useState("");
   const [voucherLoading, setVoucherLoading] = useState(false);
+  const [membership, setMembership] = useState<MembershipInfo>({ loggedIn: false });
   const router = useRouter();
 
   useEffect(() => {
@@ -43,7 +57,6 @@ export default function CheckoutPage() {
     if (cart.length === 0) router.push("/shop");
     setItems(cart);
 
-    // Load saved data dari localStorage
     try {
       const saved = localStorage.getItem("henima-checkout-data");
       if (saved) {
@@ -54,6 +67,18 @@ export default function CheckoutPage() {
         if (data.addressData) setAddressData(data.addressData);
       }
     } catch {}
+
+    fetch("/api/me/membership")
+      .then((r) => r.json())
+      .then((data: MembershipInfo) => {
+        setMembership(data);
+        if (data.loggedIn) {
+          if (data.name) setName((prev) => prev || data.name || "");
+          if (data.email) setEmail((prev) => prev || data.email || "");
+          if (data.phone) setPhone((prev) => prev || data.phone || "");
+        }
+      })
+      .catch(() => {});
   }, [router]);
 
   const subtotal = cartTotal(items);
@@ -62,13 +87,18 @@ export default function CheckoutPage() {
   const province = addressData.province;
   const postalCode = addressData.postalCode;
   const selectedCityId = addressData.biteshipAreaId;
-  const shippingCost = selectedShipping?.price || selectedShipping?.shipping_fee || 0;
+  const rawShipping = selectedShipping?.price || selectedShipping?.shipping_fee || 0;
+  const memberDiscount = membership.loggedIn && membership.discountPct
+    ? Math.floor((subtotal * (membership.discountPct || 0)) / 100)
+    : 0;
+  const shippingCost =
+    membership.loggedIn && membership.freeShipping ? 0 : rawShipping;
   const voucherDiscount = voucher ? (
     voucher.type === "discount_percent" ? Math.floor(subtotal * voucher.value / 100) :
     voucher.type === "discount_fixed" ? voucher.value :
     voucher.type === "free_shipping" ? shippingCost : 0
   ) : 0;
-  const total = subtotal + shippingCost - voucherDiscount;
+  const total = Math.max(0, subtotal + shippingCost - memberDiscount - voucherDiscount);
 
   async function applyVoucher() {
     if (!voucherCode.trim()) return;
@@ -90,21 +120,6 @@ export default function CheckoutPage() {
       }
     } catch { setVoucherMsg("Gagal memvalidasi voucher"); }
     finally { setVoucherLoading(false); }
-  }
-
-  async function searchCities(q: string) {
-    setCitySearch(q);
-    setSelectedCityId("");
-    setCity("");
-    if (q.length < 3) { setCities([]); setShowCityDropdown(false); return; }
-    try {
-      const res = await fetch("/api/biteship/locations?q=" + encodeURIComponent(q));
-      const list = await res.json();
-      setCities(list);
-      setShowCityDropdown(list.length > 0);
-    } catch (e) {
-      console.error("City search error:", e);
-    }
   }
 
   async function checkShipping() {
@@ -204,7 +219,22 @@ export default function CheckoutPage() {
 
             {/* CONTACT */}
             <div style={{marginBottom:"40px"}}>
-              <h2 style={{fontSize:"18px", fontWeight:600, color:"#1C1917", marginBottom:"20px"}}>Contact</h2>
+              <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"20px", gap:"12px", flexWrap:"wrap"}}>
+                <h2 style={{fontSize:"18px", fontWeight:600, color:"#1C1917", margin:0}}>Contact</h2>
+                {membership.loggedIn && membership.tierLabel && (
+                  <span style={{
+                    display:"inline-flex", alignItems:"center", gap:"8px",
+                    fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase",
+                    fontWeight:700, color: membership.tierColor || "#B5935A",
+                    border:`1px solid ${membership.tierColor || "#B5935A"}`,
+                    padding:"6px 12px",
+                  }}>
+                    <span style={{width:6, height:6, borderRadius:"50%", background: membership.tierColor || "#B5935A"}} />
+                    The Intimate · {membership.tierLabel}
+                    {membership.totalPoints != null ? ` · ${membership.totalPoints} pts` : ""}
+                  </span>
+                )}
+              </div>
               <div style={{display:"flex", flexDirection:"column", gap:"0"}}>
                 <input required value={email} onChange={e => setEmail(e.target.value)}
                   placeholder="Email" style={inp} type="email" />
@@ -361,9 +391,19 @@ export default function CheckoutPage() {
             <div style={{display:"flex", justifyContent:"space-between", marginBottom:"8px"}}>
               <span style={{fontSize:"13px", color:"#6B6560"}}>Shipping</span>
               <span style={{fontSize:"13px", color: shippingCost > 0 ? "#1C1917" : "#9A8F82"}}>
-                {shippingCost > 0 ? "Rp " + shippingCost.toLocaleString("id-ID") : "Calculated at next step"}
+                {membership.freeShipping && rawShipping > 0
+                  ? "GRATIS (Beloved)"
+                  : shippingCost > 0
+                    ? "Rp " + shippingCost.toLocaleString("id-ID")
+                    : "Calculated at next step"}
               </span>
             </div>
+            {memberDiscount > 0 && (
+              <div style={{display:"flex", justifyContent:"space-between", marginBottom:"8px"}}>
+                <span style={{fontSize:"13px", color:"#2E7D32"}}>Diskon Member ({membership.discountPct}%)</span>
+                <span style={{fontSize:"13px", color:"#2E7D32"}}>- Rp {memberDiscount.toLocaleString("id-ID")}</span>
+              </div>
+            )}
             {voucherDiscount > 0 && (
               <div style={{display:"flex", justifyContent:"space-between", marginBottom:"8px"}}>
                 <span style={{fontSize:"13px", color:"#2E7D32"}}>Diskon ({voucherCode})</span>

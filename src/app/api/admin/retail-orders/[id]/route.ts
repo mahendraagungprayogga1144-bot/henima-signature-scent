@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUser } from "@/lib/session";
+import { awardPointsForDeliveredOrder } from "@/lib/membership";
 import { Resend } from "resend";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -48,9 +49,20 @@ export async function POST(
       .eq("id", id)
       .single();
 
+    if (status === "delivered" && order) {
+      await awardPointsForDeliveredOrder({
+        id: order.id,
+        user_id: order.user_id,
+        total: order.total,
+        points_earned: order.points_earned,
+      });
+    }
+
+    if (!order) return NextResponse.json({ ok: true });
+
     const customerEmail = order.email || order.customer?.email || (typeof order.customer === 'string' ? JSON.parse(order.customer)?.email : order.customer?.email);
     const customerName = order.name || order.customer?.name || (typeof order.customer === 'string' ? JSON.parse(order.customer)?.name : order.customer?.name) || 'Pelanggan';
-    if (order && customerEmail && STATUS_MESSAGES[status]) {
+    if (customerEmail && STATUS_MESSAGES[status]) {
       const resend = new Resend(process.env.RESEND_API_KEY);
       const label = STATUS_LABELS[status] || status;
       const message = STATUS_MESSAGES[status];

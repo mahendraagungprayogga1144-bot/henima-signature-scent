@@ -4,6 +4,7 @@ import type { User, UserRole } from "./types";
 
 const SESSION_COOKIE = "toko_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 hari
+const SESSION_MAX_AGE_REMEMBER = 60 * 60 * 24 * 30; // 30 hari
 
 export function hashPassword(password: string): string {
   return createHash("sha256").update(password).digest("hex");
@@ -13,9 +14,9 @@ export function verifyPassword(password: string, hash: string): boolean {
   return hashPassword(password) === hash;
 }
 
-export function createSessionToken(userId: string): string {
+export function createSessionToken(userId: string, maxAgeSeconds = SESSION_MAX_AGE): string {
   const payload = Buffer.from(
-    JSON.stringify({ userId, exp: Date.now() + SESSION_MAX_AGE * 1000 })
+    JSON.stringify({ userId, exp: Date.now() + maxAgeSeconds * 1000 })
   ).toString("base64url");
   const sig = createHash("sha256")
     .update(payload + (process.env.SESSION_SECRET || "toko-dev-secret"))
@@ -46,14 +47,15 @@ export function parseSessionToken(
   }
 }
 
-export async function setSessionCookie(userId: string) {
-  const token = createSessionToken(userId);
+export async function setSessionCookie(userId: string, remember = false) {
+  const maxAge = remember ? SESSION_MAX_AGE_REMEMBER : SESSION_MAX_AGE;
+  const token = createSessionToken(userId, maxAge);
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: SESSION_MAX_AGE,
+    maxAge,
     path: "/",
   });
 }

@@ -1,4 +1,10 @@
 import Link from "next/link";
+import Image from "next/image";
+import { getDatabase } from "@/lib/db";
+import AuthFormClient from "@/components/AuthFormClient";
+import { AUTH_STYLES } from "@/lib/auth-styles";
+
+export const dynamic = "force-dynamic";
 
 export default async function LoginPage({
   searchParams,
@@ -6,185 +12,67 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
+  const db = await getDatabase();
+  const company = db.settings.company;
+  const products = db.products.filter((p) => p.active);
+  const sideImage =
+    company.heroImage ||
+    (company as { heroImages?: string[] }).heroImages?.[0] ||
+    products[0]?.photo ||
+    null;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#fff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "var(--font-jost, sans-serif)",
-        padding: "40px 24px",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "440px",
-          border: "1px solid #d5d5d5",
-          padding: "48px 40px",
-          background: "#fff",
-        }}
-      >
-        {/* Title */}
-        <h1
-          style={{
-            fontSize: "28px",
-            fontWeight: 700,
-            color: "#1a1a1a",
-            marginBottom: "6px",
-          }}
-        >
-          Login
-        </h1>
-        <p style={{ fontSize: "13px", color: "#888", marginBottom: "32px" }}>
-          Please log in to your account.
-        </p>
-
-        {error && (
-          <div
-            style={{
-              background: "#fff5f5",
-              border: "1px solid #ffc5c5",
-              padding: "12px 16px",
-              fontSize: "13px",
-              color: "#cc0000",
-              marginBottom: "20px",
-            }}
-          >
-            {decodeURIComponent(error)}
+    <div className="auth-page">
+      <div className="auth-visual">
+        {sideImage ? (
+          <Image
+            src={sideImage}
+            alt="Henima"
+            fill
+            className="object-cover object-center"
+            priority
+            sizes="50vw"
+          />
+        ) : (
+          <div className="auth-visual-fallback">
+            <p>Henima</p>
           </div>
         )}
-
-        <form action="/api/auth/login" method="POST">
-          {/* Email */}
-          <div style={{ marginBottom: "24px" }}>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              placeholder="Email"
-              style={{
-                width: "100%",
-                border: "none",
-                borderBottom: "1px solid #ccc",
-                padding: "10px 0",
-                fontSize: "14px",
-                color: "#1a1a1a",
-                outline: "none",
-                background: "transparent",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
-
-          {/* Password */}
-          <div style={{ marginBottom: "16px", position: "relative" }}>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              placeholder="Password"
-              style={{
-                width: "100%",
-                border: "none",
-                borderBottom: "1px solid #ccc",
-                padding: "10px 0",
-                fontSize: "14px",
-                color: "#1a1a1a",
-                outline: "none",
-                background: "transparent",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
-
-          {/* Remember & Forgot */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: "28px",
-            }}
-          >
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "13px",
-                color: "#555",
-                cursor: "pointer",
-              }}
-            >
-              <input type="checkbox" name="remember" style={{ width: "14px", height: "14px" }} />
-              Remember Me
-            </label>
-            <Link
-              href="/lupa-sandi"
-              style={{
-                fontSize: "13px",
-                color: "#1a1a1a",
-                textDecoration: "none",
-                fontWeight: 500,
-              }}
-            >
-              Forgot your password?
-            </Link>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              background: "#2c2c2c",
-              color: "#fff",
-              border: "none",
-              padding: "15px",
-              fontSize: "12px",
-              letterSpacing: "2px",
-              textTransform: "uppercase",
-              cursor: "pointer",
-              fontWeight: 500,
-              fontFamily: "var(--font-jost, sans-serif)",
-              marginBottom: "24px",
-            }}
-          >
-            Sign In
-          </button>
-
-          {/* Divider */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "20px",
-            }}
-          >
-            <div style={{ flex: 1, height: "1px", background: "#e5e5e5" }} />
-            <span style={{ fontSize: "12px", color: "#aaa" }}>or continue with</span>
-            <div style={{ flex: 1, height: "1px", background: "#e5e5e5" }} />
-          </div>
-
-          {/* Register link */}
-          <p style={{ textAlign: "center", fontSize: "13px", color: "#888" }}>
-            Don&apos;t have an Account?{" "}
-            <Link
-              href="/daftar"
-              style={{ color: "#1a1a1a", fontWeight: 700, textDecoration: "none" }}
-            >
-              Create account
-            </Link>
+        <div className="auth-visual-overlay" />
+        <div className="auth-visual-copy">
+          <p className="auth-eyebrow" style={{ color: "rgba(200,184,154,0.85)" }}>
+            Henima Signature Scent
           </p>
-        </form>
+          <h2 className="auth-visual-title">
+            Worn.
+            <br />
+            Not Forgotten.
+          </h2>
+        </div>
       </div>
+
+      <div className="auth-panel">
+        <div className="auth-panel-inner">
+          <p className="auth-eyebrow">Masuk</p>
+          <h1 className="auth-title">Welcome back</h1>
+          <p className="auth-subtitle">
+            Masuk ke akun The Intimate dan lanjutkan perjalanan wewangianmu.
+          </p>
+
+          {error && (
+            <div className="auth-error">{decodeURIComponent(error)}</div>
+          )}
+
+          <AuthFormClient mode="login" />
+
+          <p className="auth-footer-link">
+            Belum punya akun?{" "}
+            <Link href="/daftar">Daftar sekarang</Link>
+          </p>
+        </div>
+      </div>
+
+      <style>{AUTH_STYLES}</style>
     </div>
   );
 }

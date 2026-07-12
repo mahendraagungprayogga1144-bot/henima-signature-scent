@@ -1,4 +1,10 @@
 import Link from "next/link";
+import Image from "next/image";
+import { getDatabase } from "@/lib/db";
+import AuthFormClient from "@/components/AuthFormClient";
+import { AUTH_STYLES } from "@/lib/auth-styles";
+
+export const dynamic = "force-dynamic";
 
 export default async function RegisterPage({
   searchParams,
@@ -6,239 +12,105 @@ export default async function RegisterPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
+  const db = await getDatabase();
+  const company = db.settings.company;
+  const products = db.products.filter((p) => p.active);
+  const sideImage =
+    company.heroImage ||
+    (company as { heroImages?: string[] }).heroImages?.[0] ||
+    products[0]?.photo ||
+    null;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#fff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "var(--font-jost, sans-serif)",
-        padding: "60px 24px",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "440px",
-          border: "1px solid #d5d5d5",
-          padding: "48px 40px",
-          background: "#fff",
-        }}
-      >
-        {/* Title */}
-        <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#1a1a1a", marginBottom: "6px" }}>
-          Create Account
-        </h1>
-        <p style={{ fontSize: "13px", color: "#888", marginBottom: "32px" }}>
-          Register and get updates on our items and promotions
-        </p>
-
-        {error && (
-          <div
-            style={{
-              background: "#fff5f5",
-              border: "1px solid #ffc5c5",
-              padding: "12px 16px",
-              fontSize: "13px",
-              color: "#cc0000",
-              marginBottom: "20px",
-            }}
-          >
-            {decodeURIComponent(error)}
+    <div className="auth-page">
+      <div className="auth-visual">
+        {sideImage ? (
+          <Image
+            src={sideImage}
+            alt="Henima"
+            fill
+            className="object-cover object-center"
+            priority
+            sizes="50vw"
+          />
+        ) : (
+          <div className="auth-visual-fallback">
+            <p>Henima</p>
           </div>
         )}
-
-        <form action="/api/auth/register" method="POST">
-          {/* First Name & Last Name */}
-          {[
-            { id: "firstName", placeholder: "First Name" },
-            { id: "lastName", placeholder: "Last Name" },
-          ].map((f) => (
-            <div key={f.id} style={{ marginBottom: "24px" }}>
-              <input
-                id={f.id}
-                name={f.id}
-                type="text"
-                placeholder={f.placeholder}
-                style={inputStyle}
-              />
-            </div>
-          ))}
-
-          {/* Place Birth */}
-          <div style={{ marginBottom: "24px" }}>
-            <input
-              name="birthPlace"
-              type="text"
-              placeholder="Place Birth"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Birth Date */}
-          <div style={{ marginBottom: "24px" }}>
-            <label style={{ fontSize: "12px", color: "#888", display: "block", marginBottom: "6px" }}>
-              Birth Date
-            </label>
-            <input
-              name="birthDate"
-              type="date"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Gender */}
-          <div style={{ marginBottom: "24px" }}>
-            <label style={{ fontSize: "12px", color: "#888", display: "block", marginBottom: "6px" }}>
-              Gender
-            </label>
-            <div style={{ position: "relative" }}>
-              <select
-                name="gender"
-                style={{
-                  ...inputStyle,
-                  appearance: "none",
-                  WebkitAppearance: "none",
-                  cursor: "pointer",
-                  paddingRight: "28px",
-                }}
-              >
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
-              <span style={{
-                position: "absolute", right: "4px", top: "50%",
-                transform: "translateY(-50%)", pointerEvents: "none",
-                fontSize: "10px", color: "#888",
-              }}>▼</span>
-            </div>
-          </div>
-
-          {/* City */}
-          <div style={{ marginBottom: "24px" }}>
-            <input
-              name="city"
-              type="text"
-              placeholder="Where do you live? (City Only)"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Occupation */}
-          <div style={{ marginBottom: "24px" }}>
-            <input
-              name="occupation"
-              type="text"
-              placeholder="Occupation"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* WhatsApp */}
-          <div style={{ marginBottom: "24px" }}>
-            <input
-              name="phone"
-              type="text"
-              required
-              placeholder="Whatsapp/Phone Number"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Email */}
-          <div style={{ marginBottom: "24px" }}>
-            <input
-              name="email"
-              type="email"
-              required
-              placeholder="Email"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Password */}
-          <div style={{ marginBottom: "16px" }}>
-            <input
-              name="password"
-              type="password"
-              required
-              minLength={6}
-              placeholder="Password"
-              style={inputStyle}
-            />
-          </div>
-
-          {/* Hidden fields untuk API compatibility */}
-          <input type="hidden" name="storeName" value="Member" />
-          <input type="hidden" name="name" id="fullNameHidden" />
-
-          {/* Note */}
-          <p style={{ fontSize: "11px", color: "#888", marginBottom: "20px", lineHeight: 1.6 }}>
-            *Nomor handphone berguna untuk promosi dan informasi penawaran produk
+        <div className="auth-visual-overlay" />
+        <div className="auth-visual-copy">
+          <p className="auth-eyebrow" style={{ color: "rgba(200,184,154,0.85)" }}>
+            The Intimate
           </p>
-
-          {/* Terms */}
-          <label
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "10px",
-              fontSize: "13px",
-              color: "#555",
-              marginBottom: "28px",
-              cursor: "pointer",
-            }}
-          >
-            <input type="checkbox" required style={{ marginTop: "2px", width: "15px", height: "15px", flexShrink: 0 }} />
-            I agree to Terms of Use and Privacy Policy
-          </label>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              background: "#2c2c2c",
-              color: "#fff",
-              border: "none",
-              padding: "15px",
-              fontSize: "12px",
-              letterSpacing: "2px",
-              textTransform: "uppercase",
-              cursor: "pointer",
-              fontWeight: 500,
-              fontFamily: "var(--font-jost, sans-serif)",
-              marginBottom: "24px",
-            }}
-          >
-            Create
-          </button>
-
-          {/* Login link */}
-          <p style={{ textAlign: "center", fontSize: "13px", color: "#888" }}>
-            Already have an Account?{" "}
-            <Link href="/masuk" style={{ color: "#1a1a1a", fontWeight: 700, textDecoration: "none" }}>
-              Login here
-            </Link>
-          </p>
-        </form>
+          <h2 className="auth-visual-title">
+            Join the
+            <br />
+            circle.
+          </h2>
+        </div>
       </div>
+
+      <div className="auth-panel">
+        <div className="auth-panel-inner">
+          <p className="auth-eyebrow">Daftar</p>
+          <h1 className="auth-title">Create account</h1>
+          <p className="auth-subtitle">
+            Daftar dan nikmati akses eksklusif, diskon member, dan early access
+            koleksi baru bersama The Intimate.
+          </p>
+
+          <ul className="auth-benefits">
+            <li>Poin dari setiap belanja yang sudah sampai</li>
+            <li>Naik level Signature → Intimate → Soulscent → Beloved</li>
+            <li>Diskon member hingga 10% + gratis ongkir di tier tertinggi</li>
+          </ul>
+
+          {error && (
+            <div className="auth-error">{decodeURIComponent(error)}</div>
+          )}
+
+          <AuthFormClient mode="register" />
+
+          <p className="auth-footer-link">
+            Sudah punya akun?{" "}
+            <Link href="/masuk">Masuk di sini</Link>
+          </p>
+        </div>
+      </div>
+
+      <style>{AUTH_STYLES}</style>
+      <style>{`
+        .auth-benefits {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 32px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .auth-benefits li {
+          font-size: 13px;
+          color: #6B5E52;
+          line-height: 1.5;
+          padding-left: 18px;
+          position: relative;
+        }
+        .auth-benefits li::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 7px;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #B5935A;
+        }
+        .auth-panel { align-items: flex-start; padding-top: 64px; padding-bottom: 64px; }
+        @media (max-width: 900px) {
+          .auth-panel { padding-top: 40px; }
+        }
+      `}</style>
     </div>
   );
 }
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  border: "none",
-  borderBottom: "1px solid #ccc",
-  padding: "10px 0",
-  fontSize: "14px",
-  color: "#1a1a1a",
-  outline: "none",
-  background: "transparent",
-  boxSizing: "border-box",
-  fontFamily: "var(--font-jost, sans-serif)",
-};
