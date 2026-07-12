@@ -108,3 +108,265 @@ section:first-of-type { animation-delay: 0s; }
     gap: 40px !important;
   }
 }
+
+/* ── The Intimate welcome (profil) ── */
+@keyframes intimateIn {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes intimateGlowDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.55; }
+  50% { transform: translate(-14px, 12px) scale(1.08); opacity: 0.9; }
+}
+@keyframes intimatePulseRing {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.05); }
+}
+@keyframes intimateHeartFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-7px) scale(1.06); }
+}
+
+.intimate-welcome {
+  position: relative;
+  overflow: hidden;
+}
+.intimate-hero {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 72px 32px 48px;
+}
+.intimate-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(64px);
+  pointer-events: none;
+  z-index: 0;
+}
+.intimate-glow-a {
+  width: 300px;
+  height: 300px;
+  top: -48px;
+  right: 6%;
+  background: radial-gradient(circle, rgba(201, 169, 110, 0.35), transparent 70%);
+  animation: intimateGlowDrift 5s ease-in-out infinite;
+}
+.intimate-glow-b {
+  width: 240px;
+  height: 240px;
+  bottom: -20px;
+  left: 2%;
+  background: radial-gradient(circle, rgba(184, 134, 11, 0.22), transparent 70%);
+  animation: intimateGlowDrift 6.5s ease-in-out infinite 0.6s;
+}
+.intimate-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+.intimate-anim {
+  opacity: 0;
+  animation: intimateIn 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.intimate-avatar-wrap {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  flex-shrink: 0;
+}
+.intimate-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #ede8e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #d5cfc8;
+  position: relative;
+  z-index: 1;
+}
+.intimate-avatar-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  animation: intimatePulseRing 3s ease-in-out infinite 0.8s;
+}
+.intimate-heart {
+  position: absolute;
+  right: -2px;
+  bottom: 10px;
+  z-index: 2;
+  animation: intimateHeartFloat 3.2s ease-in-out infinite 1.2s;
+  filter: drop-shadow(0 4px 10px rgba(181, 147, 90, 0.35));
+}
+.intimate-copy {
+  flex: 1;
+  min-width: 280px;
+}
+.intimate-eyebrow {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #b5935a;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+.intimate-story {
+  font-family: var(--font-cormorant);
+  font-size: clamp(15px, 2vw, 18px);
+  font-style: italic;
+  color: #9a8f82;
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+.intimate-title {
+  font-family: var(--font-cormorant);
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 400;
+  color: #1c1917;
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+.intimate-lead {
+  font-size: 14px;
+  color: #6b5e52;
+  line-height: 1.9;
+  max-width: 580px;
+  margin: 0 0 22px;
+}
+.intimate-lead strong {
+  color: #1c1917;
+  font-weight: 600;
+}
+.intimate-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.intimate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  padding: 10px 20px;
+  border: 1px solid;
+  border-radius: 2px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.intimate-badge-fill {
+  gap: 8px;
+}
+.intimate-badge-muted {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #9e8e7e;
+  font-weight: 500;
+}
+.intimate-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.intimate-progress-wrap,
+.intimate-benefit-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 32px 40px;
+}
+.intimate-progress-card,
+.intimate-benefit-card {
+  background: #fff;
+  padding: 28px 32px;
+  border: 1px solid #e8e0d5;
+}
+.intimate-progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 11px;
+  color: #9e8e7e;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.intimate-progress-track {
+  height: 4px;
+  background: #ede8e0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.intimate-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  width: 0;
+  transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.intimate-progress-note {
+  font-size: 12px;
+  color: #b5a898;
+  margin-top: 10px;
+}
+.intimate-benefit-label {
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.intimate-benefit-list {
+  display: grid;
+  gap: 12px;
+}
+.intimate-benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.intimate-benefit-item p {
+  font-size: 14px;
+  color: #4a3f35;
+  line-height: 1.6;
+  margin: 0;
+}
+.intimate-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+@media (max-width: 640px) {
+  .intimate-hero {
+    padding: 48px 24px 32px;
+  }
+  .intimate-progress-wrap,
+  .intimate-benefit-wrap {
+    padding: 0 24px 32px;
+  }
+  .intimate-progress-card,
+  .intimate-benefit-card {
+    padding: 22px 20px;
+  }
+}
+
