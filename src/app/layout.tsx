@@ -6,6 +6,7 @@ import { Cormorant_Garamond, Jost } from "next/font/google";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import FooterSubscribe from "@/components/FooterSubscribe";
 import { getDatabase } from "@/lib/db";
+import { getCurrentUserSafe } from "@/lib/session";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +50,7 @@ export default async function RootLayout({
 }>) {
   const db = await getDatabase();
   const socialLinks = (db.settings.company as any).socialLinks || {};
+  const user = await getCurrentUserSafe();
 
   return (
     <html lang="id">
@@ -70,7 +72,7 @@ export default async function RootLayout({
         <NavbarWrapper />
         <main style={{width:"100%", overflow:"hidden"}}>{children}</main>
         <footer style={{background:"#1C1917", padding:"80px 8vw 40px"}}>
-          <FooterSubscribe />
+          {!user && <FooterSubscribe />}
           <div style={{display:"grid", gridTemplateColumns:"1.4fr 1fr 1fr 1fr", gap:"48px", marginBottom:"64px", paddingBottom:"48px", borderBottom:"1px solid rgba(200,184,154,0.12)"}} className="footer-grid">
             <div>
               <a href="/" style={{fontFamily:"var(--font-cormorant)", fontSize:"22px", fontWeight:400, letterSpacing:"6px", textTransform:"uppercase", color:"#F0EBE3", textDecoration:"none", display:"block", marginBottom:"18px"}}>Henima</a>
