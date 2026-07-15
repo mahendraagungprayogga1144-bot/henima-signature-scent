@@ -11,6 +11,9 @@ const MENUS = [
     { href: "/admin/stok", icon: "package", label: "Stok Management" },
     { href: "/admin/ulasan", icon: "star", label: "Ulasan Produk" },
   ]},
+  { group: "KEUANGAN", items: [
+    { href: "/admin/keuangan", icon: "wallet", label: "Buku Kas" },
+  ]},
   { group: "KONTEN", items: [
     { href: "/admin/produk", icon: "box", label: "Produk" },
     { href: "/admin/katalog", icon: "list", label: "Katalog Digital" },
@@ -48,6 +51,7 @@ const Icon = ({ name }: { name: string }) => {
     package: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
     bolt: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
     tag: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>,
+    wallet: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12h.01"/><path d="M2 10h20"/></svg>,
   };
   return icons[name] || null;
 };

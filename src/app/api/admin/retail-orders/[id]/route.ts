@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUser } from "@/lib/session";
 import { awardPointsForDeliveredOrder } from "@/lib/membership";
+import { recordDeliveredOrderIncome } from "@/lib/keuangan";
 import { Resend } from "resend";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -55,6 +56,11 @@ export async function POST(
         user_id: order.user_id,
         total: order.total,
         points_earned: order.points_earned,
+      });
+      await recordDeliveredOrderIncome({
+        id: order.id,
+        total: order.total,
+        updated_at: order.updated_at,
       });
     }
 
