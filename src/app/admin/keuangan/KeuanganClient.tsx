@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import type {
   KasTransaction,
   Purchase,
   HppProduct,
+  HppComponent,
   FinanceCategories,
   KasJenis,
 } from "@/lib/keuangan";
@@ -83,6 +84,16 @@ export default function KeuanganClient({
   // HPP
   const [hppSelected, setHppSelected] = useState(0);
   const [hppNewName, setHppNewName] = useState("");
+  const [hppSaving, setHppSaving] = useState(false);
+  const hppSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hppRef = useRef(hpp);
+  hppRef.current = hpp;
+
+  useEffect(() => {
+    return () => {
+      if (hppSaveTimer.current) clearTimeout(hppSaveTimer.current);
+    };
+  }, []);
 
   const resetKasForm = useCallback(() => {
     setKasEditId(null);
@@ -335,14 +346,78 @@ export default function KeuanganClient({
     }
   }
 
-  async function hppUpdate(id: string, updates: Partial<HppProduct>) {
-    const res = await fetch(`/api/admin/keuangan/hpp/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updates),
-    });
-    const data = await res.json();
-    if (res.ok) setHpp((prev) => prev.map((p) => (p.id === id ? data.product : p)));
+  /** Update lokal langsung (lancar), simpan ke server setelah berhenti mengetik. */
+  function scheduleHppSave(id: string) {
+    if (hppSaveTimer.current) clearTimeout(hppSaveTimer.current);
+    setHppSaving(true);
+    hppSaveTimer.current = setTimeout(async () => {
+      const product = hppRef.current.find((p) => p.id === id);
+      if (!product) {
+        setHppSaving(false);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/admin/keuangan/hpp/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bottles: product.bottles,
+            components: product.components,
+            name: product.name,
+          }),
+        });
+        const data = await res.json();
+        if (res.ok && data.product) {
+          setHpp((prev) => prev.map((p) => (p.id === id ? data.product : p)));
+        }
+      } finally {
+        setHppSaving(false);
+      }
+    }, 500);
+  }
+
+  function hppSetBottles(bottles: number) {
+    const id = hpp[hppSelected]?.id;
+    if (!id) return;
+    setHpp((prev) =>
+      prev.map((p, idx) => (idx === hppSelected ? { ...p, bottles: bottles || 1 } : p))
+    );
+    scheduleHppSave(id);
+  }
+
+  function hppSetComp(i: number, patch: Partial<HppComponent>) {
+    const id = hpp[hppSelected]?.id;
+    if (!id) return;
+    setHpp((prev) =>
+      prev.map((p, idx) => {
+        if (idx !== hppSelected) return p;
+        const components = p.components.map((c, ci) => (ci === i ? { ...c, ...patch } : c));
+        return { ...p, components };
+      })
+    );
+    scheduleHppSave(id);
+  }
+
+  function hppAddComp() {
+    const id = hpp[hppSelected]?.id;
+    if (!id) return;
+    setHpp((prev) =>
+      prev.map((p, idx) =>
+        idx === hppSelected ? { ...p, components: [...p.components, { name: "", cost: 0 }] } : p
+      )
+    );
+    scheduleHppSave(id);
+  }
+
+  function hppRemoveComp(i: number) {
+    const id = hpp[hppSelected]?.id;
+    if (!id) return;
+    setHpp((prev) =>
+      prev.map((p, idx) =>
+        idx === hppSelected ? { ...p, components: p.components.filter((_, j) => j !== i) } : p
+      )
+    );
+    scheduleHppSave(id);
   }
 
   // Derived data
@@ -874,14 +949,17 @@ export default function KeuanganClient({
               <div style={{ background: C.white, border: `1px solid ${C.line}`, padding: 20 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
                   <p style={{ fontFamily: "var(--font-cormorant)", fontStyle: "italic", fontSize: 22, margin: 0 }}>{hppProduct.name}</p>
-                  <button onClick={hppRemoveProduct} style={{ ...btnGhost, color: C.red, borderColor: "rgba(179,38,30,0.3)" }}>Hapus Produk</button>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    {hppSaving && <span style={{ fontSize: 11, color: C.muted }}>Menyimpan…</span>}
+                    <button type="button" onClick={hppRemoveProduct} style={{ ...btnGhost, color: C.red, borderColor: "rgba(179,38,30,0.3)" }}>Hapus Produk</button>
+                  </div>
                 </div>
                 <div style={{ marginBottom: 20, maxWidth: 220 }}>
                   <span style={labelStyle}>Jumlah Botol per Batch</span>
                   <input
                     inputMode="numeric"
-                    value={hppProduct.bottles}
-                    onChange={(e) => hppUpdate(hppProduct.id, { bottles: parseNum(e.target.value) || 1 })}
+                    value={hppProduct.bottles || ""}
+                    onChange={(e) => hppSetBottles(parseNum(e.target.value))}
                     style={inputStyle}
                   />
                 </div>
@@ -906,29 +984,23 @@ export default function KeuanganClient({
                             <input
                               value={c.name}
                               placeholder="bibit, botol, BPOM, listrik…"
-                              onChange={(e) => {
-                                const comps = [...hppProduct.components];
-                                comps[i] = { ...comps[i], name: e.target.value };
-                                hppUpdate(hppProduct.id, { components: comps });
-                              }}
-                              style={{ border: "none", padding: "6px 4px", width: "100%", fontSize: 13, outline: "none", fontFamily: "inherit" }}
+                              onChange={(e) => hppSetComp(i, { name: e.target.value })}
+                              style={{ border: "none", padding: "6px 4px", width: "100%", fontSize: 13, outline: "none", fontFamily: "inherit", background: "transparent" }}
                             />
                           </td>
                           <td style={{ padding: "4px 8px" }}>
                             <input
                               inputMode="numeric"
-                              value={c.cost}
-                              onChange={(e) => {
-                                const comps = [...hppProduct.components];
-                                comps[i] = { ...comps[i], cost: parseNum(e.target.value) };
-                                hppUpdate(hppProduct.id, { components: comps });
-                              }}
-                              style={{ border: "none", padding: "6px 4px", width: "100%", fontSize: 13, textAlign: "right", outline: "none", fontFamily: "inherit" }}
+                              value={c.cost ? formatMoneyInput(c.cost) : ""}
+                              onChange={(e) => hppSetComp(i, { cost: parseNum(e.target.value) })}
+                              placeholder="0"
+                              style={{ border: "none", padding: "6px 4px", width: "100%", fontSize: 13, textAlign: "right", outline: "none", fontFamily: "inherit", background: "transparent" }}
                             />
                           </td>
                           <td style={{ padding: "9px 12px" }}>
                             <button
-                              onClick={() => hppUpdate(hppProduct.id, { components: hppProduct.components.filter((_, j) => j !== i) })}
+                              type="button"
+                              onClick={() => hppRemoveComp(i)}
                               style={{ ...btnGhost, padding: "3px 9px", fontSize: 9, color: C.red, borderColor: "rgba(179,38,30,0.3)" }}
                             >×</button>
                           </td>
@@ -944,7 +1016,8 @@ export default function KeuanganClient({
                   </table>
                 </div>
                 <button
-                  onClick={() => hppUpdate(hppProduct.id, { components: [...hppProduct.components, { name: "", cost: 0 }] })}
+                  type="button"
+                  onClick={hppAddComp}
                   style={{ ...btnGhost, marginBottom: 16 }}
                 >+ Tambah Komponen</button>
                 <div style={{ marginTop: 24, background: C.dark, padding: 24, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
