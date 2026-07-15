@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import {
   HPP_DEFAULTS,
   calcHpp,
@@ -9,9 +9,10 @@ import {
   type HppCalculatorProduct,
   type HppFieldId,
   type HppInputs,
+  type HppResult,
 } from "@/lib/hpp-calculator";
 
-const FIELD_META: { id: HppFieldId; label: string; hint?: string; step?: string }[] = [
+const FIELD_META: { id: HppFieldId; label: string; hint?: string }[] = [
   { id: "totalStok", label: "Total stok botol & box dibeli (pcs)", hint: "basis alokasi biaya stok besar" },
   { id: "batch1Qty", label: "Jumlah botol batch pertama (pcs)", hint: "terbatas oleh kekuatan bibit" },
   { id: "cBotol", label: "Botol (per pcs)" },
@@ -21,7 +22,7 @@ const FIELD_META: { id: HppFieldId; label: string; hint?: string; step?: string 
   { id: "cPpn", label: "PPN + jasa pabrik (per pcs)" },
   { id: "bibitHarga", label: "Bibit — total beli (Rp)" },
   { id: "bibitGram", label: "Bibit — total gram/ml dibeli" },
-  { id: "bibitPerBotol", label: "Pemakaian bibit per botol (ml)", step: "0.1" },
+  { id: "bibitPerBotol", label: "Pemakaian bibit per botol (ml)" },
   { id: "hargaB1", label: "Harga jual batch 1 (Rp)" },
   { id: "hargaB2", label: "Harga jual batch 2 (Rp)" },
   { id: "komisiPct", label: "Komisi afiliator (%)" },
@@ -31,25 +32,34 @@ interface Props {
   initialProducts: HppCalculatorProduct[];
 }
 
+function parseField(raw: string): number {
+  const cleaned = raw.trim().replace(/,/g, ".");
+  if (!cleaned) return 0;
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : 0;
+}
+
 export default function HppProfitCalculator({ initialProducts }: Props) {
   const [products, setProducts] = useState(initialProducts);
   const [selectedId, setSelectedId] = useState(initialProducts[0]?.id || "");
-  const [inputs, setInputs] = useState<HppInputs>(
+  const [formGen, setFormGen] = useState(0);
+  const [seed, setSeed] = useState<HppInputs>(
     initialProducts[0] ? normalizeInputs(initialProducts[0].inputs) : { ...HPP_DEFAULTS }
+  );
+  const [result, setResult] = useState<HppResult>(() =>
+    calcHpp(initialProducts[0] ? normalizeInputs(initialProducts[0].inputs) : HPP_DEFAULTS)
   );
   const [status, setStatus] = useState("Tersimpan");
   const [saving, setSaving] = useState(false);
   const [newName, setNewName] = useState("");
   const [renameValue, setRenameValue] = useState(initialProducts[0]?.name || "");
 
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const draftRef = useRef<HppInputs>({ ...seed });
   const selectedIdRef = useRef(selectedId);
-  const inputsRef = useRef(inputs);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   selectedIdRef.current = selectedId;
-  inputsRef.current = inputs;
 
   const product = products.find((p) => p.id === selectedId) || null;
-  const result = useMemo(() => calcHpp(inputs), [inputs]);
 
   useEffect(() => {
     return () => {
@@ -57,21 +67,30 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     };
   }, []);
 
+  function loadIntoForm(next: HppInputs) {
+    const normalized = normalizeInputs(next);
+    draftRef.current = { ...normalized };
+    setSeed(normalized);
+    setResult(calcHpp(normalized));
+    setFormGen((g) => g + 1); // remount input HANYA di sini
+  }
+
   function selectProduct(p: HppCalculatorProduct) {
     if (saveTimer.current) {
       clearTimeout(saveTimer.current);
       void flushSave();
     }
     setSelectedId(p.id);
-    setInputs(normalizeInputs(p.inputs));
     setRenameValue(p.name);
     setStatus("Tersimpan");
+    loadIntoForm(p.inputs);
   }
 
   async function flushSave(override?: HppInputs) {
     const id = selectedIdRef.current;
     if (!id) return;
-    const payload = override || inputsRef.current;
+    const payload = normalizeInputs(override || draftRef.current);
+    draftRef.current = payload;
     setSaving(true);
     setStatus("Menyimpan…");
     try {
@@ -85,14 +104,15 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
         setStatus(data.error || "Gagal menyimpan");
         return;
       }
+      // Update daftar produk — JANGAN remount form / JANGAN overwrite draft
       setProducts((prev) =>
         prev.map((p) =>
-          p.id === id ? { ...p, inputs: normalizeInputs(payload), updated_at: data.product?.updated_at } : p
+          p.id === id ? { ...p, inputs: payload, updated_at: data.product?.updated_at } : p
         )
       );
       setStatus("Tersimpan");
     } catch {
-      setStatus("Gagal menyimpan — angka tetap dipakai di layar ini");
+      setStatus("Gagal menyimpan — angka tetap di layar");
     } finally {
       setSaving(false);
     }
@@ -100,17 +120,16 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
 
   function scheduleSave() {
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    setStatus("Mengetik…");
-    setSaving(true);
+    // Jangan setState di sini — biar ketikan tidak re-render / hapus input
     saveTimer.current = setTimeout(() => {
       void flushSave();
-    }, 700);
+    }, 800);
   }
 
-  function setField(id: HppFieldId, raw: string) {
-    const n = raw === "" ? 0 : Number(raw);
-    const next = { ...inputsRef.current, [id]: Number.isFinite(n) ? n : 0 };
-    setInputs(next);
+  function onFieldInput(id: HppFieldId, raw: string) {
+    draftRef.current = { ...draftRef.current, [id]: parseField(raw) };
+    const nextResult = calcHpp(draftRef.current);
+    startTransition(() => setResult(nextResult));
     scheduleSave();
   }
 
@@ -157,6 +176,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     if (!confirm(`Hapus produk "${product.name}" dari kalkulator HPP?\nData angka produk ini ikut terhapus.`)) {
       return;
     }
+    if (saveTimer.current) clearTimeout(saveTimer.current);
     const id = product.id;
     const res = await fetch(`/api/admin/hpp-calculator/${id}`, { method: "DELETE" });
     if (!res.ok) {
@@ -169,15 +189,15 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     if (next[0]) selectProduct(next[0]);
     else {
       setSelectedId("");
-      setInputs({ ...HPP_DEFAULTS });
       setRenameValue("");
+      loadIntoForm(HPP_DEFAULTS);
     }
   }
 
   async function resetDefaults() {
     if (!confirm("Reset angka produk ini ke default Henima?")) return;
-    setInputs({ ...HPP_DEFAULTS });
     if (saveTimer.current) clearTimeout(saveTimer.current);
+    loadIntoForm(HPP_DEFAULTS);
     await flushSave({ ...HPP_DEFAULTS });
   }
 
@@ -192,7 +212,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     ["hargaB1", "hargaB2", "komisiPct"].includes(f.id)
   );
 
-  function Field({ id, label, hint, step }: (typeof FIELD_META)[number]) {
+  function Field({ id, label, hint }: (typeof FIELD_META)[number]) {
     return (
       <div style={styles.fieldRow}>
         <label style={styles.fieldLabel}>
@@ -200,11 +220,12 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
           {hint ? <span style={styles.hint}>{hint}</span> : null}
         </label>
         <input
-          type="number"
-          step={step || "1"}
-          value={Number.isFinite(inputs[id]) ? inputs[id] : 0}
-          onChange={(e) => setField(id, e.target.value)}
+          type="text"
+          inputMode="decimal"
+          defaultValue={String(seed[id] ?? "")}
+          onInput={(e) => onFieldInput(id, (e.target as HTMLInputElement).value)}
           style={styles.input}
+          autoComplete="off"
         />
       </div>
     );
@@ -318,7 +339,8 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
               </div>
             </div>
 
-            <div className="hpp-calc-grid">
+            {/* formGen remount hanya saat ganti/reset produk */}
+            <div key={formGen} className="hpp-calc-grid">
               <div style={styles.card}>
                 <div style={styles.sectionTitle}>
                   <span>Data Masukan</span>
@@ -485,7 +507,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#e9e6de",
     minHeight: "100vh",
     paddingBottom: 80,
-    margin: "-0px",
   },
   topbar: {
     padding: "40px 24px 24px",
@@ -559,12 +580,6 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "6px 10px",
     cursor: "pointer",
     borderRadius: 2,
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "1.15fr 1fr",
-    gap: 28,
-    marginTop: 24,
   },
   card: {
     background: "linear-gradient(180deg, #161a17, #1d221e)",
