@@ -103,8 +103,17 @@ export function monthLabel(mk: string): string {
 }
 
 export function parseNum(v: string | number): number {
-  if (typeof v === "number") return v;
-  return parseInt(String(v).replace(/\D/g, ""), 10) || 0;
+  if (typeof v === "number") return Number.isFinite(v) ? Math.trunc(v) : 0;
+  const digits = String(v ?? "").replace(/[^\d]/g, "");
+  if (!digits) return 0;
+  const n = Number(digits);
+  return Number.isFinite(n) ? n : 0;
+}
+
+/** Format angka ribuan saat mengetik (id-ID). */
+export function formatMoneyInput(v: string | number): string {
+  const n = parseNum(v);
+  return n ? n.toLocaleString("id-ID") : "";
 }
 
 export function toCSV(rows: (string | number)[][]): string {

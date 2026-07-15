@@ -15,6 +15,7 @@ import {
   monthKey,
   monthLabel,
   parseNum,
+  formatMoneyInput,
   toCSV,
   downloadCSV,
   calcRunningSaldo,
@@ -215,11 +216,15 @@ export default function KeuanganClient({
   async function saveBelanja() {
     const qty = parseNum(bQty);
     const harga = parseNum(bHarga);
-    if (!bNama || !qty || !harga || !bTanggal) return alert("Isi nama barang, qty, dan harga dulu.");
+    if (!bNama.trim()) return alert("Isi nama barang dulu.");
+    if (!bTanggal) return alert("Isi tanggal dulu.");
+    if (!qty) return alert("Qty harus lebih dari 0. Contoh: 1 atau 500");
+    if (!harga) return alert("Harga satuan harus diisi. Contoh: 6500000 (akan jadi 6.500.000)");
+    const total = qty * harga;
 
     const payload = {
       tanggal: bTanggal,
-      nama: bNama,
+      nama: bNama.trim(),
       qty,
       satuan: bSatuan,
       harga_satuan: harga,
@@ -241,7 +246,8 @@ export default function KeuanganClient({
           setKas((prev) => prev.map((t) => (t.id === data.kasTransaction.id ? data.kasTransaction : t)));
         }
         resetBelanjaForm();
-      } else alert(data.error);
+        alert("Pembelian berhasil diupdate.");
+      } else alert(data.error || "Gagal menyimpan pembelian");
     } else {
       const res = await fetch("/api/admin/keuangan/purchases", {
         method: "POST",
@@ -253,7 +259,8 @@ export default function KeuanganClient({
         setPurchases((prev) => [data.purchase, ...prev]);
         if (data.kasTransaction) setKas((prev) => [...prev, data.kasTransaction]);
         resetBelanjaForm();
-      } else alert(data.error);
+        alert(`Pembelian tersimpan. Total ${fmt(total)}${bMasukKas ? " · sudah masuk Buku Kas" : ""}`);
+      } else alert(data.error || "Gagal menyimpan pembelian");
     }
   }
 
@@ -572,7 +579,7 @@ export default function KeuanganClient({
                   <input
                     inputMode="numeric"
                     value={kasNominal}
-                    onChange={(e) => setKasNominal(parseNum(e.target.value) ? parseNum(e.target.value).toLocaleString("id-ID") : "")}
+                    onChange={(e) => setKasNominal(formatMoneyInput(e.target.value))}
                     placeholder="15.000.000"
                     style={inputStyle}
                   />
@@ -706,6 +713,9 @@ export default function KeuanganClient({
         {tab === "belanja" && (
           <>
             <p style={secTitle}>{belanjaEditId ? "Edit Pembelian" : "Catat Pembelian Barang / Order Pabrik"}</p>
+            <p style={{ fontSize: 12, color: C.muted, marginTop: -8, marginBottom: 16 }}>
+              Tab ini untuk beli barang/bahan (misal fragrance, botol). Untuk biaya seperti <strong>Biaya Persyuratan / Notaris / Sewa</strong>, pakai tab <strong>Buku Kas</strong> → Keluar.
+            </p>
             <div style={{ background: C.white, border: `1px solid ${belanjaEditId ? C.goldD : C.line}`, padding: 20, marginBottom: 32 }}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 12 }}>
                 <div>
@@ -714,7 +724,20 @@ export default function KeuanganClient({
                 </div>
                 <div>
                   <span style={labelStyle}>Nama Barang</span>
-                  <input value={bNama} onChange={(e) => setBNama(e.target.value)} placeholder="Produksi 500 botol Afternoon" style={inputStyle} />
+                  <input
+                    value={bNama}
+                    onChange={(e) => {
+                      const name = e.target.value;
+                      setBNama(name);
+                      const lower = name.toLowerCase();
+                      if (/pers(y)?uratan|notaris|legalitas|izin/.test(lower)) {
+                        const match = kategori.keluar.find((k) => /pers(y)?uratan|legalitas/i.test(k));
+                        if (match) setBKategoriKas(match);
+                      }
+                    }}
+                    placeholder="misal: Fragrance oil / Botol 50ml"
+                    style={inputStyle}
+                  />
                 </div>
                 <div>
                   <span style={labelStyle}>Supplier / Pabrik</span>
@@ -724,7 +747,13 @@ export default function KeuanganClient({
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, marginBottom: 12 }}>
                 <div>
                   <span style={labelStyle}>Qty</span>
-                  <input inputMode="numeric" value={bQty} onChange={(e) => setBQty(parseNum(e.target.value) ? parseNum(e.target.value).toLocaleString("id-ID") : "")} placeholder="500" style={inputStyle} />
+                  <input
+                    inputMode="numeric"
+                    value={bQty}
+                    onChange={(e) => setBQty(formatMoneyInput(e.target.value))}
+                    placeholder="500"
+                    style={inputStyle}
+                  />
                 </div>
                 <div>
                   <span style={labelStyle}>Satuan</span>
@@ -734,11 +763,22 @@ export default function KeuanganClient({
                 </div>
                 <div>
                   <span style={labelStyle}>Harga Satuan</span>
-                  <input inputMode="numeric" value={bHarga} onChange={(e) => setBHarga(parseNum(e.target.value) ? parseNum(e.target.value).toLocaleString("id-ID") : "")} placeholder="45.000" style={inputStyle} />
+                  <input
+                    inputMode="numeric"
+                    value={bHarga}
+                    onChange={(e) => setBHarga(formatMoneyInput(e.target.value))}
+                    placeholder="6.500.000"
+                    style={inputStyle}
+                  />
                 </div>
                 <div>
                   <span style={labelStyle}>Total</span>
-                  <div style={{ border: `1px solid ${C.line}`, background: C.panel, padding: "10px 12px", fontSize: 14, fontWeight: 500 }}>{fmt(bTotal)}</div>
+                  <div style={{ border: `1px solid ${C.line}`, background: C.panel, padding: "10px 12px", fontSize: 14, fontWeight: 500 }}>
+                    {fmt(bTotal)}
+                  </div>
+                  <p style={{ fontSize: 10, color: C.muted, marginTop: 4 }}>
+                    {parseNum(bQty) || 0} × {fmtN(parseNum(bHarga))}
+                  </p>
                 </div>
               </div>
               {!belanjaEditId && (
