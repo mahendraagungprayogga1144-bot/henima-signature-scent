@@ -69,34 +69,40 @@ export async function POST(
     }
   }
 
-  await updateDatabase((db) => {
-    const product = db.products.find((p) => p.id === id);
-    if (product) {
-      if (name) product.name = name;
-      product.originalPrice = originalPrice;
-      product.discountPrice = discountPrice;
-      product.description = description || product.description;
-      product.active = active;
-      if (photos !== undefined) {
-        product.photos = photos;
-        if (photos.length > 0) product.photo = photos[0];
-      } else if (photoUrl && photoUrl.startsWith("http")) {
-        product.photo = photoUrl;
-        product.photos = [photoUrl];
+  try {
+    await updateDatabase((db) => {
+      const product = db.products.find((p) => p.id === id);
+      if (product) {
+        if (name) product.name = name;
+        product.originalPrice = originalPrice;
+        product.discountPrice = discountPrice;
+        product.description = description || product.description;
+        product.active = active;
+        if (photos !== undefined) {
+          product.photos = photos;
+          if (photos.length > 0) product.photo = photos[0];
+        } else if (photoUrl && photoUrl.startsWith("http")) {
+          product.photo = photoUrl;
+          product.photos = [photoUrl];
+        }
+        if (video !== null) product.video = video || undefined;
+        if (topNotes !== null) (product as any).topNotes = topNotes;
+        (product as any).comingSoon = comingSoon;
+        if (middleNotes !== null) (product as any).middleNotes = middleNotes;
+        if (baseNotes !== null) (product as any).baseNotes = baseNotes;
+        if (inspiration !== null) (product as any).inspiration = inspiration;
+        if (sillage !== null) (product as any).sillage = sillage;
+        if (projection !== null) (product as any).projection = projection;
+        if (longevity !== null) (product as any).longevity = longevity;
+        if (scentFamily !== null) (product as any).scentFamily = scentFamily;
+        if (variants) product.variants = variants;
       }
-      if (video !== null) product.video = video || undefined;
-      if (topNotes !== null) (product as any).topNotes = topNotes;
-      (product as any).comingSoon = comingSoon;
-      if (middleNotes !== null) (product as any).middleNotes = middleNotes;
-      if (baseNotes !== null) (product as any).baseNotes = baseNotes;
-      if (inspiration !== null) (product as any).inspiration = inspiration;
-      if (sillage !== null) (product as any).sillage = sillage;
-      if (projection !== null) (product as any).projection = projection;
-      if (longevity !== null) (product as any).longevity = longevity;
-      if (scentFamily !== null) (product as any).scentFamily = scentFamily;
-      if (variants) product.variants = variants;
-    }
-  });
+    });
 
-  return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Gagal menyimpan produk";
+    console.error("Product save error:", message);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }

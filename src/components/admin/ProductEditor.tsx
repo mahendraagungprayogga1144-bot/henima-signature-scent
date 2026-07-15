@@ -122,7 +122,18 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
       if (photos[0]) fd.set("photoUrl", photos[0]);
 
       const res = await fetch(`/api/admin/products/${product.id}`, { method: "POST", body: fd });
-      if (!res.ok) { const text = await res.text(); setError(text || "Gagal menyimpan produk"); return; }
+      if (!res.ok) {
+        let msg = "Gagal menyimpan produk";
+        try {
+          const data = await res.json();
+          msg = data.error || msg;
+        } catch {
+          const text = await res.text();
+          if (text) msg = text;
+        }
+        setError(msg);
+        return;
+      }
       window.location.reload();
       
     } catch { setError("Terjadi kesalahan jaringan"); }

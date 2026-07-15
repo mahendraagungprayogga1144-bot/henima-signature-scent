@@ -214,7 +214,7 @@ export async function updateDatabase(
   await updater(after); // may throw — nothing is saved if it does
 
   await Promise.all([
-    syncArray("products", before.products, after.products, productToRow),
+    syncProducts(before.products, after.products),
     syncArray("users", before.users, after.users, userToRow),
     syncArray("orders", before.orders, after.orders, orderToRow),
     syncSettings(before.settings, after.settings),
@@ -224,6 +224,44 @@ export async function updateDatabase(
 }
 
 // ---------- Internal sync helpers ----------
+
+const PRODUCT_MEDIA_COLUMNS = ["photos", "video"] as const;
+
+function isMissingColumnError(message: string): boolean {
+  return /column|schema cache|could not find/i.test(message);
+}
+
+async function syncProducts(before: Product[], after: Product[]): Promise<void> {
+  const afterIds = new Set(after.map((i) => i.id));
+  const deleted = before.filter((i) => !afterIds.has(i.id));
+  if (deleted.length > 0) {
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .in("id", deleted.map((i) => i.id));
+    if (error) throw new Error(`Delete from products failed: ${error.message}`);
+  }
+
+  const beforeMap = new Map(before.map((i) => [i.id, JSON.stringify(i)]));
+  const upserted = after.filter((i) => beforeMap.get(i.id) !== JSON.stringify(i));
+  if (upserted.length === 0) return;
+
+  const rows = upserted.map((p) => productToRow(p));
+  let { error } = await supabase.from("products").upsert(rows);
+
+  if (error && isMissingColumnError(error.message)) {
+    const fallbackRows = rows.map((row, idx) => {
+      const product = upserted[idx];
+      const next = { ...row } as Record<string, unknown>;
+      for (const col of PRODUCT_MEDIA_COLUMNS) delete next[col];
+      if (product.photos?.[0]) next.photo = product.photos[0];
+      return next;
+    });
+    ({ error } = await supabase.from("products").upsert(fallbackRows));
+  }
+
+  if (error) throw new Error(`Upsert to products failed: ${error.message}`);
+}
 
 async function syncArray<T extends { id: string }>(
   table: string,
