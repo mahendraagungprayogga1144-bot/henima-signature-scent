@@ -445,6 +445,60 @@ export default function KeuanganClient({
               </div>
             </div>
 
+            <p style={secTitle}>Laba Rugi Kas — {monthLabel(tm)}</p>
+            <div style={{ background: C.white, border: `1px solid ${C.line}`, padding: 20, marginBottom: 32 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+                <div>
+                  <p style={{ ...labelStyle, marginBottom: 10 }}>Pendapatan</p>
+                  {Object.entries(
+                    kas
+                      .filter((t) => t.jenis === "masuk" && monthKey(t.tanggal) === tm)
+                      .reduce((acc: Record<string, number>, t) => {
+                        acc[t.kategori] = (acc[t.kategori] || 0) + t.nominal;
+                        return acc;
+                      }, {})
+                  )
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([k, v]) => (
+                      <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.panel}` }}>
+                        <span>{k}</span>
+                        <span style={{ color: C.green }}>{fmt(v)}</span>
+                      </div>
+                    ))}
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 700, paddingTop: 10 }}>
+                    <span>Total Pendapatan</span>
+                    <span style={{ color: C.green }}>{fmt(masukBulan)}</span>
+                  </div>
+                </div>
+                <div>
+                  <p style={{ ...labelStyle, marginBottom: 10 }}>Beban / Pengeluaran</p>
+                  {Object.entries(perKat)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([k, v]) => (
+                      <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, padding: "6px 0", borderBottom: `1px solid ${C.panel}` }}>
+                        <span>{k}</span>
+                        <span style={{ color: C.red }}>{fmt(v)}</span>
+                      </div>
+                    ))}
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 700, paddingTop: 10 }}>
+                    <span>Total Beban</span>
+                    <span style={{ color: C.red }}>{fmt(keluarBulan)}</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${C.line}`, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+                <div>
+                  <span style={labelStyle}>Laba / (Rugi) Kas</span>
+                  <p style={{ fontSize: 22, margin: 0, color: laba >= 0 ? C.green : C.red }}>{fmt(laba)}</p>
+                </div>
+                <div>
+                  <span style={labelStyle}>Estimasi Pajak UMKM ~0,5% omzet</span>
+                  <p style={{ fontSize: 16, margin: 0, color: C.muted }}>{fmt(Math.round(masukBulan * 0.005))}</p>
+                  <p style={{ fontSize: 11, color: C.muted, margin: "4px 0 0" }}>Estimasi kasar — konsultasikan bendahara/akuntan</p>
+                </div>
+              </div>
+            </div>
+
             <p style={secTitle}>Pengeluaran per Kategori — {monthLabel(tm)}</p>
             <div style={{ background: C.white, border: `1px solid ${C.line}`, padding: 0, marginBottom: 32 }}>
               {Object.entries(perKat).sort((a, b) => b[1] - a[1]).map(([k, v]) => (

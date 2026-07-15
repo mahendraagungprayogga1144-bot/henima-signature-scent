@@ -200,14 +200,34 @@ export default function Navbar({ user }: { user?: any }) {
             ) : (
               <>
                 {user.role !== "admin" && (
-                  <Link href="/profil" onClick={() => setOpen(false)} style={{
-                    fontFamily:"var(--font-jost)", fontSize:"clamp(28px,7vw,42px)",
-                    fontWeight:300, color:"rgba(240,235,227,0.9)", textDecoration:"none",
-                    lineHeight:1.4, letterSpacing:"2px", textTransform:"uppercase",
-                    borderBottom:"1px solid rgba(255,255,255,0.06)", paddingBottom:"14px", marginBottom:"4px",
-                  }}>
-                    The Intimate
-                  </Link>
+                  <>
+                    <Link href="/shop" onClick={() => setOpen(false)} style={{
+                      fontFamily:"var(--font-jost)", fontSize:"clamp(28px,7vw,42px)",
+                      fontWeight:300, color:"rgba(240,235,227,0.9)", textDecoration:"none",
+                      lineHeight:1.4, letterSpacing:"2px", textTransform:"uppercase",
+                      borderBottom:"1px solid rgba(255,255,255,0.06)", paddingBottom:"14px", marginBottom:"4px",
+                    }}>
+                      Shop
+                    </Link>
+                    {user.role === "reseller" && (
+                      <Link href="/grosir" onClick={() => setOpen(false)} style={{
+                        fontFamily:"var(--font-jost)", fontSize:"clamp(28px,7vw,42px)",
+                        fontWeight:300, color:"rgba(200,184,154,0.9)", textDecoration:"none",
+                        lineHeight:1.4, letterSpacing:"2px", textTransform:"uppercase",
+                        borderBottom:"1px solid rgba(255,255,255,0.06)", paddingBottom:"14px", marginBottom:"4px",
+                      }}>
+                        Order Grosir
+                      </Link>
+                    )}
+                    <Link href="/profil" onClick={() => setOpen(false)} style={{
+                      fontFamily:"var(--font-jost)", fontSize:"clamp(28px,7vw,42px)",
+                      fontWeight:300, color:"rgba(240,235,227,0.9)", textDecoration:"none",
+                      lineHeight:1.4, letterSpacing:"2px", textTransform:"uppercase",
+                      borderBottom:"1px solid rgba(255,255,255,0.06)", paddingBottom:"14px", marginBottom:"4px",
+                    }}>
+                      The Intimate
+                    </Link>
+                  </>
                 )}
                 {user.role === "admin" && (
                   <Link href="/admin" onClick={() => setOpen(false)} style={{

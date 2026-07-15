@@ -37,10 +37,21 @@ export async function POST(
   await updateDatabase((data) => {
     const o = data.orders.find((x) => x.id === id);
     if (o) {
+      const prev = o.status;
       o.status = status;
       if (resi) o.resi = resi;
       o.statusHistory.push({ status, note, at: now });
       o.updatedAt = now;
+
+      // Kredit komisi reseller saat pertama kali jadi delivered
+      if (status === "delivered" && prev !== "delivered" && o.resellerId) {
+        const r = data.users.find((u) => u.id === o.resellerId && u.role === "reseller");
+        if (r?.reseller?.approved) {
+          const pct = Number(r.reseller.commissionPct) || 0;
+          const earned = Math.round((o.total || 0) * (pct / 100));
+          r.reseller.commissionEarned = (r.reseller.commissionEarned || 0) + earned;
+        }
+      }
     }
   });
 

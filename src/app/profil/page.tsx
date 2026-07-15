@@ -63,6 +63,36 @@ export default async function ProfilePage() {
         benefits={currentTier.benefits}
       />
 
+      {/* Referral */}
+      <div className="profil-reveal profil-reveal-d1" style={{ maxWidth: 720, margin: "0 auto", padding: "40px 32px 0" }}>
+        <div style={{ border: "1px solid #E8E0D5", background: "#fff", padding: "28px 24px" }}>
+          <p style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#B5935A", margin: "0 0 8px" }}>
+            Invite Your Circle
+          </p>
+          <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: 28, margin: "0 0 10px", fontWeight: 500 }}>
+            Kode Referral Kamu
+          </h2>
+          <p style={{ fontSize: 14, color: "#6B5E52", lineHeight: 1.7, marginBottom: 16 }}>
+            Bagikan kode ini ke teman. Saat mereka daftar / belanja dengan kode referral, kalian berdua
+            makin dekat ke tier berikutnya. (Poin referral segera aktif penuh di fase berikutnya.)
+          </p>
+          <div
+            style={{
+              display: "inline-block",
+              border: "1px dashed #C8B89A",
+              padding: "12px 20px",
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+              fontSize: 18,
+              letterSpacing: 3,
+              color: "#1C1917",
+              background: "#F9F6F1",
+            }}
+          >
+            HENIMA-{user.id.slice(0, 6).toUpperCase()}
+          </div>
+        </div>
+      </div>
+
       {/* KEUNTUNGAN TIAP LEVEL */}
       <div className="profil-reveal profil-reveal-d1" style={{ background: "#fff", padding: "80px 32px" }}>
         <div style={{ textAlign: "center", marginBottom: "64px", maxWidth: "700px", margin: "0 auto 64px" }}>

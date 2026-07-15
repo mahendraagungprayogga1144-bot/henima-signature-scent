@@ -3,83 +3,118 @@ import { redirect } from "next/navigation";
 import { getDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import MemberManager from "@/components/admin/MemberManager";
+import ResellerManager from "@/components/admin/ResellerManager";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminMembersPage() {
+export default async function AdminResellerPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/masuk");
   if (user.role !== "admin") redirect("/");
 
   const db = await getDatabase();
-  const allUsers = db.users.filter((u: any) => u.role !== "admin");
-
-  const members = allUsers.filter((u: any) => u.role === "member");
-  const resellers = allUsers.filter((u: any) => u.role === "reseller");
+  const allUsers = db.users.filter((u) => u.role !== "admin");
+  const members = allUsers.filter((u) => u.role === "member");
+  const resellers = allUsers.filter((u) => u.role === "reseller");
+  const approved = resellers.filter((u) => u.reseller?.approved).length;
 
   return (
     <div
       style={{
-        maxWidth: "1000px",
+        maxWidth: 1000,
         margin: "0 auto",
         padding: "40px 24px",
         fontFamily: "var(--font-jost, sans-serif)",
       }}
     >
-      <Link
-        href="/admin"
-        style={{ fontSize: "12px", color: "#888", textDecoration: "none", letterSpacing: "1px" }}
-      >
+      <Link href="/admin" style={{ fontSize: 12, color: "#888", textDecoration: "none", letterSpacing: 1 }}>
+        ← Dashboard
       </Link>
 
-      <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1a1a1a", marginTop: "16px", marginBottom: "4px" }}>
-        Kelola Member
+      <h1 style={{ fontSize: 24, fontWeight: 700, color: "#1a1a1a", marginTop: 16, marginBottom: 4 }}>
+        Reseller & Member
       </h1>
-      <p style={{ fontSize: "13px", color: "#888", marginBottom: "40px" }}>
-        {members.length} member &nbsp;·&nbsp; {resellers.length} reseller
+      <p style={{ fontSize: 13, color: "#888", marginBottom: 40 }}>
+        Approve reseller, atur tier & komisi · kelola member Circle
       </p>
 
-      {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "16px", marginBottom: "48px" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+          gap: 16,
+          marginBottom: 48,
+        }}
+      >
         {[
           { label: "Total User", value: allUsers.length },
           { label: "Member Circle", value: members.length },
           { label: "Reseller", value: resellers.length },
-          { label: "Reseller Aktif", value: resellers.filter((u: any) => u.reseller?.approved).length },
+          { label: "Reseller Aktif", value: approved },
         ].map((s) => (
-          <div key={s.label} style={{ border: "1px solid #e5e5e5", padding: "20px", background: "#fff" }}>
-            <p style={{ fontSize: "11px", color: "#aaa", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "8px" }}>{s.label}</p>
-            <p style={{ fontSize: "28px", fontWeight: 700, color: "#1a1a1a" }}>{s.value}</p>
+          <div key={s.label} style={{ border: "1px solid #e5e5e5", padding: 20, background: "#fff" }}>
+            <p
+              style={{
+                fontSize: 11,
+                color: "#aaa",
+                letterSpacing: 1,
+                textTransform: "uppercase",
+                marginBottom: 8,
+              }}
+            >
+              {s.label}
+            </p>
+            <p style={{ fontSize: 28, fontWeight: 700, color: "#1a1a1a", margin: 0 }}>{s.value}</p>
           </div>
         ))}
       </div>
 
-      {/* Reseller section */}
-      {resellers.length > 0 && (
-        <div style={{ marginBottom: "48px" }}>
-          <h2 style={{ fontSize: "14px", letterSpacing: "2px", textTransform: "uppercase", color: "#888", marginBottom: "16px", fontWeight: 600 }}>
-            Reseller
-          </h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {resellers.map((r: any) => (
-              <MemberManager key={r.id} member={r} />
+      <div style={{ marginBottom: 48 }}>
+        <h2
+          style={{
+            fontSize: 14,
+            letterSpacing: 2,
+            textTransform: "uppercase",
+            color: "#888",
+            marginBottom: 16,
+            fontWeight: 600,
+          }}
+        >
+          Reseller
+        </h2>
+        {resellers.length === 0 ? (
+          <div style={{ border: "1px solid #e5e5e5", padding: 40, textAlign: "center", color: "#aaa", fontSize: 14 }}>
+            Belum ada akun reseller
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {resellers.map((r) => (
+              <ResellerManager key={r.id} reseller={r} />
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Member section */}
       <div>
-        <h2 style={{ fontSize: "14px", letterSpacing: "2px", textTransform: "uppercase", color: "#888", marginBottom: "16px", fontWeight: 600 }}>
+        <h2
+          style={{
+            fontSize: 14,
+            letterSpacing: 2,
+            textTransform: "uppercase",
+            color: "#888",
+            marginBottom: 16,
+            fontWeight: 600,
+          }}
+        >
           Henima Circle Members
         </h2>
         {members.length === 0 ? (
-          <div style={{ border: "1px solid #e5e5e5", padding: "40px", textAlign: "center", color: "#aaa", fontSize: "14px" }}>
+          <div style={{ border: "1px solid #e5e5e5", padding: 40, textAlign: "center", color: "#aaa", fontSize: 14 }}>
             Belum ada member terdaftar
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {members.map((m: any) => (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {members.map((m) => (
               <MemberManager key={m.id} member={m} />
             ))}
           </div>

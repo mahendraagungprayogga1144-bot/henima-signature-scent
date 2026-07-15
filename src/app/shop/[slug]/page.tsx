@@ -87,7 +87,30 @@ export default async function ProductDetailPage({
           <h1 style={{ fontFamily: "var(--font-cormorant)", fontSize: "clamp(36px,4vw,56px)", fontWeight: 300, fontStyle: "italic", color: "#1C1917", marginBottom: "6px", lineHeight: 1.1 }}>
             {product.name}
           </h1>
-          <p style={{ fontSize: "11px", color: "#9A8F82", marginBottom: "24px", letterSpacing: "1px" }}>Extrait de Parfum · Made in Indonesia</p>
+          <p style={{ fontSize: "11px", color: "#9A8F82", marginBottom: "16px", letterSpacing: "1px" }}>Extrait de Parfum · Made in Indonesia</p>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 24 }}>
+            {[
+              { label: "BPOM Registered", hint: "Terdaftar di BPOM" },
+              { label: "Halal Ready", hint: "Proses & standar halal brand" },
+              { label: "Batch Tracked", hint: "Produksi per batch tercatat" },
+            ].map((b) => (
+              <span
+                key={b.label}
+                title={b.hint}
+                style={{
+                  fontSize: 9,
+                  letterSpacing: 1.5,
+                  textTransform: "uppercase",
+                  border: "1px solid rgba(200,184,154,0.45)",
+                  color: "#B5935A",
+                  padding: "6px 10px",
+                }}
+              >
+                {b.label}
+              </span>
+            ))}
+          </div>
 
           <div style={{ width: "32px", height: "1px", background: "rgba(200,184,154,0.5)", marginBottom: "28px" }} />
 
