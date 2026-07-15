@@ -3,18 +3,23 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
   HPP_DEFAULTS,
+  SELLER_CHANNELS,
   calcHpp,
   fmtRp,
+  getHppWarnings,
   normalizeInputs,
+  normalizeSellerChannel,
   type HppCalculatorProduct,
   type HppFieldId,
   type HppInputs,
   type HppResult,
+  type SellerChannelId,
 } from "@/lib/hpp-calculator";
 
 const FIELD_META: { id: HppFieldId; label: string; hint?: string }[] = [
-  { id: "totalStok", label: "Total stok botol & box dibeli (pcs)", hint: "basis alokasi biaya stok besar" },
-  { id: "batch1Qty", label: "Jumlah botol batch pertama (pcs)", hint: "terbatas oleh kekuatan bibit" },
+  { id: "totalStok", label: "Total stok botol & box dibeli (pcs)", hint: "wajib diisi — basis alokasi sablon & BPOM" },
+  { id: "batch1Qty", label: "Produksi Batch 1 (pcs)", hint: "cetak pertama — biasanya dibatasi kekuatan bibit" },
+  { id: "batch2Qty", label: "Produksi Batch 2 (pcs)", hint: "cetak berikutnya setelah Batch 1 habis terjual" },
   { id: "cBotol", label: "Botol (per pcs)" },
   { id: "cBox", label: "Box (per pcs)" },
   { id: "cSablonTotal", label: "Sablon (total beli)", hint: "dibagi total stok" },
@@ -23,15 +28,16 @@ const FIELD_META: { id: HppFieldId; label: string; hint?: string }[] = [
   { id: "bibitHarga", label: "Bibit — total beli (Rp)" },
   { id: "bibitGram", label: "Bibit — total gram/ml dibeli" },
   { id: "bibitPerBotol", label: "Pemakaian bibit per botol (ml)" },
-  { id: "hargaB1", label: "Harga jual batch 1 (Rp)" },
-  { id: "hargaB2", label: "Harga jual batch 2 (Rp)" },
-  { id: "komisiPct", label: "Komisi afiliator (%)" },
+  { id: "hargaB1", label: "Harga jual Batch 1 (Rp)" },
+  { id: "hargaB2", label: "Harga jual Batch 2 (Rp)" },
+  { id: "komisiPct", label: "Komisi channel (%)" },
 ];
 
-const STOCK_IDS: HppFieldId[] = ["totalStok", "batch1Qty"];
+const STOCK_IDS: HppFieldId[] = ["totalStok", "batch1Qty", "batch2Qty"];
 const UNIT_IDS: HppFieldId[] = ["cBotol", "cBox", "cSablonTotal", "cBpomTotal", "cPpn"];
 const BIBIT_IDS: HppFieldId[] = ["bibitHarga", "bibitGram", "bibitPerBotol"];
-const SELL_IDS: HppFieldId[] = ["hargaB1", "hargaB2", "komisiPct"];
+const PRICE_IDS: HppFieldId[] = ["hargaB1", "hargaB2"];
+const KOMISI_IDS: HppFieldId[] = ["komisiPct"];
 
 function parseField(raw: string): number {
   const cleaned = raw.trim().replace(/,/g, ".");
@@ -40,19 +46,29 @@ function parseField(raw: string): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-/** Komponen di luar parent — JANGAN definisikan di dalam render (itu penyebab teks hilang). */
+function sellerFromProduct(p: HppCalculatorProduct | null | undefined): SellerChannelId {
+  if (!p) return "afiliator";
+  const raw = p.inputs as unknown as Record<string, unknown>;
+  return normalizeSellerChannel(
+    p.seller_channel || raw?.sellerChannel,
+    normalizeInputs(p.inputs).komisiPct
+  );
+}
+
 const FieldRow = memo(function FieldRow({
   id,
   label,
   hint,
   defaultValue,
   onChange,
+  warn,
 }: {
   id: HppFieldId;
   label: string;
   hint?: string;
   defaultValue: string;
   onChange: (id: HppFieldId, raw: string) => void;
+  warn?: boolean;
 }) {
   return (
     <div style={styles.fieldRow}>
@@ -65,7 +81,10 @@ const FieldRow = memo(function FieldRow({
         inputMode="decimal"
         defaultValue={defaultValue}
         onChange={(e) => onChange(id, e.target.value)}
-        style={styles.input}
+        style={{
+          ...styles.input,
+          ...(warn ? { borderColor: "#c07061" } : {}),
+        }}
         autoComplete="off"
         spellCheck={false}
       />
@@ -73,15 +92,55 @@ const FieldRow = memo(function FieldRow({
   );
 });
 
-/** Form angka: hanya remount saat `formKey` berubah (ganti/reset produk). */
+const WarningsBanner = memo(function WarningsBanner({
+  warnings,
+}: {
+  warnings: ReturnType<typeof getHppWarnings>;
+}) {
+  if (!warnings.length) return null;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
+      {warnings.map((w) => (
+        <div
+          key={w.text}
+          style={{
+            padding: "10px 12px",
+            fontSize: 12,
+            lineHeight: 1.45,
+            border: `1px solid ${
+              w.level === "error" ? "#c07061" : w.level === "ok" ? "#7ea08a" : "#8f7a4a"
+            }`,
+            background:
+              w.level === "error"
+                ? "rgba(192,112,97,0.12)"
+                : w.level === "ok"
+                  ? "rgba(126,160,138,0.12)"
+                  : "rgba(143,122,74,0.12)",
+            color: "#e9e6de",
+          }}
+        >
+          {w.level === "error" ? "⚠ " : w.level === "ok" ? "✓ " : "• "}
+          {w.text}
+        </div>
+      ))}
+    </div>
+  );
+});
+
 const InputsPanel = memo(function InputsPanel({
   formKey,
   seed,
+  sellerChannel,
   onChange,
+  onSellerChange,
+  onFillBatch2,
 }: {
   formKey: string;
   seed: HppInputs;
+  sellerChannel: SellerChannelId;
   onChange: (id: HppFieldId, raw: string) => void;
+  onSellerChange: (id: SellerChannelId) => void;
+  onFillBatch2: () => void;
 }) {
   function group(ids: HppFieldId[], legend: string, last = false) {
     return (
@@ -95,6 +154,10 @@ const InputsPanel = memo(function InputsPanel({
             hint={f.hint}
             defaultValue={String(seed[f.id] ?? "")}
             onChange={onChange}
+            warn={
+              (f.id === "totalStok" && !seed.totalStok) ||
+              (f.id === "batch1Qty" && !seed.batch1Qty)
+            }
           />
         ))}
       </fieldset>
@@ -107,20 +170,70 @@ const InputsPanel = memo(function InputsPanel({
         <span>Data Masukan</span>
         <span style={{ color: "#c8a45e" }}>01</span>
       </div>
-      {group(STOCK_IDS, "Stok & produksi")}
+
+      {group(STOCK_IDS, "Stok & produksi Batch 1 / 2")}
+      <button type="button" onClick={onFillBatch2} style={{ ...styles.btnGhost, marginBottom: 18 }}>
+        Isi Batch 2 = Total stok − Batch 1
+      </button>
+
       {group(UNIT_IDS, "Biaya per unit — basis total stok")}
       {group(BIBIT_IDS, "Bibit")}
-      {group(SELL_IDS, "Harga jual & komisi", true)}
+
+      <fieldset style={{ ...styles.fieldset, marginBottom: 12 }}>
+        <legend style={styles.legend}>Channel penjualan (seller)</legend>
+        <p style={{ fontSize: 12, color: "#9a998f", margin: "0 0 10px", lineHeight: 1.45 }}>
+          Pilih channel — komisi menyesuaikan otomatis. Custom = isi % manual di bawah.
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
+          {SELLER_CHANNELS.map((ch) => (
+            <button
+              key={ch.id}
+              type="button"
+              onClick={() => onSellerChange(ch.id)}
+              style={{
+                ...styles.pbtn,
+                ...(sellerChannel === ch.id
+                  ? { borderColor: "#c8a45e", color: "#c8a45e", background: "#1a1710" }
+                  : {}),
+              }}
+            >
+              {ch.label}
+              {ch.komisiPct !== null ? ` · ${ch.komisiPct}%` : ""}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      {group(PRICE_IDS, "Harga jual")}
+      {sellerChannel === "custom" ? group(KOMISI_IDS, "Komisi custom", true) : (
+        <p style={{ fontSize: 12, color: "#9a998f", margin: 0 }}>
+          Komisi channel aktif:{" "}
+          <b style={{ color: "#c8a45e" }}>
+            {SELLER_CHANNELS.find((c) => c.id === sellerChannel)?.komisiPct ?? 0}%
+          </b>
+          {" "}— ganti ke Custom untuk isi manual.
+        </p>
+      )}
     </div>
   );
 });
 
-const ResultsPanel = memo(function ResultsPanel({ result }: { result: HppResult }) {
+const ResultsPanel = memo(function ResultsPanel({
+  result,
+  warnings,
+  sellerLabel,
+}: {
+  result: HppResult;
+  warnings: ReturnType<typeof getHppWarnings>;
+  sellerLabel: string;
+}) {
   return (
     <div>
-      <div style={styles.card}>
+      <WarningsBanner warnings={warnings} />
+
+      <div style={{ ...styles.card, marginTop: warnings.length ? 16 : 0 }}>
         <div style={styles.sectionTitle}>
-          <span>HPP Batch 1</span>
+          <span>HPP Batch 1 (produksi awal)</span>
           <span style={{ color: "#c8a45e" }}>02</span>
         </div>
         <div style={styles.hppHero}>
@@ -130,15 +243,15 @@ const ResultsPanel = memo(function ResultsPanel({ result }: { result: HppResult 
           </div>
         </div>
         <div style={styles.stat}>
-          <span style={styles.lbl}>Botol + box (basis stok)</span>
+          <span style={styles.lbl}>Botol + box (alokasi stok)</span>
           <span style={styles.val}>{fmtRp(result.botolBoxPerPcs)}</span>
         </div>
         <div style={styles.stat}>
-          <span style={styles.lbl}>Sablon (basis stok)</span>
+          <span style={styles.lbl}>Sablon (÷ total stok)</span>
           <span style={styles.val}>{fmtRp(result.sablonPerPcs)}</span>
         </div>
         <div style={styles.stat}>
-          <span style={styles.lbl}>BPOM/halal (basis stok)</span>
+          <span style={styles.lbl}>BPOM/halal (÷ total stok)</span>
           <span style={styles.val}>{fmtRp(result.bpomPerPcs)}</span>
         </div>
         <div style={styles.stat}>
@@ -146,32 +259,64 @@ const ResultsPanel = memo(function ResultsPanel({ result }: { result: HppResult 
           <span style={styles.val}>{fmtRp(result.cPpn)}</span>
         </div>
         <div style={styles.stat}>
-          <span style={styles.lbl}>Bibit (basis batch 1)</span>
+          <span style={styles.lbl}>Bibit (total beli ÷ Batch 1)</span>
           <span style={styles.val}>{fmtRp(result.bibitPerPcsBatch1)}</span>
+        </div>
+        <div style={styles.komisiBox}>
+          <div style={styles.stat}>
+            <span style={styles.lbl}>Channel: {sellerLabel}</span>
+            <span style={styles.val}>{result.komisiPct}%</span>
+          </div>
+          <div style={styles.stat}>
+            <span style={styles.lbl}>Harga jual B1</span>
+            <span style={styles.val}>{fmtRp(result.hargaB1)}</span>
+          </div>
+          <div style={styles.stat}>
+            <span style={styles.lbl}>Komisi / botol</span>
+            <span style={styles.val}>{fmtRp(result.komisiRpB1)}</span>
+          </div>
+          <div style={{ ...styles.stat, ...styles.statBig }}>
+            <span style={styles.lblBig}>Margin bersih B1</span>
+            <span style={styles.valBig}>{fmtRp(result.marginBersihB1)}</span>
+          </div>
         </div>
       </div>
 
       <div style={{ ...styles.card, marginTop: 24 }}>
         <div style={styles.sectionTitle}>
-          <span>Margin per Botol</span>
+          <span>HPP Batch 2 (cetak ulang)</span>
           <span style={{ color: "#c8a45e" }}>03</span>
         </div>
-        <div style={styles.stat}>
-          <span style={styles.lbl}>Harga jual batch 1</span>
-          <span style={styles.val}>{fmtRp(result.hargaB1)}</span>
+        <div style={styles.hppHero}>
+          <div style={styles.hppNum}>{fmtRp(result.hppBatch2)}</div>
+          <div style={styles.hppCap}>
+            per botol · {result.batch2Qty.toLocaleString("id-ID")} pcs
+          </div>
         </div>
         <div style={styles.stat}>
-          <span style={styles.lbl}>Profit kotor / botol</span>
-          <span style={styles.val}>{fmtRp(result.profitB1)}</span>
+          <span style={styles.lbl}>Botol/box/sablon/BPOM</span>
+          <span style={styles.val}>Rp0 (sudah di Batch 1)</span>
+        </div>
+        <div style={styles.stat}>
+          <span style={styles.lbl}>Bibit baru (harga/ml × pakai)</span>
+          <span style={styles.val}>{fmtRp(result.bibitPerPcsBatch2)}</span>
+        </div>
+        <div style={styles.stat}>
+          <span style={styles.lbl}>PPN + jasa pabrik</span>
+          <span style={styles.val}>{fmtRp(result.cPpn)}</span>
         </div>
         <div style={styles.komisiBox}>
           <div style={styles.stat}>
-            <span style={styles.lbl}>Komisi afiliator ({result.komisiPct}%)</span>
-            <span style={styles.val}>{fmtRp(result.komisiRp)}</span>
+            <span style={styles.lbl}>Harga jual B2</span>
+            <span style={styles.val}>{fmtRp(result.hargaB2)}</span>
+          </div>
+          <div style={styles.stat}>
+            <span style={styles.lbl}>Komisi / botol</span>
+            <span style={styles.val}>{fmtRp(result.komisiRpB2)}</span>
           </div>
           <div style={{ ...styles.stat, ...styles.statBig }}>
-            <span style={styles.lblBig}>Margin bersih / botol</span>
-            <span style={styles.valBig}>{fmtRp(result.marginBersih)}</span>
+            <span style={styles.lblBig}>Margin bersih B2</span>
+            <span style={styles.valBig}>{fmtRp(result.marginBersihB2)}</span>
           </div>
         </div>
       </div>
@@ -180,35 +325,44 @@ const ResultsPanel = memo(function ResultsPanel({ result }: { result: HppResult 
 });
 
 const ProjectionPanel = memo(function ProjectionPanel({ result }: { result: HppResult }) {
+  const produksi = result.batch1Qty + result.batch2Qty;
   return (
     <div style={{ ...styles.card, marginTop: 28 }}>
       <div style={styles.sectionTitle}>
-        <span>Proyeksi Total — Dua Batch</span>
+        <span>Proyeksi Total — Batch 1 + Batch 2</span>
         <span style={{ color: "#c8a45e" }}>04</span>
       </div>
       <div style={{ overflowX: "auto" }}>
         <table style={styles.table}>
           <thead>
             <tr>
-              {["Batch", "Pcs", "Harga jual", "Omzet", "Modal", "Profit kotor"].map((h, i) => (
-                <th key={h} style={{ ...styles.th, textAlign: i === 0 ? "left" : "right" }}>
-                  {h}
-                </th>
-              ))}
+              {["Batch", "Pcs", "HPP/botol", "Harga jual", "Omzet", "Modal", "Profit kotor"].map(
+                (h, i) => (
+                  <th key={h} style={{ ...styles.th, textAlign: i === 0 ? "left" : "right" }}>
+                    {h}
+                  </th>
+                )
+              )}
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td style={{ ...styles.td, textAlign: "left", fontFamily: "var(--font-jost)" }}>Batch 1</td>
+              <td style={{ ...styles.td, textAlign: "left", fontFamily: "var(--font-jost)" }}>
+                Batch 1 · produksi awal
+              </td>
               <td style={styles.td}>{result.batch1Qty.toLocaleString("id-ID")}</td>
+              <td style={styles.td}>{fmtRp(result.hppBatch1)}</td>
               <td style={styles.td}>{fmtRp(result.hargaB1)}</td>
               <td style={styles.td}>{fmtRp(result.omzetB1)}</td>
               <td style={styles.td}>{fmtRp(result.modalB1)}</td>
               <td style={styles.td}>{fmtRp(result.profitTotalB1)}</td>
             </tr>
             <tr>
-              <td style={{ ...styles.td, textAlign: "left", fontFamily: "var(--font-jost)" }}>Batch 2</td>
+              <td style={{ ...styles.td, textAlign: "left", fontFamily: "var(--font-jost)" }}>
+                Batch 2 · cetak ulang
+              </td>
               <td style={styles.td}>{result.batch2Qty.toLocaleString("id-ID")}</td>
+              <td style={styles.td}>{fmtRp(result.hppBatch2)}</td>
               <td style={styles.td}>{fmtRp(result.hargaB2)}</td>
               <td style={styles.td}>{fmtRp(result.omzetB2)}</td>
               <td style={styles.td}>{fmtRp(result.modalB2)}</td>
@@ -216,8 +370,12 @@ const ProjectionPanel = memo(function ProjectionPanel({ result }: { result: HppR
             </tr>
             <tr>
               <td style={{ ...styles.tdTotal, textAlign: "left" }}>
-                Total ({result.totalStok.toLocaleString("id-ID")} pcs)
+                Total produksi {produksi.toLocaleString("id-ID")} pcs
+                {result.totalStok
+                  ? ` · stok beli ${result.totalStok.toLocaleString("id-ID")}`
+                  : ""}
               </td>
+              <td style={styles.tdTotal} />
               <td style={styles.tdTotal} />
               <td style={styles.tdTotal} />
               <td style={styles.tdTotal}>{fmtRp(result.totalOmzet)}</td>
@@ -228,12 +386,12 @@ const ProjectionPanel = memo(function ProjectionPanel({ result }: { result: HppR
         </table>
       </div>
       <div style={styles.note}>
-        <b style={{ color: "#8f7a4a" }}>Cara baca:</b> Batch 1 memikul biaya botol/box/sablon/BPOM (basis total
-        stok) + bibit (basis batch 1 saja). Batch 2 hanya menanggung bibit baru + PPN/jasa pabrik.
+        <b style={{ color: "#8f7a4a" }}>Skema produksi:</b> Batch 1 = cetakan pertama (pikul botol/box/sablon/BPOM
+        + bibit). Habis terjual → isi <b>Batch 2</b> berapa pcs yang akan dicetak ulang (hanya bibit baru + PPN).
         <br />
         <br />
-        <b style={{ color: "#8f7a4a" }}>Internal:</b> Alat hitung operasional PT Henima Collection — bukan
-        pembukuan resmi.
+        <b style={{ color: "#8f7a4a" }}>Internal PT Henima Collection</b> — cross-check bendahara sebelum keputusan
+        besar.
       </div>
     </div>
   );
@@ -250,6 +408,9 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
   const [seed, setSeed] = useState<HppInputs>(
     initialProducts[0] ? normalizeInputs(initialProducts[0].inputs) : { ...HPP_DEFAULTS }
   );
+  const [sellerChannel, setSellerChannel] = useState<SellerChannelId>(
+    sellerFromProduct(initialProducts[0])
+  );
   const [result, setResult] = useState<HppResult>(() =>
     calcHpp(initialProducts[0] ? normalizeInputs(initialProducts[0].inputs) : HPP_DEFAULTS)
   );
@@ -259,11 +420,17 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
   const [renameValue, setRenameValue] = useState(initialProducts[0]?.name || "");
 
   const draftRef = useRef<HppInputs>({ ...seed });
+  const sellerRef = useRef<SellerChannelId>(sellerChannel);
   const selectedIdRef = useRef(selectedId);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   selectedIdRef.current = selectedId;
+  sellerRef.current = sellerChannel;
 
   const product = products.find((p) => p.id === selectedId) || null;
+  const displayWarnings = getHppWarnings(draftRef.current);
+
+  const sellerLabel =
+    SELLER_CHANNELS.find((c) => c.id === sellerChannel)?.label.split(" (")[0] || "Custom";
 
   useEffect(() => {
     return () => {
@@ -282,7 +449,10 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
       const res = await fetch(`/api/admin/hpp-calculator/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inputs: payload }),
+        body: JSON.stringify({
+          inputs: payload,
+          sellerChannel: sellerRef.current,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -290,7 +460,16 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
         return;
       }
       setProducts((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, inputs: payload, updated_at: data.product?.updated_at } : p))
+        prev.map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                inputs: payload,
+                seller_channel: sellerRef.current,
+                updated_at: data.product?.updated_at,
+              }
+            : p
+        )
       );
       setStatus("Tersimpan");
     } catch {
@@ -307,20 +486,52 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     }, 900);
   }, [flushSave]);
 
-  /** Stable — InputsPanel memo tidak re-render kecuali formKey/seed berubah. */
+  const refreshCalc = useCallback(() => {
+    setResult(calcHpp(draftRef.current));
+    scheduleSave();
+  }, [scheduleSave]);
+
   const onFieldChange = useCallback(
     (id: HppFieldId, raw: string) => {
       draftRef.current = { ...draftRef.current, [id]: parseField(raw) };
+      refreshCalc();
+    },
+    [refreshCalc]
+  );
+
+  const onSellerChange = useCallback(
+    (id: SellerChannelId) => {
+      setSellerChannel(id);
+      sellerRef.current = id;
+      const ch = SELLER_CHANNELS.find((c) => c.id === id);
+      if (ch && ch.komisiPct !== null) {
+        draftRef.current = { ...draftRef.current, komisiPct: ch.komisiPct };
+      }
+      // remount hanya jika buka/tutup field custom komisi
+      setSeed({ ...draftRef.current });
+      setFormKey(`${selectedIdRef.current}-ch-${id}-${Date.now()}`);
       setResult(calcHpp(draftRef.current));
       scheduleSave();
     },
     [scheduleSave]
   );
 
-  function loadIntoForm(id: string, next: HppInputs) {
+  const onFillBatch2 = useCallback(() => {
+    const total = draftRef.current.totalStok || 0;
+    const b1 = draftRef.current.batch1Qty || 0;
+    const b2 = Math.max(total - b1, 0);
+    draftRef.current = { ...draftRef.current, batch2Qty: b2 };
+    setSeed({ ...draftRef.current });
+    setFormKey((k) => `${selectedIdRef.current}-${Date.now()}`);
+    refreshCalc();
+  }, [refreshCalc]);
+
+  function loadIntoForm(id: string, next: HppInputs, channel: SellerChannelId) {
     const normalized = normalizeInputs(next);
     draftRef.current = { ...normalized };
+    sellerRef.current = channel;
     setSeed(normalized);
+    setSellerChannel(channel);
     setResult(calcHpp(normalized));
     setFormKey(`${id}-${Date.now()}`);
   }
@@ -333,7 +544,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     setSelectedId(p.id);
     setRenameValue(p.name);
     setStatus("Tersimpan");
-    loadIntoForm(p.id, p.inputs);
+    loadIntoForm(p.id, p.inputs, sellerFromProduct(p));
   }
 
   async function addProduct() {
@@ -342,7 +553,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     const res = await fetch("/api/admin/hpp-calculator", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, inputs: HPP_DEFAULTS }),
+      body: JSON.stringify({ name, inputs: HPP_DEFAULTS, sellerChannel: "afiliator" }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -391,14 +602,14 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     else {
       setSelectedId("");
       setRenameValue("");
-      loadIntoForm("empty", HPP_DEFAULTS);
+      loadIntoForm("empty", HPP_DEFAULTS, "afiliator");
     }
   }
 
   async function resetDefaults() {
     if (!confirm("Reset angka produk ini ke default Henima?")) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    loadIntoForm(selectedId || "reset", HPP_DEFAULTS);
+    loadIntoForm(selectedId || "reset", HPP_DEFAULTS, "afiliator");
     await flushSave({ ...HPP_DEFAULTS });
   }
 
@@ -421,7 +632,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
             Kalkulator HPP &amp; <em style={{ color: "#c8a45e", fontStyle: "italic" }}>Profit</em> per Produk
           </h1>
           <p style={styles.sub}>
-            Data tersimpan otomatis per produk. Tambah / hapus / rename — khusus internal Henima Collection.
+            Rencana Batch 1 (produksi awal) → Batch 2 (cetak ulang). Pilih channel seller, angka tersimpan per produk.
           </p>
         </div>
       </div>
@@ -484,9 +695,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
 
         {!product && (
           <div style={{ ...styles.card, marginTop: 24 }}>
-            <p style={{ color: "#9a998f", margin: 0 }}>
-              Belum ada produk. Tambahkan produk pertama di atas.
-            </p>
+            <p style={{ color: "#9a998f", margin: 0 }}>Belum ada produk. Tambahkan produk pertama di atas.</p>
           </div>
         )}
 
@@ -511,8 +720,15 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
             </div>
 
             <div className="hpp-calc-grid">
-              <InputsPanel formKey={formKey} seed={seed} onChange={onFieldChange} />
-              <ResultsPanel result={result} />
+              <InputsPanel
+                formKey={formKey}
+                seed={seed}
+                sellerChannel={sellerChannel}
+                onChange={onFieldChange}
+                onSellerChange={onSellerChange}
+                onFillBatch2={onFillBatch2}
+              />
+              <ResultsPanel result={result} warnings={displayWarnings} sellerLabel={sellerLabel} />
             </div>
 
             <ProjectionPanel result={result} />
@@ -556,7 +772,7 @@ const styles: Record<string, React.CSSProperties> = {
     margin: "14px 0 8px",
     letterSpacing: "-0.01em",
   },
-  sub: { color: "#9a998f", fontSize: 14, maxWidth: 560, lineHeight: 1.5, margin: 0 },
+  sub: { color: "#9a998f", fontSize: 14, maxWidth: 640, lineHeight: 1.5, margin: 0 },
   wrap: { maxWidth: 1100, margin: "0 auto", padding: "0 24px" },
   productRow: { display: "flex", gap: 8, flexWrap: "wrap", marginTop: 20 },
   pbtn: {
@@ -701,7 +917,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#c8a45e",
     fontWeight: 500,
   },
-  table: { width: "100%", borderCollapse: "collapse", fontSize: 13, marginTop: 6, minWidth: 640 },
+  table: { width: "100%", borderCollapse: "collapse", fontSize: 13, marginTop: 6, minWidth: 720 },
   th: {
     fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
     fontSize: 10,

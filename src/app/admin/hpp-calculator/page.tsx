@@ -17,15 +17,23 @@ export default async function HppCalculatorPage() {
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 
-  const products: HppCalculatorProduct[] = (data || []).map((row) => ({
-    id: row.id,
-    slug: row.slug,
-    name: row.name,
-    inputs: normalizeInputs(row.inputs),
-    sort_order: row.sort_order ?? 0,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
-  }));
+  const products: HppCalculatorProduct[] = (data || []).map((row) => {
+    const raw = row.inputs;
+    const seller =
+      raw && typeof raw === "object" && "sellerChannel" in raw
+        ? String((raw as { sellerChannel?: string }).sellerChannel || "")
+        : "";
+    return {
+      id: row.id,
+      slug: row.slug,
+      name: row.name,
+      inputs: normalizeInputs(raw),
+      seller_channel: seller || undefined,
+      sort_order: row.sort_order ?? 0,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    };
+  });
 
   return (
     <>

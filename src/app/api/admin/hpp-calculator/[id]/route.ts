@@ -30,7 +30,13 @@ export async function PATCH(
   }
 
   if (body.inputs !== undefined) {
-    updates.inputs = normalizeInputs(body.inputs);
+    const nums = normalizeInputs(body.inputs);
+    const sellerChannel =
+      body.sellerChannel ||
+      (typeof body.inputs === "object" && body.inputs && "sellerChannel" in body.inputs
+        ? String((body.inputs as { sellerChannel?: string }).sellerChannel || "custom")
+        : "custom");
+    updates.inputs = { ...nums, sellerChannel };
   }
 
   if (body.sort_order !== undefined) {

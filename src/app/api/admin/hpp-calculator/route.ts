@@ -19,10 +19,18 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const products = (data || []).map((row) => ({
-    ...row,
-    inputs: normalizeInputs(row.inputs),
-  }));
+  const products = (data || []).map((row) => {
+    const raw = row.inputs;
+    const seller =
+      raw && typeof raw === "object" && "sellerChannel" in raw
+        ? String((raw as { sellerChannel?: string }).sellerChannel || "")
+        : "";
+    return {
+      ...row,
+      inputs: normalizeInputs(raw),
+      seller_channel: seller || undefined,
+    };
+  });
 
   return NextResponse.json({ products });
 }
@@ -57,7 +65,9 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   const sort_order = (maxRow?.sort_order ?? -1) + 1;
-  const inputs = normalizeInputs(body.inputs || HPP_DEFAULTS);
+  const nums = normalizeInputs(body.inputs || HPP_DEFAULTS);
+  const sellerChannel = body.sellerChannel || "afiliator";
+  const inputs = { ...nums, sellerChannel };
 
   const { data, error } = await supabase
     .from("hpp_calculator_products")
@@ -70,6 +80,13 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json({
-    product: { ...data, inputs: normalizeInputs(data.inputs) },
+    product: {
+      ...data,
+      inputs: normalizeInputs(data.inputs),
+      seller_channel:
+        typeof data.inputs === "object" && data.inputs && "sellerChannel" in (data.inputs as object)
+          ? String((data.inputs as { sellerChannel?: string }).sellerChannel || "afiliator")
+          : "afiliator",
+    },
   });
 }
