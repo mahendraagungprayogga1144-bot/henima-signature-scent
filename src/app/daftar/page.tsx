@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
 export default async function RegisterPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; ref?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, ref } = await searchParams;
   const db = await getDatabase();
   const company = db.settings.company;
   const products = db.products.filter((p) => p.active);
@@ -70,7 +70,7 @@ export default async function RegisterPage({
             <div className="auth-error">{decodeURIComponent(error)}</div>
           )}
 
-          <AuthFormClient mode="register" />
+          <AuthFormClient mode="register" defaultReferral={ref || ""} />
 
           <p className="auth-footer-link">
             Sudah punya akun?{" "}

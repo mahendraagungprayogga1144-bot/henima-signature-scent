@@ -39,7 +39,7 @@ export default async function AdminProductsPage({
 
       <div className="mt-8 space-y-8">
         {db.products.map((product) => (
-          <ProductEditor key={product.id} product={product} />
+          <ProductEditor key={product.id} product={product} allProducts={db.products} />
         ))}
       </div>
     </div>

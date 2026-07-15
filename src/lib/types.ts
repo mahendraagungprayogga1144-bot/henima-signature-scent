@@ -48,6 +48,10 @@ export interface Product {
   baseNotes?: string;
   inspiration?: string;
   comingSoon?: boolean;
+  /** Gift set / bundling */
+  isGiftSet?: boolean;
+  /** IDs produk yang termasuk dalam gift set */
+  bundleItems?: Array<{ productId: string; label?: string }>;
 }
 
 export interface User {

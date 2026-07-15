@@ -47,8 +47,15 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-export default function AuthFormClient({ mode }: { mode: Mode }) {
+export default function AuthFormClient({
+  mode,
+  defaultReferral = "",
+}: {
+  mode: Mode;
+  defaultReferral?: string;
+}) {
   const [clientError, setClientError] = useState("");
+  const [referralCode, setReferralCode] = useState(defaultReferral);
 
   function validateLogin(e: React.FormEvent<HTMLFormElement>) {
     setClientError("");
@@ -171,6 +178,22 @@ export default function AuthFormClient({ mode }: { mode: Mode }) {
       <div style={{ marginBottom: "24px" }}>
         <label htmlFor="confirmPassword" style={labelStyle}>Konfirmasi password</label>
         <input id="confirmPassword" name="confirmPassword" type="password" required minLength={8} autoComplete="new-password" style={inputStyle} />
+      </div>
+
+      <div style={{ marginBottom: "24px" }}>
+        <label htmlFor="referralCode" style={labelStyle}>Kode referral (opsional)</label>
+        <input
+          id="referralCode"
+          name="referralCode"
+          type="text"
+          value={referralCode}
+          onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+          placeholder="HENIMA-XXXXXX"
+          style={{ ...inputStyle, letterSpacing: "0.12em", textTransform: "uppercase" }}
+        />
+        <p style={{ fontSize: 12, color: "#9A8F82", marginTop: 8, lineHeight: 1.5 }}>
+          Daftar dengan kode teman: kamu +15 poin, pengajak +25 poin.
+        </p>
       </div>
 
       <input type="hidden" name="storeName" value="Member" />

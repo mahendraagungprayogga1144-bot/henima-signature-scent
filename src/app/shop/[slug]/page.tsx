@@ -90,6 +90,20 @@ export default async function ProductDetailPage({
           <p style={{ fontSize: "11px", color: "#9A8F82", marginBottom: "16px", letterSpacing: "1px" }}>Extrait de Parfum · Made in Indonesia</p>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 24 }}>
+            {product.isGiftSet && (
+              <span
+                style={{
+                  fontSize: 9,
+                  letterSpacing: 1.5,
+                  textTransform: "uppercase",
+                  background: "#C8B89A",
+                  color: "#1C1917",
+                  padding: "6px 10px",
+                }}
+              >
+                Gift Set
+              </span>
+            )}
             {[
               { label: "BPOM Registered", hint: "Terdaftar di BPOM" },
               { label: "Halal Ready", hint: "Proses & standar halal brand" },
@@ -150,6 +164,31 @@ export default async function ProductDetailPage({
                   active: Boolean(v.active),
                 }))}
               />
+            </div>
+          )}
+
+          {product.isGiftSet && (product.bundleItems?.length ?? 0) > 0 && (
+            <div style={{ marginBottom: 32, border: "1px solid rgba(200,184,154,0.35)", padding: "18px 20px" }}>
+              <p style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#B5935A", marginBottom: 12 }}>
+                Isi Gift Set
+              </p>
+              <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
+                {(product.bundleItems || []).map((item) => {
+                  const linked = products.find((p) => p.id === item.productId);
+                  const label = item.label || linked?.name || item.productId;
+                  return (
+                    <li key={item.productId} style={{ fontSize: 14, color: "#4A4440" }}>
+                      {linked ? (
+                        <Link href={`/shop/${toSlug(linked.name)}`} style={{ color: "#1C1917", textDecoration: "none", borderBottom: "1px solid rgba(200,184,154,0.5)" }}>
+                          {label}
+                        </Link>
+                      ) : (
+                        label
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           )}
 

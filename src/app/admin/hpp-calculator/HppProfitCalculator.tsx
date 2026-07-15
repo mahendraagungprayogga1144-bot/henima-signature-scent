@@ -416,6 +416,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
   );
   const [status, setStatus] = useState("Tersimpan");
   const [saving, setSaving] = useState(false);
+  const [producing, setProducing] = useState(false);
   const [newName, setNewName] = useState("");
   const [renameValue, setRenameValue] = useState(initialProducts[0]?.name || "");
 
@@ -613,6 +614,48 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     await flushSave({ ...HPP_DEFAULTS });
   }
 
+  async function produceBatch(batch: 1 | 2) {
+    if (!product) return;
+    const qty = batch === 1 ? Math.trunc(seed.batch1Qty) : Math.trunc(seed.batch2Qty);
+    if (
+      !confirm(
+        `Catat produksi Batch ${batch} untuk "${product.name}"?\nQty ${qty} pcs → potong stok Botol/Box/Bibit di Bahan Baku.`
+      )
+    ) {
+      return;
+    }
+    setProducing(true);
+    setStatus("Mencatat produksi…");
+    try {
+      const res = await fetch(`/api/admin/hpp-calculator/${product.id}/produce`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ batch }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Gagal mencatat produksi");
+        setStatus("Gagal produksi");
+        return;
+      }
+      const lines = (data.updated || [])
+        .map(
+          (u: { name: string; qtyBefore: number; qtyAfter: number }) =>
+            `• ${u.name}: ${u.qtyBefore} → ${u.qtyAfter}`
+        )
+        .join("\n");
+      const warn =
+        data.warnings?.length > 0 ? `\n\nPeringatan stok negatif:\n${data.warnings.join("\n")}` : "";
+      alert(`Produksi Batch ${batch} tercatat.\n\n${lines}${warn}`);
+      setStatus("Produksi tercatat");
+    } catch {
+      alert("Gagal mencatat produksi");
+      setStatus("Gagal produksi");
+    } finally {
+      setProducing(false);
+    }
+  }
+
   return (
     <div style={styles.page}>
       <style>{`
@@ -729,6 +772,34 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
                 onFillBatch2={onFillBatch2}
               />
               <ResultsPanel result={result} warnings={displayWarnings} sellerLabel={sellerLabel} />
+            </div>
+
+            <div style={{ ...styles.card, marginTop: 16, padding: "16px 20px" }}>
+              <div style={styles.sectionTitle}>
+                <span>Catat produksi → stok bahan</span>
+                <span style={{ color: "#c8a45e" }}>SYNC</span>
+              </div>
+              <p style={{ color: "#9a998f", fontSize: 13, lineHeight: 1.5, margin: "0 0 14px" }}>
+                Potong stok Bahan Baku (Botol / Box / Bibit) sesuai qty Batch. Nama bahan harus mengandung kata tersebut.
+              </p>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  disabled={producing}
+                  onClick={() => void produceBatch(1)}
+                  style={styles.btnGhost}
+                >
+                  {producing ? "Memproses…" : `Produksi Batch 1 (${Math.trunc(seed.batch1Qty)} pcs)`}
+                </button>
+                <button
+                  type="button"
+                  disabled={producing}
+                  onClick={() => void produceBatch(2)}
+                  style={styles.btnGhost}
+                >
+                  {producing ? "Memproses…" : `Produksi Batch 2 (${Math.trunc(seed.batch2Qty)} pcs)`}
+                </button>
+              </div>
             </div>
 
             <ProjectionPanel result={result} />

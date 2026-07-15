@@ -27,6 +27,10 @@ function rowToProduct(row: Record<string, unknown>): Product {
     longevity: (row.longevity as string) ?? undefined,
     scentFamily: (row.scent_family as string) ?? undefined,
     comingSoon: (row.coming_soon as boolean) ?? false,
+    isGiftSet: (row.is_gift_set as boolean) ?? false,
+    bundleItems: Array.isArray(row.bundle_items)
+      ? (row.bundle_items as Product["bundleItems"])
+      : [],
   };
 }
 
@@ -51,6 +55,8 @@ function productToRow(p: Product) {
     longevity: (p as any).longevity ?? null,
     scent_family: (p as any).scentFamily ?? null,
     coming_soon: (p as any).comingSoon ?? false,
+    is_gift_set: p.isGiftSet ?? false,
+    bundle_items: p.bundleItems ?? [],
   };
 }
 
@@ -229,6 +235,7 @@ export async function updateDatabase(
 // ---------- Internal sync helpers ----------
 
 const PRODUCT_MEDIA_COLUMNS = ["photos", "video"] as const;
+const PRODUCT_GIFT_COLUMNS = ["is_gift_set", "bundle_items"] as const;
 
 function isMissingColumnError(message: string): boolean {
   return /column|schema cache|could not find/i.test(message);
@@ -257,6 +264,7 @@ async function syncProducts(before: Product[], after: Product[]): Promise<void> 
       const product = upserted[idx];
       const next = { ...row } as Record<string, unknown>;
       for (const col of PRODUCT_MEDIA_COLUMNS) delete next[col];
+      for (const col of PRODUCT_GIFT_COLUMNS) delete next[col];
       if (product.photos?.[0]) next.photo = product.photos[0];
       return next;
     });

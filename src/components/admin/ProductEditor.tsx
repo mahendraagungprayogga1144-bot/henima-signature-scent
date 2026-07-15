@@ -16,7 +16,15 @@ function newVariant(productId: string, sizeMl: 30 | 50 | 100): VariantDraft {
   return { id: `${productId}-${sizeMl}`, sizeMl, stock: 0, originalPrice: 0, discountPrice: 0, active: true };
 }
 
-export default function ProductEditor({ product, onSaved }: { product: Product; onSaved?: () => void }) {
+export default function ProductEditor({
+  product,
+  allProducts = [],
+  onSaved,
+}: {
+  product: Product;
+  allProducts?: Product[];
+  onSaved?: () => void;
+}) {
   const [name, setName] = useState(product.name);
   const [description, setDescription] = useState(product.description);
   const [active, setActive] = useState(product.active);
@@ -32,6 +40,10 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   const [videoUploading, setVideoUploading] = useState(false);
   const [topNotes, setTopNotes] = useState((product as any).topNotes || "");
   const [comingSoon, setComingSoon] = useState((product as any).comingSoon || false);
+  const [isGiftSet, setIsGiftSet] = useState(Boolean(product.isGiftSet));
+  const [bundleIds, setBundleIds] = useState<string[]>(
+    (product.bundleItems || []).map((b) => b.productId).filter(Boolean)
+  );
   const [middleNotes, setMiddleNotes] = useState((product as any).middleNotes || "");
   const [baseNotes, setBaseNotes] = useState((product as any).baseNotes || "");
   const [inspiration, setInspiration] = useState((product as any).inspiration || "");
@@ -120,6 +132,16 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
       fd.set("variants", JSON.stringify(variants));
       fd.set("topNotes", topNotes);
       fd.set("comingSoon", String(comingSoon));
+      fd.set("isGiftSet", String(isGiftSet));
+      fd.set(
+        "bundleItems",
+        JSON.stringify(
+          bundleIds.map((id) => {
+            const p = allProducts.find((x) => x.id === id);
+            return { productId: id, label: p?.name };
+          })
+        )
+      );
       fd.set("middleNotes", middleNotes);
       fd.set("baseNotes", baseNotes);
       fd.set("inspiration", inspiration);
@@ -303,6 +325,38 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
             <input type="checkbox" checked={comingSoon} onChange={(e) => setComingSoon(e.target.checked)} />
             Coming Soon (sembunyikan harga)
           </label>
+          <label className="flex items-center gap-2 text-sm text-ink-200">
+            <input type="checkbox" checked={isGiftSet} onChange={(e) => setIsGiftSet(e.target.checked)} />
+            Gift Set / Bundling
+          </label>
+          {isGiftSet && (
+            <div className="rounded border border-ink-700/40 bg-ink-900/20 p-3 sm:col-span-2">
+              <p className="label mb-2">Isi bundel (centang produk yang termasuk)</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {allProducts
+                  .filter((p) => p.id !== product.id)
+                  .map((p) => {
+                    const checked = bundleIds.includes(p.id);
+                    return (
+                      <label key={p.id} className="flex items-center gap-2 text-sm text-ink-200">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            setBundleIds((prev) =>
+                              e.target.checked
+                                ? [...prev, p.id]
+                                : prev.filter((id) => id !== p.id)
+                            );
+                          }}
+                        />
+                        {p.name}
+                      </label>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
           <div className="grid gap-4 sm:grid-cols-3 sm:col-span-2">
             <div>
               <label className="label">Top Notes</label>

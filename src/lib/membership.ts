@@ -192,9 +192,107 @@ type DeliveredOrderLike = {
   points_earned?: number | null;
 };
 
+export async function addMemberPoints(
+  userId: string,
+  points: number
+): Promise<{ totalPoints: number; tier: IntimateTier } | null> {
+  if (!userId || !points || points <= 0) return null;
+  const profile = await getOrCreateMemberProfile(userId);
+  const newTotal = profile.totalPoints + points;
+  const newTier = tierFromPoints(newTotal);
+
+  const { error } = await supabase
+    .from("member_profiles")
+    .update({ total_points: newTotal, tier: newTier })
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("addMemberPoints failed:", error.message);
+    return null;
+  }
+  return { totalPoints: newTotal, tier: newTier };
+}
+
+export function referralCodeForUserId(userId: string): string {
+  return `HENIMA-${String(userId).slice(0, 6).toUpperCase()}`;
+}
+
+/** Parse HENIMA-XXXXXX or bare XXXXXX */
+export function normalizeReferralCode(raw: string): string | null {
+  const cleaned = String(raw || "")
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, "");
+  if (!cleaned) return null;
+  const withPrefix = cleaned.match(/^HENIMA-([A-Z0-9]{4,12})$/);
+  if (withPrefix) return withPrefix[1];
+  const bare = cleaned.match(/^([A-Z0-9]{4,12})$/);
+  return bare ? bare[1] : null;
+}
+
+export async function findUserIdByReferralCode(
+  code: string
+): Promise<string | null> {
+  const prefix = normalizeReferralCode(code);
+  if (!prefix) return null;
+
+  const { getDatabase } = await import("./db");
+  const db = await getDatabase();
+  const user = (db.users || []).find(
+    (u: { id: string }) =>
+      String(u.id).slice(0, prefix.length).toUpperCase() === prefix
+  );
+  return user?.id ?? null;
+}
+
+export async function setReferredBy(
+  userId: string,
+  referrerId: string
+): Promise<void> {
+  if (!userId || !referrerId || userId === referrerId) return;
+  await getOrCreateMemberProfile(userId);
+  const { error } = await supabase
+    .from("member_profiles")
+    .update({ referred_by: referrerId })
+    .eq("user_id", userId)
+    .is("referred_by", null);
+  if (error) console.error("setReferredBy failed:", error.message);
+}
+
+export async function getReferredBy(userId: string): Promise<string | null> {
+  const { data } = await supabase
+    .from("member_profiles")
+    .select("referred_by")
+    .eq("user_id", userId)
+    .maybeSingle();
+  return (data?.referred_by as string) || null;
+}
+
+/** Poin bonus saat daftar pakai kode referral */
+export const REFERRAL_SIGNUP_NEWBIE = 15;
+export const REFERRAL_SIGNUP_REFERRER = 25;
+
+/**
+ * Apply referral on register. Awards points to both sides.
+ * Returns referrer id if applied.
+ */
+export async function applyReferralOnSignup(
+  newUserId: string,
+  referralCode: string
+): Promise<{ referrerId: string } | null> {
+  const referrerId = await findUserIdByReferralCode(referralCode);
+  if (!referrerId || referrerId === newUserId) return null;
+
+  await setReferredBy(newUserId, referrerId);
+  await addMemberPoints(newUserId, REFERRAL_SIGNUP_NEWBIE);
+  await addMemberPoints(referrerId, REFERRAL_SIGNUP_REFERRER);
+  return { referrerId };
+}
+
 /**
  * Award points when an order becomes delivered.
  * Idempotent: skips if points_earned already set or no user_id.
+ * Also awards referral bonus to referrer if member was referred.
  */
 export async function awardPointsForDeliveredOrder(
   order: DeliveredOrderLike
@@ -224,17 +322,17 @@ export async function awardPointsForDeliveredOrder(
     return null;
   }
 
-  const profile = await getOrCreateMemberProfile(order.user_id);
-  const newTotal = profile.totalPoints + points;
-  const newTier = tierFromPoints(newTotal);
+  await addMemberPoints(order.user_id, points);
 
-  const { error: profileErr } = await supabase
-    .from("member_profiles")
-    .update({ total_points: newTotal, tier: newTier })
-    .eq("user_id", order.user_id);
-
-  if (profileErr) {
-    console.error("Failed to update member_profiles:", profileErr.message);
+  // Bonus referrer: 20% poin order (min 5) sekali per order delivered
+  try {
+    const referrerId = await getReferredBy(order.user_id);
+    if (referrerId) {
+      const bonus = Math.max(5, Math.floor(points * 0.2));
+      await addMemberPoints(referrerId, bonus);
+    }
+  } catch (e) {
+    console.error("referral order bonus failed:", e);
   }
 
   return { awarded: points };

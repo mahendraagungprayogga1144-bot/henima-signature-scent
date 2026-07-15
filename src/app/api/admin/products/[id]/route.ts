@@ -34,6 +34,25 @@ export async function POST(
   const projection = form.get("projection") as string || null;
   const longevity = form.get("longevity") as string || null;
   const scentFamily = form.get("scentFamily") as string || null;
+  const isGiftSet = form.get("isGiftSet") === "true";
+  const bundleItemsRaw = form.get("bundleItems");
+
+  let bundleItems: Array<{ productId: string; label?: string }> = [];
+  if (typeof bundleItemsRaw === "string" && bundleItemsRaw.trim()) {
+    try {
+      const parsed = JSON.parse(bundleItemsRaw);
+      if (Array.isArray(parsed)) {
+        bundleItems = parsed
+          .filter((x) => x && typeof x.productId === "string")
+          .map((x) => ({
+            productId: String(x.productId),
+            label: typeof x.label === "string" ? x.label : undefined,
+          }));
+      }
+    } catch {
+      /* ignore */
+    }
+  }
 
   if (originalPrice < 0 || discountPrice < 0) {
     return NextResponse.json({ error: "Harga tidak valid" }, { status: 400 });
@@ -95,6 +114,8 @@ export async function POST(
         if (projection !== null) (product as any).projection = projection;
         if (longevity !== null) (product as any).longevity = longevity;
         if (scentFamily !== null) (product as any).scentFamily = scentFamily;
+        product.isGiftSet = isGiftSet;
+        product.bundleItems = bundleItems;
         if (variants) product.variants = variants;
       }
     });

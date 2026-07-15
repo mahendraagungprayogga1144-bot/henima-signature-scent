@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   if (!user || user.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await request.json();
-  const { tanggal, nama, qty, satuan, harga_satuan, supplier, masuk_kas, kategori_kas } = body;
+  const { tanggal, nama, qty, satuan, harga_satuan, supplier, masuk_kas, kategori_kas, po_status, expected_date, po_notes } = body;
 
   if (!tanggal || !nama || !qty || !harga_satuan) {
     return NextResponse.json({ error: "Tanggal, nama, qty, dan harga wajib diisi" }, { status: 400 });
@@ -28,6 +28,9 @@ export async function POST(request: Request) {
 
   const total = Number(qty) * Number(harga_satuan);
   const catatan = `${nama} ${qty} ${satuan}${supplier ? ` (${supplier})` : ""}`;
+  const status = ["draft", "ordered", "received", "cancelled"].includes(po_status)
+    ? po_status
+    : "ordered";
 
   let kasTransactionId: string | null = null;
   let purchaseId: string | null = null;
@@ -60,6 +63,9 @@ export async function POST(request: Request) {
       total,
       supplier: supplier || "",
       kas_transaction_id: kasTransactionId,
+      po_status: status,
+      expected_date: expected_date || null,
+      po_notes: po_notes || "",
     })
     .select()
     .single();

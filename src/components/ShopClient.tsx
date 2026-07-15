@@ -180,6 +180,11 @@ export default function ShopClient({ products, waNumber }: { products: Product[]
                         Coming Soon
                       </div>
                     )}
+                    {(product as any).isGiftSet && !(product as any).comingSoon && (
+                      <div style={{position:"absolute", top:"14px", left:"14px", background:"#C8B89A", color:"#1C1917", fontSize:"8px", letterSpacing:"2px", textTransform:"uppercase", padding:"4px 10px", fontFamily:"var(--font-jost)"}}>
+                        Gift Set
+                      </div>
+                    )}
                     {/* Overlay on hover */}
                     <div style={{
                       position:"absolute", inset:0,
@@ -195,7 +200,9 @@ export default function ShopClient({ products, waNumber }: { products: Product[]
                     </div>
                   </div>
                   <div style={{padding:"16px 18px 20px", background:"#FAF8F4"}}>
-                    <p style={{fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#C8B89A", fontFamily:"var(--font-jost)", marginBottom:"6px"}}>Extrait de Parfum</p>
+                    <p style={{fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#C8B89A", fontFamily:"var(--font-jost)", marginBottom:"6px"}}>
+                      {(product as any).isGiftSet ? "Gift Set / Bundling" : "Extrait de Parfum"}
+                    </p>
                     <h2 style={{fontFamily:"var(--font-cormorant)", fontSize:"22px", fontWeight:400, color:"#1C1917", marginBottom:"6px", lineHeight:1.2}}>{product.name}</h2>
                     <p style={{fontSize:"11px", color:"#9A8F82", fontFamily:"var(--font-jost)", fontWeight:300, marginBottom:"14px", lineHeight:1.6, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden"}}>{product.description}</p>
                     {(product as any).comingSoon ? (

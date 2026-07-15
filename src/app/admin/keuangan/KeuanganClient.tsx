@@ -7,6 +7,7 @@ import type {
   HppProduct,
   FinanceCategories,
   KasJenis,
+  PoStatus,
 } from "@/lib/keuangan";
 import {
   fmt,
@@ -37,6 +38,12 @@ const C = {
 };
 
 const SATUAN_OPTS = ["pcs", "botol", "ml", "liter", "kg", "gram", "pack", "lusin", "dus/karton", "batch"];
+const PO_STATUS_OPTS: { id: PoStatus; label: string }[] = [
+  { id: "draft", label: "Draft" },
+  { id: "ordered", label: "PO Dipesan" },
+  { id: "received", label: "Diterima" },
+  { id: "cancelled", label: "Batal" },
+];
 const TABS = ["dashboard", "kas", "belanja", "hpp"] as const;
 type TabId = (typeof TABS)[number];
 
@@ -78,6 +85,8 @@ export default function KeuanganClient({
   const [bSatuan, setBSatuan] = useState("pcs");
   const [bHarga, setBHarga] = useState("");
   const [bSupplier, setBSupplier] = useState("");
+  const [bPoStatus, setBPoStatus] = useState<PoStatus>("ordered");
+  const [bExpected, setBExpected] = useState("");
   const [bMasukKas, setBMasukKas] = useState(true);
   const [bKategoriKas, setBKategoriKas] = useState("Pembelian Pabrik");
 
@@ -226,6 +235,8 @@ export default function KeuanganClient({
       satuan: bSatuan,
       harga_satuan: harga,
       supplier: bSupplier,
+      po_status: bPoStatus,
+      expected_date: bExpected || null,
       masuk_kas: belanjaEditId ? undefined : bMasukKas,
       kategori_kas: bKategoriKas,
     };
@@ -243,7 +254,10 @@ export default function KeuanganClient({
           setKas((prev) => prev.map((t) => (t.id === data.kasTransaction.id ? data.kasTransaction : t)));
         }
         resetBelanjaForm();
-        alert("Pembelian berhasil diupdate.");
+        const syncNote = data.stockSynced
+          ? `\nStok bahan "${data.stockSynced.name}" → ${data.stockSynced.qtyAfter}`
+          : "";
+        alert("Pembelian berhasil diupdate." + syncNote);
       } else alert(data.error || "Gagal menyimpan pembelian");
     } else {
       const res = await fetch("/api/admin/keuangan/purchases", {
@@ -269,6 +283,8 @@ export default function KeuanganClient({
     setBSatuan("pcs");
     setBHarga("");
     setBSupplier("");
+    setBPoStatus("ordered");
+    setBExpected("");
     setBMasukKas(true);
   }
 
@@ -282,6 +298,8 @@ export default function KeuanganClient({
     setBSatuan(b.satuan);
     setBHarga(fmtN(b.harga_satuan));
     setBSupplier(b.supplier || "");
+    setBPoStatus((b.po_status as PoStatus) || "received");
+    setBExpected(b.expected_date || "");
     setTab("belanja");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -754,6 +772,18 @@ export default function KeuanganClient({
                   <span style={labelStyle}>Supplier / Pabrik</span>
                   <input value={bSupplier} onChange={(e) => setBSupplier(e.target.value)} placeholder="PT Pabrik Parfum Surabaya" style={inputStyle} />
                 </div>
+                <div>
+                  <span style={labelStyle}>Status PO</span>
+                  <select value={bPoStatus} onChange={(e) => setBPoStatus(e.target.value as PoStatus)} style={inputStyle}>
+                    {PO_STATUS_OPTS.map((s) => (
+                      <option key={s.id} value={s.id}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <span style={labelStyle}>Estimasi datang</span>
+                  <input type="date" value={bExpected} onChange={(e) => setBExpected(e.target.value)} style={inputStyle} />
+                </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12, marginBottom: 12 }}>
                 <div>
@@ -824,7 +854,7 @@ export default function KeuanganClient({
               <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
                 <thead>
                   <tr>
-                    {["No", "Tanggal", "Nama Barang", "Qty", "Satuan", "Harga Satuan", "Total", "Supplier", "Aksi"].map((h, i) => (
+                    {["No", "Tanggal", "Nama Barang", "Qty", "Satuan", "Harga Satuan", "Total", "Supplier", "PO", "Aksi"].map((h, i) => (
                       <th key={h} style={{
                         padding: "10px 12px", fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase",
                         color: C.panel, background: C.dark, textAlign: [3, 5, 6].includes(i) ? "right" : "left",
@@ -846,6 +876,9 @@ export default function KeuanganClient({
                       <td style={{ padding: "9px 12px", fontSize: 13, borderBottom: `1px solid ${C.panel}`, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{fmtN(b.harga_satuan)}</td>
                       <td style={{ padding: "9px 12px", fontSize: 13, borderBottom: `1px solid ${C.panel}`, textAlign: "right", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{fmtN(b.total)}</td>
                       <td style={{ padding: "9px 12px", fontSize: 13, borderBottom: `1px solid ${C.panel}` }}>{b.supplier || "—"}</td>
+                      <td style={{ padding: "9px 12px", fontSize: 11, borderBottom: `1px solid ${C.panel}`, letterSpacing: 0.5, whiteSpace: "nowrap", color: b.po_status === "ordered" ? C.goldD : C.muted }}>
+                        {PO_STATUS_OPTS.find((s) => s.id === (b.po_status || "received"))?.label || "Diterima"}
+                      </td>
                       <td style={{ padding: "9px 12px", fontSize: 13, borderBottom: `1px solid ${C.panel}`, whiteSpace: "nowrap" }}>
                         <button onClick={() => editBelanja(b.id)} style={{ ...btnGhost, padding: "3px 9px", fontSize: 9, letterSpacing: 1, marginRight: 4 }}>Edit</button>
                         <button onClick={() => removeBelanja(b.id)} style={{ ...btnGhost, padding: "3px 9px", fontSize: 9, letterSpacing: 1, color: C.red, borderColor: "rgba(179,38,30,0.3)" }}>×</button>

@@ -10,14 +10,15 @@ const MENUS = [
     { href: "/admin/orders", icon: "bag", label: "Retail Orders" },
     { href: "/admin/stok", icon: "package", label: "Stok Management" },
     { href: "/admin/bahan", icon: "flask", label: "Bahan Baku" },
+    { href: "/admin/reseller", icon: "users", label: "Reseller & Member" },
     { href: "/admin/ulasan", icon: "star", label: "Ulasan Produk" },
   ]},
   { group: "KEUANGAN", items: [
-    { href: "/admin/keuangan", icon: "wallet", label: "Buku Kas" },
+    { href: "/admin/keuangan", icon: "wallet", label: "Buku Kas / PO" },
     { href: "/admin/hpp-calculator", icon: "calc", label: "Kalkulator HPP" },
   ]},
   { group: "KONTEN", items: [
-    { href: "/admin/produk", icon: "box", label: "Produk" },
+    { href: "/admin/produk", icon: "box", label: "Produk / Gift Set" },
     { href: "/admin/katalog", icon: "list", label: "Katalog Digital" },
     { href: "/admin/galeri", icon: "image", label: "Galeri" },
     { href: "/admin/blog", icon: "edit", label: "Blog / Journal" },
@@ -28,7 +29,6 @@ const MENUS = [
     { href: "/admin/subscribers", icon: "users", label: "Subscribers" },
     { href: "/admin/voucher", icon: "tag", label: "Voucher & Promo" },
     { href: "/admin/flash-sale", icon: "bolt", label: "Flash Sale" },
-    { href: "/admin/reseller", icon: "users", label: "Reseller" },
   ]},
   { group: "SISTEM", items: [
     { href: "/admin/pengaturan", icon: "settings", label: "Pengaturan" },

@@ -15,6 +15,8 @@ export interface KasTransaction {
   updated_at?: string;
 }
 
+export type PoStatus = "draft" | "ordered" | "received" | "cancelled";
+
 export interface Purchase {
   id: string;
   tanggal: string;
@@ -25,6 +27,9 @@ export interface Purchase {
   total: number;
   supplier: string;
   kas_transaction_id: string | null;
+  po_status?: PoStatus;
+  expected_date?: string | null;
+  po_notes?: string;
   created_at?: string;
   updated_at?: string;
 }

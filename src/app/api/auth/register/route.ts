@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { hashPassword, generateId, setSessionCookie } from "@/lib/auth";
 import { getDatabase, updateDatabase } from "@/lib/db";
-import { getOrCreateMemberProfile } from "@/lib/membership";
+import {
+  applyReferralOnSignup,
+  getOrCreateMemberProfile,
+} from "@/lib/membership";
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -22,6 +25,7 @@ export async function POST(request: Request) {
   const birthPlace = String(form.get("birthPlace") || "").trim();
   const birthDate = String(form.get("birthDate") || "").trim();
   const gender = String(form.get("gender") || "").trim();
+  const referralCode = String(form.get("referralCode") || "").trim();
 
   if (!firstName || !lastName || !email || !password || !phone) {
     return NextResponse.redirect(
@@ -97,8 +101,11 @@ export async function POST(request: Request) {
 
     try {
       await getOrCreateMemberProfile(userId);
+      if (referralCode) {
+        await applyReferralOnSignup(userId, referralCode);
+      }
     } catch (e) {
-      console.error("member_profiles create failed:", e);
+      console.error("member_profiles / referral failed:", e);
     }
 
     await setSessionCookie(userId);

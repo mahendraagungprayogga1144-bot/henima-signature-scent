@@ -73,8 +73,9 @@ export default async function ProfilePage() {
             Kode Referral Kamu
           </h2>
           <p style={{ fontSize: 14, color: "#6B5E52", lineHeight: 1.7, marginBottom: 16 }}>
-            Bagikan kode ini ke teman. Saat mereka daftar / belanja dengan kode referral, kalian berdua
-            makin dekat ke tier berikutnya. (Poin referral segera aktif penuh di fase berikutnya.)
+            Bagikan kode ini ke teman. Saat mereka daftar dengan kode ini, kamu dapat{" "}
+            <strong>+25 poin</strong> dan mereka <strong>+15 poin</strong>. Setiap kali mereka
+            belanja sampai (delivered), kamu dapat bonus ~20% poin order mereka.
           </p>
           <div
             style={{
@@ -90,6 +91,9 @@ export default async function ProfilePage() {
           >
             HENIMA-{user.id.slice(0, 6).toUpperCase()}
           </div>
+          <p style={{ fontSize: 12, color: "#9A8F82", marginTop: 14 }}>
+            Link undang: henimaofficial.com/daftar?ref=HENIMA-{user.id.slice(0, 6).toUpperCase()}
+          </p>
         </div>
       </div>
 
