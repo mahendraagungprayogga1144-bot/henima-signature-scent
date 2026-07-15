@@ -33,6 +33,8 @@ export interface Product {
   name: string;
   description: string;
   photo: string;
+  photos?: string[];
+  video?: string;
   originalPrice: number;
   discountPrice: number;
   active: boolean;

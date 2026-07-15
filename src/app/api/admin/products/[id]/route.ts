@@ -23,6 +23,8 @@ export async function POST(
   const active = form.get("active") === "on";
   const variantsRaw = form.get("variants");
   const photoUrl = form.get("photoUrl") as string | null;
+  const photosRaw = form.get("photos");
+  const video = form.get("video") as string | null;
   const topNotes = form.get("topNotes") as string || null;
   const comingSoon = form.get("comingSoon") === "true";
   const middleNotes = form.get("middleNotes") as string || null;
@@ -57,6 +59,16 @@ export async function POST(
     }
   }
 
+  let photos: string[] | undefined;
+  if (typeof photosRaw === "string" && photosRaw.trim()) {
+    try {
+      const parsed = JSON.parse(photosRaw);
+      if (Array.isArray(parsed)) photos = parsed.filter((u) => typeof u === "string" && u.startsWith("http"));
+    } catch {
+      return new NextResponse("Photos JSON tidak valid", { status: 400 });
+    }
+  }
+
   await updateDatabase((db) => {
     const product = db.products.find((p) => p.id === id);
     if (product) {
@@ -65,7 +77,14 @@ export async function POST(
       product.discountPrice = discountPrice;
       product.description = description || product.description;
       product.active = active;
-      if (photoUrl && photoUrl.startsWith("http")) product.photo = photoUrl;
+      if (photos !== undefined) {
+        product.photos = photos;
+        if (photos.length > 0) product.photo = photos[0];
+      } else if (photoUrl && photoUrl.startsWith("http")) {
+        product.photo = photoUrl;
+        product.photos = [photoUrl];
+      }
+      if (video !== null) product.video = video || undefined;
       if (topNotes !== null) (product as any).topNotes = topNotes;
       (product as any).comingSoon = comingSoon;
       if (middleNotes !== null) (product as any).middleNotes = middleNotes;

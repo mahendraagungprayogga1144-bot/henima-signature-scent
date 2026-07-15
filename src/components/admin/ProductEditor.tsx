@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import type { Product, ProductVariant } from "@/lib/types";
 import { formatRupiah } from "@/lib/format";
@@ -25,7 +25,11 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   const [variants, setVariants] = useState<VariantDraft[]>(sortVariants(product.variants));
   const [notifSending, setNotifSending] = useState(false);
   const [notifMsg, setNotifMsg] = useState("");
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const initialPhotos = product.photos?.length ? product.photos : product.photo ? [product.photo] : [];
+  const [photos, setPhotos] = useState<string[]>(initialPhotos);
+  const [video, setVideo] = useState(product.video || "");
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [videoUploading, setVideoUploading] = useState(false);
   const [topNotes, setTopNotes] = useState((product as any).topNotes || "");
   const [comingSoon, setComingSoon] = useState((product as any).comingSoon || false);
   const [middleNotes, setMiddleNotes] = useState((product as any).middleNotes || "");
@@ -38,29 +42,65 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const previewUrl = useMemo(() => {
-    if (!photoFile) return null;
-    return URL.createObjectURL(photoFile);
-  }, [photoFile]);
+  const previewPhoto = photos[0] || product.photo;
+
+  async function uploadFile(file: File, prefix: string): Promise<string> {
+    const ext = file.name.split(".").pop() || "jpg";
+    const filename = `${product.id}-${prefix}-${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("product-images")
+      .upload(filename, file, { upsert: true, contentType: file.type });
+    if (uploadError) throw new Error(uploadError.message);
+    const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(filename);
+    return urlData.publicUrl;
+  }
+
+  async function addPhotos(files: FileList | null) {
+    if (!files?.length) return;
+    setPhotoUploading(true);
+    setError("");
+    try {
+      const urls: string[] = [];
+      for (const file of Array.from(files)) {
+        urls.push(await uploadFile(file, "photo"));
+      }
+      setPhotos((prev) => [...prev, ...urls]);
+    } catch (e: any) {
+      setError("Gagal upload foto: " + e.message);
+    } finally {
+      setPhotoUploading(false);
+    }
+  }
+
+  async function addVideo(file: File | null) {
+    if (!file) return;
+    setVideoUploading(true);
+    setError("");
+    try {
+      const url = await uploadFile(file, "video");
+      setVideo(url);
+    } catch (e: any) {
+      setError("Gagal upload video: " + e.message);
+    } finally {
+      setVideoUploading(false);
+    }
+  }
+
+  function movePhoto(index: number, dir: -1 | 1) {
+    setPhotos((prev) => {
+      const next = [...prev];
+      const target = index + dir;
+      if (target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSaving(true);
     try {
-      let photoUrl = product.photo;
-
-      if (photoFile) {
-        const ext = photoFile.name.split(".").pop() || "jpg";
-        const filename = `${product.id}-${Date.now()}.${ext}`;
-        const { data, error: uploadError } = await supabase.storage
-          .from("product-images")
-          .upload(filename, photoFile, { upsert: true, contentType: photoFile.type });
-        if (uploadError) { setError("Gagal upload foto: " + uploadError.message); return; }
-        const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(filename);
-        photoUrl = urlData.publicUrl;
-      }
-
       const fd = new FormData();
       fd.set("name", name);
       fd.set("description", description);
@@ -77,7 +117,9 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
       fd.set("projection", projection);
       fd.set("longevity", longevity);
       fd.set("scentFamily", scentFamily);
-      fd.set("photoUrl", photoUrl);
+      fd.set("photos", JSON.stringify(photos));
+      fd.set("video", video);
+      if (photos[0]) fd.set("photoUrl", photos[0]);
 
       const res = await fetch(`/api/admin/products/${product.id}`, { method: "POST", body: fd });
       if (!res.ok) { const text = await res.text(); setError(text || "Gagal menyimpan produk"); return; }
@@ -133,20 +175,83 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   return (
     <form onSubmit={handleSubmit} className="card space-y-6">
       <div className="flex flex-col gap-6 sm:flex-row">
-        <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-2xl border border-ink-800 bg-ink-950/40">
-          <Image src={previewUrl || product.photo} alt={product.name} fill className="object-contain p-4" />
+        <div className="space-y-4 sm:w-56 shrink-0">
+          <div className="relative h-32 w-full overflow-hidden rounded-2xl border border-ink-800 bg-ink-950/40">
+            {previewPhoto ? (
+              <Image src={previewPhoto} alt={product.name} fill className="object-contain p-4" />
+            ) : (
+              <div className="flex h-full items-center justify-center text-xs text-ink-500">Belum ada foto</div>
+            )}
+          </div>
+          {video && (
+            <div className="rounded-2xl border border-ink-800 bg-ink-950/40 p-3">
+              <p className="text-[10px] uppercase tracking-widest text-ink-400 mb-2">Video Produk</p>
+              <video src={video} className="w-full rounded-lg" muted playsInline controls />
+            </div>
+          )}
         </div>
         <div className="flex-1 space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="label">Nama Produk</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} className="input-field" required />
+          </div>
+
+          <div className="rounded-2xl border border-ink-800 bg-ink-950/20 p-4 space-y-4">
             <div>
-              <label className="label">Nama Produk</label>
-              <input value={name} onChange={(e) => setName(e.target.value)} className="input-field" required />
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <label className="label !mb-0">Galeri Foto (bisa digeser di halaman produk)</label>
+                <span className="text-xs text-ink-400">{photos.length} foto</span>
+              </div>
+              {photos.length > 0 && (
+                <div className="flex flex-wrap gap-3 mb-3">
+                  {photos.map((url, idx) => (
+                    <div key={url + idx} className="relative group">
+                      <div className="relative h-20 w-20 overflow-hidden rounded-xl border border-ink-800">
+                        <Image src={url} alt={`Foto ${idx + 1}`} fill className="object-cover" />
+                        {idx === 0 && (
+                          <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-[9px] text-center text-gold-200 py-0.5">Utama</span>
+                        )}
+                      </div>
+                      <div className="mt-1 flex gap-1 justify-center">
+                        <button type="button" className="text-[10px] text-ink-400 hover:text-ink-100" onClick={() => movePhoto(idx, -1)} disabled={idx === 0}>←</button>
+                        <button type="button" className="text-[10px] text-red-300 hover:text-red-100" onClick={() => setPhotos((p) => p.filter((_, i) => i !== idx))}>×</button>
+                        <button type="button" className="text-[10px] text-ink-400 hover:text-ink-100" onClick={() => movePhoto(idx, 1)} disabled={idx === photos.length - 1}>→</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                disabled={photoUploading || saving}
+                className="block w-full text-sm text-ink-300 file:mr-4 file:rounded-lg file:border-0 file:bg-ink-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink-50"
+                onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }}
+              />
+              <p className="mt-1 text-xs text-ink-400">
+                {photoUploading ? "Mengupload foto..." : "Pilih satu atau banyak foto sekaligus. Foto pertama = thumbnail utama."}
+              </p>
             </div>
-            <div>
-              <label className="label">Foto Produk</label>
-              <input type="file" accept="image/*" className="block w-full text-sm text-ink-300 file:mr-4 file:rounded-lg file:border-0 file:bg-ink-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink-50"
-                onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)} />
-              <p className="mt-1 text-xs text-ink-400">Upload ke Supabase Storage (tanpa batas ukuran).</p>
+
+            <div className="border-t border-ink-800 pt-4">
+              <label className="label">Video Produk (opsional)</label>
+              {video ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-green-400 flex-1 truncate">✅ Video siap</span>
+                  <button type="button" className="btn-secondary !py-1 !px-3 text-xs" onClick={() => setVideo("")}>Hapus video</button>
+                </div>
+              ) : null}
+              <input
+                type="file"
+                accept="video/mp4,video/webm,video/*"
+                disabled={videoUploading || saving}
+                className="mt-2 block w-full text-sm text-ink-300 file:mr-4 file:rounded-lg file:border-0 file:bg-ink-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink-50"
+                onChange={(e) => { addVideo(e.target.files?.[0] ?? null); e.target.value = ""; }}
+              />
+              <p className="mt-1 text-xs text-ink-400">
+                {videoUploading ? "Mengupload video..." : "MP4/WebM. Video tampil di slider halaman produk (slide pertama)."}
+              </p>
             </div>
           </div>
           <div>

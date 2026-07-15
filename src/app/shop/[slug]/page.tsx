@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
 import StockNotifyButton from "@/components/StockNotifyButton";
-import ProductGallery from "@/components/ProductGallery";
+import ProductGallery, { buildProductMedia } from "@/components/ProductGallery";
 import ProductReviews from "@/components/ProductReviews";
 import { getProductReviews } from "@/lib/reviews";
 
@@ -41,7 +41,8 @@ export default async function ProductDetailPage({
 
   const variants = product.variants.filter((v) => v.active);
   const totalStock = variants.reduce((sum, v) => sum + (v.stock || 0), 0);
-  const photos = (product as any).photos?.length > 0 ? (product as any).photos : product.photo ? [product.photo] : [];
+  const photos = product.photos?.length ? product.photos : product.photo ? [product.photo] : [];
+  const media = buildProductMedia(photos, product.video);
 
   return (
     <div style={{background:"#FAF8F4", minHeight:"100vh", color:"#1C1917", fontFamily:"var(--font-jost)"}}>
@@ -57,7 +58,7 @@ export default async function ProductDetailPage({
       <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0", minHeight:"85vh"}} className="product-detail-grid">
 
         {/* LEFT — Gallery */}
-        <ProductGallery photos={photos} productName={product.name} comingSoon={(product as any).comingSoon} />
+        <ProductGallery media={media} productName={product.name} comingSoon={(product as any).comingSoon} />
 
         {/* RIGHT — Info */}
         <div style={{padding:"64px 8vw 64px", display:"flex", flexDirection:"column", background:"#FAF8F4", overflowY:"auto"}} className="product-detail-right">
