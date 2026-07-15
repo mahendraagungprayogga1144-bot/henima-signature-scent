@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { HppComponent, HppProduct } from "@/lib/keuangan";
 import { fmt, fmtN, parseNum } from "@/lib/keuangan";
 
@@ -17,74 +17,88 @@ const C = {
   bg: "#FAF8F4",
 };
 
-type DraftComp = { name: string; costText: string };
-
-function toDraft(components: HppComponent[]): DraftComp[] {
-  return (components?.length ? components : [{ name: "", cost: 0 }]).map((c) => ({
-    name: c.name || "",
-    costText: c.cost ? String(c.cost) : "",
-  }));
-}
-
-function toPayload(draft: DraftComp[]): HppComponent[] {
-  return draft.map((c) => ({
-    name: c.name.trim(),
-    cost: parseNum(c.costText),
-  }));
-}
-
+/**
+ * Sama seperti henima-buku-kas-v2.html:
+ * - input tidak di-control React saat mengetik (tidak setState tiap huruf)
+ * - hanya summary di-update lewat DOM
+ * - simpan ke server di-debounce di background
+ */
 interface Props {
   products: HppProduct[];
   onChange: React.Dispatch<React.SetStateAction<HppProduct[]>>;
 }
 
+type Draft = {
+  bottles: number;
+  comps: HppComponent[];
+};
+
 export default function HppCalculator({ products, onChange }: Props) {
   const [selected, setSelected] = useState(0);
   const [newName, setNewName] = useState("");
-  const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
+  /** Naikkan supaya form me-mount ulang (ganti produk / tambah-hapus baris). */
+  const [formKey, setFormKey] = useState(0);
 
   const product = products[selected] || null;
+  const productId = product?.id ?? null;
 
-  const [bottlesText, setBottlesText] = useState(product ? String(product.bottles || 50) : "50");
-  const [comps, setComps] = useState<DraftComp[]>(product ? toDraft(product.components) : []);
-
-  const productId = product?.id;
+  const draftRef = useRef<Draft>({ bottles: 50, comps: [{ name: "", cost: 0 }] });
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const draftRef = useRef({ bottlesText, comps, productId });
-  draftRef.current = { bottlesText, comps, productId };
+  const productIdRef = useRef<string | null>(null);
+  productIdRef.current = productId;
 
-  // Saat ganti produk, load draft lokalnya (tidak rewrite saat mengetik)
-  useEffect(() => {
-    if (!product) return;
-    setBottlesText(String(product.bottles || 50));
-    setComps(toDraft(product.components));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId]);
+  const totalRowRef = useRef<HTMLTableCellElement>(null);
+  const totalRef = useRef<HTMLParagraphElement>(null);
+  const perRef = useRef<HTMLParagraphElement>(null);
+  const bottlesLabelRef = useRef<HTMLSpanElement>(null);
+  const tipRef = useRef<HTMLParagraphElement>(null);
 
-  useEffect(() => {
-    return () => {
-      if (saveTimer.current) clearTimeout(saveTimer.current);
+  function loadDraft(p: HppProduct) {
+    draftRef.current = {
+      bottles: p.bottles || 50,
+      comps: (p.components?.length ? p.components : [{ name: "", cost: 0 }]).map((c) => ({
+        name: c.name || "",
+        cost: Number(c.cost) || 0,
+      })),
     };
-  }, []);
+  }
 
-  const total = useMemo(
-    () => comps.reduce((s, c) => s + parseNum(c.costText), 0),
-    [comps]
-  );
-  const bottles = parseNum(bottlesText) || 1;
-  const per = bottles > 0 ? Math.round(total / bottles) : 0;
+  function paintSummary() {
+    const { bottles, comps } = draftRef.current;
+    const total = comps.reduce((s, c) => s + (Number(c.cost) || 0), 0);
+    const b = bottles > 0 ? bottles : 1;
+    const per = Math.round(total / b);
+    if (totalRowRef.current) totalRowRef.current.textContent = fmtN(total);
+    if (totalRef.current) totalRef.current.textContent = fmt(total);
+    if (perRef.current) perRef.current.textContent = fmt(per);
+    if (bottlesLabelRef.current) bottlesLabelRef.current.textContent = `HPP per Botol (${b} botol)`;
+    if (tipRef.current) {
+      tipRef.current.textContent =
+        `Tips: harga jual sehat 2.5–4× HPP → untuk HPP ${fmt(per)}, harga wajar ± ${fmt(per * 3)}. ` +
+        "Masukkan juga biaya persyuratan (BPOM, halal), listrik, tenaga kerja, dan penyusutan alat sebagai komponen.";
+    }
+  }
 
-  function persistNow(id: string, bottlesVal: number, components: HppComponent[]) {
+  function scheduleSave() {
+    const id = productIdRef.current;
+    if (!id) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    setSaving(true);
-    setStatus("Menyimpan…");
+    // Jangan setState di sini — biar ketikan 0 re-render (seperti HTML lokal)
     saveTimer.current = setTimeout(async () => {
+      const { bottles, comps } = draftRef.current;
+      setStatus("Menyimpan…");
       try {
         const res = await fetch(`/api/admin/keuangan/hpp/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bottles: bottlesVal, components }),
+          body: JSON.stringify({
+            bottles: bottles || 1,
+            components: comps.map((c) => ({
+              name: (c.name || "").trim(),
+              cost: Number(c.cost) || 0,
+            })),
+          }),
         });
         const data = await res.json();
         if (res.ok && data.product) {
@@ -96,19 +110,25 @@ export default function HppCalculator({ products, onChange }: Props) {
         }
       } catch {
         setStatus("Gagal menyimpan");
-      } finally {
-        setSaving(false);
       }
-    }, 450);
+    }, 600);
   }
 
-  function queueSave() {
-    const id = draftRef.current.productId;
-    if (!id) return;
-    const bottlesVal = parseNum(draftRef.current.bottlesText) || 1;
-    const components = toPayload(draftRef.current.comps);
-    persistNow(id, bottlesVal, components);
-  }
+  // Load draft + remount form hanya saat ganti produk (bukan tiap save)
+  useEffect(() => {
+    if (!product) return;
+    loadDraft(product);
+    setFormKey((k) => k + 1);
+    // paint setelah mount
+    requestAnimationFrame(() => paintSummary());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId]);
+
+  useEffect(() => {
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, []);
 
   async function addProduct() {
     if (!newName.trim()) return;
@@ -137,6 +157,11 @@ export default function HppCalculator({ products, onChange }: Props) {
       onChange((prev) => prev.filter((p) => p.id !== id));
       setSelected(0);
     }
+  }
+
+  function remountFromDraft() {
+    setFormKey((k) => k + 1);
+    requestAnimationFrame(() => paintSummary());
   }
 
   const labelStyle: React.CSSProperties = {
@@ -171,6 +196,18 @@ export default function HppCalculator({ products, onChange }: Props) {
     fontFamily: "inherit",
   };
 
+  const cellInput: React.CSSProperties = {
+    border: "none",
+    padding: "6px 4px",
+    width: "100%",
+    fontSize: 13,
+    outline: "none",
+    fontFamily: "inherit",
+    background: "transparent",
+  };
+
+  const draft = draftRef.current;
+
   return (
     <>
       <p style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: C.goldD, fontWeight: 600, marginBottom: 16 }}>
@@ -197,7 +234,9 @@ export default function HppCalculator({ products, onChange }: Props) {
           placeholder="Nama produk baru"
           style={{ ...inputStyle, maxWidth: 240 }}
         />
-        <button type="button" onClick={addProduct} style={btnGhost}>+ Tambah Produk</button>
+        <button type="button" onClick={addProduct} style={btnGhost}>
+          + Tambah Produk
+        </button>
       </div>
 
       {product && (
@@ -205,10 +244,8 @@ export default function HppCalculator({ products, onChange }: Props) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
             <p style={{ fontFamily: "var(--font-cormorant)", fontStyle: "italic", fontSize: 22, margin: 0 }}>{product.name}</p>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              {(saving || status) && (
-                <span style={{ fontSize: 11, color: status === "Tersimpan" ? "#2E7D32" : C.muted }}>
-                  {status || (saving ? "Menyimpan…" : "")}
-                </span>
+              {status && (
+                <span style={{ fontSize: 11, color: status === "Tersimpan" ? "#2E7D32" : C.muted }}>{status}</span>
               )}
               <button type="button" onClick={removeProduct} style={{ ...btnGhost, color: C.red, borderColor: "rgba(179,38,30,0.3)" }}>
                 Hapus Produk
@@ -216,123 +253,141 @@ export default function HppCalculator({ products, onChange }: Props) {
             </div>
           </div>
 
-          <div style={{ marginBottom: 20, maxWidth: 220 }}>
-            <span style={labelStyle}>Jumlah Botol per Batch</span>
-            <input
-              inputMode="numeric"
-              value={bottlesText}
-              onChange={(e) => setBottlesText(e.target.value.replace(/[^\d]/g, ""))}
-              onBlur={queueSave}
-              style={inputStyle}
-            />
-          </div>
+          {/* formKey remount hanya saat ganti produk / ubah jumlah baris */}
+          <div key={`${productId}-${formKey}`}>
+            <div style={{ marginBottom: 20, maxWidth: 220 }}>
+              <span style={labelStyle}>Jumlah Botol per Batch</span>
+              <input
+                inputMode="numeric"
+                defaultValue={draft.bottles || 50}
+                onChange={(e) => {
+                  draftRef.current.bottles = parseNum(e.target.value) || 1;
+                  paintSummary();
+                  scheduleSave();
+                }}
+                style={inputStyle}
+              />
+            </div>
 
-          <span style={labelStyle}>Komponen Biaya per Batch</span>
-          <div style={{ overflowX: "auto", border: `1px solid ${C.line}`, marginBottom: 12 }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 420 }}>
-              <thead>
-                <tr>
-                  {["No", "Komponen", "Biaya (Rp)", ""].map((h, i) => (
-                    <th
-                      key={h || "act"}
-                      style={{
-                        padding: "10px 12px",
-                        fontSize: 10,
-                        letterSpacing: 1.5,
-                        textTransform: "uppercase",
-                        color: C.panel,
-                        background: C.dark,
-                        textAlign: i === 2 ? "right" : "left",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {comps.map((c, i) => (
-                  <tr key={i} style={{ background: i % 2 === 1 ? C.rowAlt : undefined }}>
-                    <td style={{ padding: "9px 12px", color: C.muted, fontSize: 13 }}>{i + 1}</td>
-                    <td style={{ padding: "4px 8px" }}>
-                      <input
-                        value={c.name}
-                        placeholder="bibit, botol, BPOM, listrik…"
-                        onChange={(e) => {
-                          const next = [...comps];
-                          next[i] = { ...next[i], name: e.target.value };
-                          setComps(next);
+            <span style={labelStyle}>Komponen Biaya per Batch</span>
+            <div style={{ overflowX: "auto", border: `1px solid ${C.line}`, marginBottom: 12 }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 420 }}>
+                <thead>
+                  <tr>
+                    {["No", "Komponen", "Biaya (Rp)", ""].map((h, i) => (
+                      <th
+                        key={h || "act"}
+                        style={{
+                          padding: "10px 12px",
+                          fontSize: 10,
+                          letterSpacing: 1.5,
+                          textTransform: "uppercase",
+                          color: C.panel,
+                          background: C.dark,
+                          textAlign: i === 2 ? "right" : "left",
+                          fontWeight: 500,
                         }}
-                        onBlur={queueSave}
-                        style={{ border: "none", padding: "6px 4px", width: "100%", fontSize: 13, outline: "none", fontFamily: "inherit", background: "transparent" }}
-                      />
-                    </td>
-                    <td style={{ padding: "4px 8px" }}>
-                      <input
-                        inputMode="numeric"
-                        value={c.costText}
-                        placeholder="0"
-                        onChange={(e) => {
-                          const next = [...comps];
-                          next[i] = { ...next[i], costText: e.target.value.replace(/[^\d]/g, "") };
-                          setComps(next);
-                        }}
-                        onBlur={queueSave}
-                        style={{ border: "none", padding: "6px 4px", width: "100%", fontSize: 13, textAlign: "right", outline: "none", fontFamily: "inherit", background: "transparent" }}
-                      />
-                    </td>
-                    <td style={{ padding: "9px 12px" }}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const next = comps.filter((_, j) => j !== i);
-                          const final = next.length ? next : [{ name: "", costText: "" }];
-                          setComps(final);
-                          draftRef.current = { ...draftRef.current, comps: final };
-                          queueSave();
-                        }}
-                        style={{ ...btnGhost, padding: "3px 9px", fontSize: 9, color: C.red, borderColor: "rgba(179,38,30,0.3)" }}
                       >
-                        ×
-                      </button>
-                    </td>
+                        {h}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-                <tr style={{ background: C.panel, fontWeight: 600 }}>
-                  <td style={{ padding: "9px 12px" }} />
-                  <td style={{ padding: "9px 12px", fontWeight: 700 }}>TOTAL</td>
-                  <td style={{ padding: "9px 12px", textAlign: "right", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{fmtN(total)}</td>
-                  <td />
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setComps((prev) => [...prev, { name: "", costText: "" }]);
-            }}
-            style={{ ...btnGhost, marginBottom: 16 }}
-          >
-            + Tambah Komponen
-          </button>
-
-          <div style={{ marginTop: 24, background: C.dark, padding: 24, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
-            <div>
-              <span style={{ ...labelStyle, color: C.gold }}>Total Modal per Batch</span>
-              <p style={{ fontSize: 20, fontWeight: 300, color: C.panel, margin: 0 }}>{fmt(total)}</p>
+                </thead>
+                <tbody>
+                  {draft.comps.map((c, i) => (
+                    <tr key={i} style={{ background: i % 2 === 1 ? C.rowAlt : undefined }}>
+                      <td style={{ padding: "9px 12px", color: C.muted, fontSize: 13 }}>{i + 1}</td>
+                      <td style={{ padding: "4px 8px" }}>
+                        <input
+                          defaultValue={c.name}
+                          placeholder="bibit, botol, BPOM, listrik…"
+                          onInput={(e) => {
+                            draftRef.current.comps[i].name = (e.target as HTMLInputElement).value;
+                            scheduleSave();
+                          }}
+                          style={cellInput}
+                        />
+                      </td>
+                      <td style={{ padding: "4px 8px" }}>
+                        <input
+                          inputMode="numeric"
+                          defaultValue={c.cost ? String(c.cost) : ""}
+                          placeholder="0"
+                          onInput={(e) => {
+                            draftRef.current.comps[i].cost = parseNum((e.target as HTMLInputElement).value);
+                            paintSummary();
+                            scheduleSave();
+                          }}
+                          style={{ ...cellInput, textAlign: "right" }}
+                        />
+                      </td>
+                      <td style={{ padding: "9px 12px" }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            draftRef.current.comps = draftRef.current.comps.filter((_, j) => j !== i);
+                            if (!draftRef.current.comps.length) {
+                              draftRef.current.comps = [{ name: "", cost: 0 }];
+                            }
+                            remountFromDraft();
+                            scheduleSave();
+                          }}
+                          style={{ ...btnGhost, padding: "3px 9px", fontSize: 9, color: C.red, borderColor: "rgba(179,38,30,0.3)" }}
+                        >
+                          ×
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  <tr style={{ background: C.panel, fontWeight: 600 }}>
+                    <td style={{ padding: "9px 12px" }} />
+                    <td style={{ padding: "9px 12px", fontWeight: 700 }}>TOTAL</td>
+                    <td
+                      ref={totalRowRef}
+                      style={{ padding: "9px 12px", textAlign: "right", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}
+                    >
+                      {fmtN(draft.comps.reduce((s, x) => s + (Number(x.cost) || 0), 0))}
+                    </td>
+                    <td />
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div>
-              <span style={{ ...labelStyle, color: C.gold }}>HPP per Botol ({bottles} botol)</span>
-              <p style={{ fontSize: 26, color: C.gold, margin: 0 }}>{fmt(per)}</p>
+
+            <button
+              type="button"
+              onClick={() => {
+                draftRef.current.comps.push({ name: "", cost: 0 });
+                remountFromDraft();
+                scheduleSave();
+              }}
+              style={{ ...btnGhost, marginBottom: 16 }}
+            >
+              + Tambah Komponen
+            </button>
+
+            <div style={{ marginTop: 24, background: C.dark, padding: 24, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
+              <div>
+                <span style={{ ...labelStyle, color: C.gold }}>Total Modal per Batch</span>
+                <p ref={totalRef} style={{ fontSize: 20, fontWeight: 300, color: C.panel, margin: 0 }}>
+                  {fmt(draft.comps.reduce((s, x) => s + (Number(x.cost) || 0), 0))}
+                </p>
+              </div>
+              <div>
+                <span ref={bottlesLabelRef} style={{ ...labelStyle, color: C.gold }}>
+                  HPP per Botol ({draft.bottles || 1} botol)
+                </span>
+                <p ref={perRef} style={{ fontSize: 26, color: C.gold, margin: 0 }}>
+                  {fmt(
+                    Math.round(
+                      draft.comps.reduce((s, x) => s + (Number(x.cost) || 0), 0) / (draft.bottles || 1)
+                    )
+                  )}
+                </p>
+              </div>
             </div>
+            <p ref={tipRef} style={{ fontSize: 11, color: C.muted, marginTop: 10 }} />
           </div>
-          <p style={{ fontSize: 11, color: C.muted, marginTop: 10 }}>
-            Tips: harga jual sehat 2.5–4× HPP → untuk HPP {fmt(per)}, harga wajar ± {fmt(per * 3)}.
-            Masukkan juga biaya persyuratan (BPOM, halal), listrik, tenaga kerja, dan penyusutan alat sebagai komponen.
-          </p>
         </div>
       )}
     </>
