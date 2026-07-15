@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
   HPP_DEFAULTS,
   calcHpp,
@@ -28,9 +28,10 @@ const FIELD_META: { id: HppFieldId; label: string; hint?: string }[] = [
   { id: "komisiPct", label: "Komisi afiliator (%)" },
 ];
 
-interface Props {
-  initialProducts: HppCalculatorProduct[];
-}
+const STOCK_IDS: HppFieldId[] = ["totalStok", "batch1Qty"];
+const UNIT_IDS: HppFieldId[] = ["cBotol", "cBox", "cSablonTotal", "cBpomTotal", "cPpn"];
+const BIBIT_IDS: HppFieldId[] = ["bibitHarga", "bibitGram", "bibitPerBotol"];
+const SELL_IDS: HppFieldId[] = ["hargaB1", "hargaB2", "komisiPct"];
 
 function parseField(raw: string): number {
   const cleaned = raw.trim().replace(/,/g, ".");
@@ -39,10 +40,213 @@ function parseField(raw: string): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+/** Komponen di luar parent — JANGAN definisikan di dalam render (itu penyebab teks hilang). */
+const FieldRow = memo(function FieldRow({
+  id,
+  label,
+  hint,
+  defaultValue,
+  onChange,
+}: {
+  id: HppFieldId;
+  label: string;
+  hint?: string;
+  defaultValue: string;
+  onChange: (id: HppFieldId, raw: string) => void;
+}) {
+  return (
+    <div style={styles.fieldRow}>
+      <label style={styles.fieldLabel}>
+        {label}
+        {hint ? <span style={styles.hint}>{hint}</span> : null}
+      </label>
+      <input
+        type="text"
+        inputMode="decimal"
+        defaultValue={defaultValue}
+        onChange={(e) => onChange(id, e.target.value)}
+        style={styles.input}
+        autoComplete="off"
+        spellCheck={false}
+      />
+    </div>
+  );
+});
+
+/** Form angka: hanya remount saat `formKey` berubah (ganti/reset produk). */
+const InputsPanel = memo(function InputsPanel({
+  formKey,
+  seed,
+  onChange,
+}: {
+  formKey: string;
+  seed: HppInputs;
+  onChange: (id: HppFieldId, raw: string) => void;
+}) {
+  function group(ids: HppFieldId[], legend: string, last = false) {
+    return (
+      <fieldset style={{ ...styles.fieldset, ...(last ? { marginBottom: 0 } : {}) }}>
+        <legend style={styles.legend}>{legend}</legend>
+        {FIELD_META.filter((f) => ids.includes(f.id)).map((f) => (
+          <FieldRow
+            key={`${formKey}-${f.id}`}
+            id={f.id}
+            label={f.label}
+            hint={f.hint}
+            defaultValue={String(seed[f.id] ?? "")}
+            onChange={onChange}
+          />
+        ))}
+      </fieldset>
+    );
+  }
+
+  return (
+    <div style={styles.card}>
+      <div style={styles.sectionTitle}>
+        <span>Data Masukan</span>
+        <span style={{ color: "#c8a45e" }}>01</span>
+      </div>
+      {group(STOCK_IDS, "Stok & produksi")}
+      {group(UNIT_IDS, "Biaya per unit — basis total stok")}
+      {group(BIBIT_IDS, "Bibit")}
+      {group(SELL_IDS, "Harga jual & komisi", true)}
+    </div>
+  );
+});
+
+const ResultsPanel = memo(function ResultsPanel({ result }: { result: HppResult }) {
+  return (
+    <div>
+      <div style={styles.card}>
+        <div style={styles.sectionTitle}>
+          <span>HPP Batch 1</span>
+          <span style={{ color: "#c8a45e" }}>02</span>
+        </div>
+        <div style={styles.hppHero}>
+          <div style={styles.hppNum}>{fmtRp(result.hppBatch1)}</div>
+          <div style={styles.hppCap}>
+            per botol · {result.batch1Qty.toLocaleString("id-ID")} pcs
+          </div>
+        </div>
+        <div style={styles.stat}>
+          <span style={styles.lbl}>Botol + box (basis stok)</span>
+          <span style={styles.val}>{fmtRp(result.botolBoxPerPcs)}</span>
+        </div>
+        <div style={styles.stat}>
+          <span style={styles.lbl}>Sablon (basis stok)</span>
+          <span style={styles.val}>{fmtRp(result.sablonPerPcs)}</span>
+        </div>
+        <div style={styles.stat}>
+          <span style={styles.lbl}>BPOM/halal (basis stok)</span>
+          <span style={styles.val}>{fmtRp(result.bpomPerPcs)}</span>
+        </div>
+        <div style={styles.stat}>
+          <span style={styles.lbl}>PPN + jasa pabrik</span>
+          <span style={styles.val}>{fmtRp(result.cPpn)}</span>
+        </div>
+        <div style={styles.stat}>
+          <span style={styles.lbl}>Bibit (basis batch 1)</span>
+          <span style={styles.val}>{fmtRp(result.bibitPerPcsBatch1)}</span>
+        </div>
+      </div>
+
+      <div style={{ ...styles.card, marginTop: 24 }}>
+        <div style={styles.sectionTitle}>
+          <span>Margin per Botol</span>
+          <span style={{ color: "#c8a45e" }}>03</span>
+        </div>
+        <div style={styles.stat}>
+          <span style={styles.lbl}>Harga jual batch 1</span>
+          <span style={styles.val}>{fmtRp(result.hargaB1)}</span>
+        </div>
+        <div style={styles.stat}>
+          <span style={styles.lbl}>Profit kotor / botol</span>
+          <span style={styles.val}>{fmtRp(result.profitB1)}</span>
+        </div>
+        <div style={styles.komisiBox}>
+          <div style={styles.stat}>
+            <span style={styles.lbl}>Komisi afiliator ({result.komisiPct}%)</span>
+            <span style={styles.val}>{fmtRp(result.komisiRp)}</span>
+          </div>
+          <div style={{ ...styles.stat, ...styles.statBig }}>
+            <span style={styles.lblBig}>Margin bersih / botol</span>
+            <span style={styles.valBig}>{fmtRp(result.marginBersih)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+const ProjectionPanel = memo(function ProjectionPanel({ result }: { result: HppResult }) {
+  return (
+    <div style={{ ...styles.card, marginTop: 28 }}>
+      <div style={styles.sectionTitle}>
+        <span>Proyeksi Total — Dua Batch</span>
+        <span style={{ color: "#c8a45e" }}>04</span>
+      </div>
+      <div style={{ overflowX: "auto" }}>
+        <table style={styles.table}>
+          <thead>
+            <tr>
+              {["Batch", "Pcs", "Harga jual", "Omzet", "Modal", "Profit kotor"].map((h, i) => (
+                <th key={h} style={{ ...styles.th, textAlign: i === 0 ? "left" : "right" }}>
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ ...styles.td, textAlign: "left", fontFamily: "var(--font-jost)" }}>Batch 1</td>
+              <td style={styles.td}>{result.batch1Qty.toLocaleString("id-ID")}</td>
+              <td style={styles.td}>{fmtRp(result.hargaB1)}</td>
+              <td style={styles.td}>{fmtRp(result.omzetB1)}</td>
+              <td style={styles.td}>{fmtRp(result.modalB1)}</td>
+              <td style={styles.td}>{fmtRp(result.profitTotalB1)}</td>
+            </tr>
+            <tr>
+              <td style={{ ...styles.td, textAlign: "left", fontFamily: "var(--font-jost)" }}>Batch 2</td>
+              <td style={styles.td}>{result.batch2Qty.toLocaleString("id-ID")}</td>
+              <td style={styles.td}>{fmtRp(result.hargaB2)}</td>
+              <td style={styles.td}>{fmtRp(result.omzetB2)}</td>
+              <td style={styles.td}>{fmtRp(result.modalB2)}</td>
+              <td style={styles.td}>{fmtRp(result.profitTotalB2)}</td>
+            </tr>
+            <tr>
+              <td style={{ ...styles.tdTotal, textAlign: "left" }}>
+                Total ({result.totalStok.toLocaleString("id-ID")} pcs)
+              </td>
+              <td style={styles.tdTotal} />
+              <td style={styles.tdTotal} />
+              <td style={styles.tdTotal}>{fmtRp(result.totalOmzet)}</td>
+              <td style={styles.tdTotal}>{fmtRp(result.totalModal)}</td>
+              <td style={styles.tdTotal}>{fmtRp(result.totalProfit)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style={styles.note}>
+        <b style={{ color: "#8f7a4a" }}>Cara baca:</b> Batch 1 memikul biaya botol/box/sablon/BPOM (basis total
+        stok) + bibit (basis batch 1 saja). Batch 2 hanya menanggung bibit baru + PPN/jasa pabrik.
+        <br />
+        <br />
+        <b style={{ color: "#8f7a4a" }}>Internal:</b> Alat hitung operasional PT Henima Collection — bukan
+        pembukuan resmi.
+      </div>
+    </div>
+  );
+});
+
+interface Props {
+  initialProducts: HppCalculatorProduct[];
+}
+
 export default function HppProfitCalculator({ initialProducts }: Props) {
   const [products, setProducts] = useState(initialProducts);
   const [selectedId, setSelectedId] = useState(initialProducts[0]?.id || "");
-  const [formGen, setFormGen] = useState(0);
+  const [formKey, setFormKey] = useState(initialProducts[0]?.id || "empty");
   const [seed, setSeed] = useState<HppInputs>(
     initialProducts[0] ? normalizeInputs(initialProducts[0].inputs) : { ...HPP_DEFAULTS }
   );
@@ -67,26 +271,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     };
   }, []);
 
-  function loadIntoForm(next: HppInputs) {
-    const normalized = normalizeInputs(next);
-    draftRef.current = { ...normalized };
-    setSeed(normalized);
-    setResult(calcHpp(normalized));
-    setFormGen((g) => g + 1); // remount input HANYA di sini
-  }
-
-  function selectProduct(p: HppCalculatorProduct) {
-    if (saveTimer.current) {
-      clearTimeout(saveTimer.current);
-      void flushSave();
-    }
-    setSelectedId(p.id);
-    setRenameValue(p.name);
-    setStatus("Tersimpan");
-    loadIntoForm(p.inputs);
-  }
-
-  async function flushSave(override?: HppInputs) {
+  const flushSave = useCallback(async (override?: HppInputs) => {
     const id = selectedIdRef.current;
     if (!id) return;
     const payload = normalizeInputs(override || draftRef.current);
@@ -104,11 +289,8 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
         setStatus(data.error || "Gagal menyimpan");
         return;
       }
-      // Update daftar produk — JANGAN remount form / JANGAN overwrite draft
       setProducts((prev) =>
-        prev.map((p) =>
-          p.id === id ? { ...p, inputs: payload, updated_at: data.product?.updated_at } : p
-        )
+        prev.map((p) => (p.id === id ? { ...p, inputs: payload, updated_at: data.product?.updated_at } : p))
       );
       setStatus("Tersimpan");
     } catch {
@@ -116,21 +298,42 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     } finally {
       setSaving(false);
     }
-  }
+  }, []);
 
-  function scheduleSave() {
+  const scheduleSave = useCallback(() => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    // Jangan setState di sini — biar ketikan tidak re-render / hapus input
     saveTimer.current = setTimeout(() => {
       void flushSave();
-    }, 800);
+    }, 900);
+  }, [flushSave]);
+
+  /** Stable — InputsPanel memo tidak re-render kecuali formKey/seed berubah. */
+  const onFieldChange = useCallback(
+    (id: HppFieldId, raw: string) => {
+      draftRef.current = { ...draftRef.current, [id]: parseField(raw) };
+      setResult(calcHpp(draftRef.current));
+      scheduleSave();
+    },
+    [scheduleSave]
+  );
+
+  function loadIntoForm(id: string, next: HppInputs) {
+    const normalized = normalizeInputs(next);
+    draftRef.current = { ...normalized };
+    setSeed(normalized);
+    setResult(calcHpp(normalized));
+    setFormKey(`${id}-${Date.now()}`);
   }
 
-  function onFieldInput(id: HppFieldId, raw: string) {
-    draftRef.current = { ...draftRef.current, [id]: parseField(raw) };
-    const nextResult = calcHpp(draftRef.current);
-    startTransition(() => setResult(nextResult));
-    scheduleSave();
+  function selectProduct(p: HppCalculatorProduct) {
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current);
+      void flushSave();
+    }
+    setSelectedId(p.id);
+    setRenameValue(p.name);
+    setStatus("Tersimpan");
+    loadIntoForm(p.id, p.inputs);
   }
 
   async function addProduct() {
@@ -173,9 +376,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
 
   async function deleteProduct() {
     if (!product) return;
-    if (!confirm(`Hapus produk "${product.name}" dari kalkulator HPP?\nData angka produk ini ikut terhapus.`)) {
-      return;
-    }
+    if (!confirm(`Hapus produk "${product.name}"?\nData angka ikut terhapus.`)) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     const id = product.id;
     const res = await fetch(`/api/admin/hpp-calculator/${id}`, { method: "DELETE" });
@@ -190,45 +391,15 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
     else {
       setSelectedId("");
       setRenameValue("");
-      loadIntoForm(HPP_DEFAULTS);
+      loadIntoForm("empty", HPP_DEFAULTS);
     }
   }
 
   async function resetDefaults() {
     if (!confirm("Reset angka produk ini ke default Henima?")) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
-    loadIntoForm(HPP_DEFAULTS);
+    loadIntoForm(selectedId || "reset", HPP_DEFAULTS);
     await flushSave({ ...HPP_DEFAULTS });
-  }
-
-  const stockFields = FIELD_META.filter((f) => f.id === "totalStok" || f.id === "batch1Qty");
-  const unitFields = FIELD_META.filter((f) =>
-    ["cBotol", "cBox", "cSablonTotal", "cBpomTotal", "cPpn"].includes(f.id)
-  );
-  const bibitFields = FIELD_META.filter((f) =>
-    ["bibitHarga", "bibitGram", "bibitPerBotol"].includes(f.id)
-  );
-  const sellFields = FIELD_META.filter((f) =>
-    ["hargaB1", "hargaB2", "komisiPct"].includes(f.id)
-  );
-
-  function Field({ id, label, hint }: (typeof FIELD_META)[number]) {
-    return (
-      <div style={styles.fieldRow}>
-        <label style={styles.fieldLabel}>
-          {label}
-          {hint ? <span style={styles.hint}>{hint}</span> : null}
-        </label>
-        <input
-          type="text"
-          inputMode="decimal"
-          defaultValue={String(seed[id] ?? "")}
-          onInput={(e) => onFieldInput(id, (e.target as HTMLInputElement).value)}
-          style={styles.input}
-          autoComplete="off"
-        />
-      </div>
-    );
   }
 
   return (
@@ -250,7 +421,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
             Kalkulator HPP &amp; <em style={{ color: "#c8a45e", fontStyle: "italic" }}>Profit</em> per Produk
           </h1>
           <p style={styles.sub}>
-            Data tersimpan otomatis per produk. Tambah / hapus / rename produk bebas — khusus internal Henima Collection.
+            Data tersimpan otomatis per produk. Tambah / hapus / rename — khusus internal Henima Collection.
           </p>
         </div>
       </div>
@@ -314,7 +485,7 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
         {!product && (
           <div style={{ ...styles.card, marginTop: 24 }}>
             <p style={{ color: "#9a998f", margin: 0 }}>
-              Belum ada produk. Tambahkan produk pertama di atas untuk mulai menghitung HPP & profit.
+              Belum ada produk. Tambahkan produk pertama di atas.
             </p>
           </div>
         )}
@@ -339,160 +510,12 @@ export default function HppProfitCalculator({ initialProducts }: Props) {
               </div>
             </div>
 
-            {/* formGen remount hanya saat ganti/reset produk */}
-            <div key={formGen} className="hpp-calc-grid">
-              <div style={styles.card}>
-                <div style={styles.sectionTitle}>
-                  <span>Data Masukan</span>
-                  <span style={{ color: "#c8a45e" }}>01</span>
-                </div>
-
-                <fieldset style={styles.fieldset}>
-                  <legend style={styles.legend}>Stok &amp; produksi</legend>
-                  {stockFields.map((f) => (
-                    <Field key={f.id} {...f} />
-                  ))}
-                </fieldset>
-
-                <fieldset style={styles.fieldset}>
-                  <legend style={styles.legend}>Biaya per unit — basis total stok</legend>
-                  {unitFields.map((f) => (
-                    <Field key={f.id} {...f} />
-                  ))}
-                </fieldset>
-
-                <fieldset style={styles.fieldset}>
-                  <legend style={styles.legend}>Bibit</legend>
-                  {bibitFields.map((f) => (
-                    <Field key={f.id} {...f} />
-                  ))}
-                </fieldset>
-
-                <fieldset style={{ ...styles.fieldset, marginBottom: 0 }}>
-                  <legend style={styles.legend}>Harga jual &amp; komisi</legend>
-                  {sellFields.map((f) => (
-                    <Field key={f.id} {...f} />
-                  ))}
-                </fieldset>
-              </div>
-
-              <div>
-                <div style={styles.card}>
-                  <div style={styles.sectionTitle}>
-                    <span>HPP Batch 1</span>
-                    <span style={{ color: "#c8a45e" }}>02</span>
-                  </div>
-                  <div style={styles.hppHero}>
-                    <div style={styles.hppNum}>{fmtRp(result.hppBatch1)}</div>
-                    <div style={styles.hppCap}>
-                      per botol · {result.batch1Qty.toLocaleString("id-ID")} pcs
-                    </div>
-                  </div>
-                  <div style={styles.stat}>
-                    <span style={styles.lbl}>Botol + box (basis stok)</span>
-                    <span style={styles.val}>{fmtRp(result.botolBoxPerPcs)}</span>
-                  </div>
-                  <div style={styles.stat}>
-                    <span style={styles.lbl}>Sablon (basis stok)</span>
-                    <span style={styles.val}>{fmtRp(result.sablonPerPcs)}</span>
-                  </div>
-                  <div style={styles.stat}>
-                    <span style={styles.lbl}>BPOM/halal (basis stok)</span>
-                    <span style={styles.val}>{fmtRp(result.bpomPerPcs)}</span>
-                  </div>
-                  <div style={styles.stat}>
-                    <span style={styles.lbl}>PPN + jasa pabrik</span>
-                    <span style={styles.val}>{fmtRp(result.cPpn)}</span>
-                  </div>
-                  <div style={styles.stat}>
-                    <span style={styles.lbl}>Bibit (basis batch 1)</span>
-                    <span style={styles.val}>{fmtRp(result.bibitPerPcsBatch1)}</span>
-                  </div>
-                </div>
-
-                <div style={{ ...styles.card, marginTop: 24 }}>
-                  <div style={styles.sectionTitle}>
-                    <span>Margin per Botol</span>
-                    <span style={{ color: "#c8a45e" }}>03</span>
-                  </div>
-                  <div style={styles.stat}>
-                    <span style={styles.lbl}>Harga jual batch 1</span>
-                    <span style={styles.val}>{fmtRp(result.hargaB1)}</span>
-                  </div>
-                  <div style={styles.stat}>
-                    <span style={styles.lbl}>Profit kotor / botol</span>
-                    <span style={styles.val}>{fmtRp(result.profitB1)}</span>
-                  </div>
-                  <div style={styles.komisiBox}>
-                    <div style={styles.stat}>
-                      <span style={styles.lbl}>Komisi afiliator ({result.komisiPct}%)</span>
-                      <span style={styles.val}>{fmtRp(result.komisiRp)}</span>
-                    </div>
-                    <div style={{ ...styles.stat, ...styles.statBig }}>
-                      <span style={styles.lblBig}>Margin bersih / botol</span>
-                      <span style={styles.valBig}>{fmtRp(result.marginBersih)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="hpp-calc-grid">
+              <InputsPanel formKey={formKey} seed={seed} onChange={onFieldChange} />
+              <ResultsPanel result={result} />
             </div>
 
-            <div style={{ ...styles.card, marginTop: 28 }}>
-              <div style={styles.sectionTitle}>
-                <span>Proyeksi Total — Dua Batch</span>
-                <span style={{ color: "#c8a45e" }}>04</span>
-              </div>
-              <div style={{ overflowX: "auto" }}>
-                <table style={styles.table}>
-                  <thead>
-                    <tr>
-                      {["Batch", "Pcs", "Harga jual", "Omzet", "Modal", "Profit kotor"].map((h, i) => (
-                        <th key={h} style={{ ...styles.th, textAlign: i === 0 ? "left" : "right" }}>
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td style={{ ...styles.td, textAlign: "left", fontFamily: "var(--font-jost)" }}>Batch 1</td>
-                      <td style={styles.td}>{result.batch1Qty.toLocaleString("id-ID")}</td>
-                      <td style={styles.td}>{fmtRp(result.hargaB1)}</td>
-                      <td style={styles.td}>{fmtRp(result.omzetB1)}</td>
-                      <td style={styles.td}>{fmtRp(result.modalB1)}</td>
-                      <td style={styles.td}>{fmtRp(result.profitTotalB1)}</td>
-                    </tr>
-                    <tr>
-                      <td style={{ ...styles.td, textAlign: "left", fontFamily: "var(--font-jost)" }}>Batch 2</td>
-                      <td style={styles.td}>{result.batch2Qty.toLocaleString("id-ID")}</td>
-                      <td style={styles.td}>{fmtRp(result.hargaB2)}</td>
-                      <td style={styles.td}>{fmtRp(result.omzetB2)}</td>
-                      <td style={styles.td}>{fmtRp(result.modalB2)}</td>
-                      <td style={styles.td}>{fmtRp(result.profitTotalB2)}</td>
-                    </tr>
-                    <tr>
-                      <td style={{ ...styles.tdTotal, textAlign: "left" }}>
-                        Total ({result.totalStok.toLocaleString("id-ID")} pcs)
-                      </td>
-                      <td style={styles.tdTotal} />
-                      <td style={styles.tdTotal} />
-                      <td style={styles.tdTotal}>{fmtRp(result.totalOmzet)}</td>
-                      <td style={styles.tdTotal}>{fmtRp(result.totalModal)}</td>
-                      <td style={styles.tdTotal}>{fmtRp(result.totalProfit)}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div style={styles.note}>
-                <b style={{ color: "#8f7a4a" }}>Cara baca:</b> Batch 1 memikul biaya botol/box/sablon/BPOM (basis
-                total stok) + bibit (basis batch 1 saja). Batch 2 hanya menanggung bibit baru + PPN/jasa pabrik —
-                botol, box, sablon, dan BPOM sudah dialokasikan di batch 1.
-                <br />
-                <br />
-                <b style={{ color: "#8f7a4a" }}>Internal:</b> Alat hitung operasional PT Henima Collection —
-                bukan pembukuan resmi. Cross-check dengan bendahara sebelum keputusan besar.
-              </div>
-            </div>
+            <ProjectionPanel result={result} />
           </>
         )}
       </div>
