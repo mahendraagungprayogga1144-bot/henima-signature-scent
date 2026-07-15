@@ -41,6 +41,8 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   const [scentFamily, setScentFamily] = useState((product as any).scentFamily || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [uploadMsg, setUploadMsg] = useState("");
 
   const previewPhoto = photos[0] || product.photo;
 
@@ -59,12 +61,15 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
     if (!files?.length) return;
     setPhotoUploading(true);
     setError("");
+    setSuccess("");
+    setUploadMsg("");
     try {
       const urls: string[] = [];
       for (const file of Array.from(files)) {
         urls.push(await uploadFile(file, "photo"));
       }
       setPhotos((prev) => [...prev, ...urls]);
+      setUploadMsg(`${urls.length} foto berhasil diupload. Klik "Simpan Produk" untuk menyimpan.`);
     } catch (e: any) {
       setError("Gagal upload foto: " + e.message);
     } finally {
@@ -76,9 +81,12 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
     if (!file) return;
     setVideoUploading(true);
     setError("");
+    setSuccess("");
+    setUploadMsg("");
     try {
       const url = await uploadFile(file, "video");
       setVideo(url);
+      setUploadMsg("Video berhasil diupload. Klik \"Simpan Produk\" untuk menyimpan.");
     } catch (e: any) {
       setError("Gagal upload video: " + e.message);
     } finally {
@@ -99,6 +107,8 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setSuccess("");
+    setUploadMsg("");
     setSaving(true);
     try {
       const fd = new FormData();
@@ -134,7 +144,10 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
         setError(msg);
         return;
       }
-      window.location.reload();
+
+      setSuccess(`Produk "${name}" berhasil disimpan.`);
+      onSaved?.();
+      window.location.href = `/admin/produk?saved=1#${product.id}`;
       
     } catch { setError("Terjadi kesalahan jaringan"); }
     finally { setSaving(false); }
@@ -184,7 +197,7 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card space-y-6">
+    <form id={product.id} onSubmit={handleSubmit} className="card space-y-6 scroll-mt-24">
       <div className="flex flex-col gap-6 sm:flex-row">
         <div className="space-y-4 sm:w-56 shrink-0">
           <div className="relative h-32 w-full overflow-hidden rounded-2xl border border-ink-800 bg-ink-950/40">
@@ -243,6 +256,7 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
               <p className="mt-1 text-xs text-ink-400">
                 {photoUploading ? "Mengupload foto..." : "Pilih satu atau banyak foto sekaligus. Foto pertama = thumbnail utama."}
               </p>
+              {uploadMsg && <p className="mt-2 text-xs text-green-400">{uploadMsg}</p>}
             </div>
 
             <div className="border-t border-ink-800 pt-4">
@@ -378,6 +392,7 @@ export default function ProductEditor({ product, onSaved }: { product: Product; 
       </div>
 
       {error && <p className="text-sm text-red-200">{error}</p>}
+      {success && <p className="text-sm text-green-300">{success}</p>}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button type="submit" className="btn-primary" disabled={saving}>{saving ? "Menyimpan..." : "Simpan Produk"}</button>
         <button type="button" className="btn-secondary" disabled={saving} onClick={handleDelete}>Hapus Produk</button>

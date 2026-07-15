@@ -24,7 +24,7 @@ export default async function AdminProductsPage({
       <h1 className="mt-4 text-2xl font-bold">Kelola Produk</h1>
       {saved && (
         <p className="mt-4 rounded-lg border border-green-900/30 bg-green-950/30 px-3 py-2 text-sm text-green-200">
-          Produk berhasil disimpan.
+          ✅ Produk berhasil disimpan.
         </p>
       )}
       {error && (
