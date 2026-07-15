@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback } from "react";
 import type {
   KasTransaction,
   Purchase,
   HppProduct,
-  HppComponent,
   FinanceCategories,
   KasJenis,
 } from "@/lib/keuangan";
@@ -21,6 +20,7 @@ import {
   downloadCSV,
   calcRunningSaldo,
 } from "@/lib/keuangan";
+import HppCalculator from "./HppCalculator";
 
 const C = {
   bg: "#FAF8F4",
@@ -80,20 +80,6 @@ export default function KeuanganClient({
   const [bSupplier, setBSupplier] = useState("");
   const [bMasukKas, setBMasukKas] = useState(true);
   const [bKategoriKas, setBKategoriKas] = useState("Pembelian Pabrik");
-
-  // HPP
-  const [hppSelected, setHppSelected] = useState(0);
-  const [hppNewName, setHppNewName] = useState("");
-  const [hppSaving, setHppSaving] = useState(false);
-  const hppSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hppRef = useRef(hpp);
-  hppRef.current = hpp;
-
-  useEffect(() => {
-    return () => {
-      if (hppSaveTimer.current) clearTimeout(hppSaveTimer.current);
-    };
-  }, []);
 
   const resetKasForm = useCallback(() => {
     setKasEditId(null);
@@ -320,106 +306,6 @@ export default function KeuanganClient({
     downloadCSV(`belanja-henima-${todayStr()}.csv`, toCSV(r));
   }
 
-  async function hppAddProduct() {
-    if (!hppNewName.trim()) return;
-    const res = await fetch("/api/admin/keuangan/hpp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: hppNewName.trim() }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      setHpp((prev) => [...prev, data.product]);
-      setHppSelected(hpp.length);
-      setHppNewName("");
-    }
-  }
-
-  async function hppRemoveProduct() {
-    const p = hpp[hppSelected];
-    if (!p) return;
-    if (!confirm(`Hapus produk "${p.name}" dari kalkulator HPP?`)) return;
-    const res = await fetch(`/api/admin/keuangan/hpp/${p.id}`, { method: "DELETE" });
-    if (res.ok) {
-      setHpp((prev) => prev.filter((_, i) => i !== hppSelected));
-      setHppSelected(0);
-    }
-  }
-
-  /** Update lokal langsung (lancar), simpan ke server setelah berhenti mengetik. */
-  function scheduleHppSave(id: string) {
-    if (hppSaveTimer.current) clearTimeout(hppSaveTimer.current);
-    setHppSaving(true);
-    hppSaveTimer.current = setTimeout(async () => {
-      const product = hppRef.current.find((p) => p.id === id);
-      if (!product) {
-        setHppSaving(false);
-        return;
-      }
-      try {
-        const res = await fetch(`/api/admin/keuangan/hpp/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            bottles: product.bottles,
-            components: product.components,
-            name: product.name,
-          }),
-        });
-        const data = await res.json();
-        if (res.ok && data.product) {
-          setHpp((prev) => prev.map((p) => (p.id === id ? data.product : p)));
-        }
-      } finally {
-        setHppSaving(false);
-      }
-    }, 500);
-  }
-
-  function hppSetBottles(bottles: number) {
-    const id = hpp[hppSelected]?.id;
-    if (!id) return;
-    setHpp((prev) =>
-      prev.map((p, idx) => (idx === hppSelected ? { ...p, bottles: bottles || 1 } : p))
-    );
-    scheduleHppSave(id);
-  }
-
-  function hppSetComp(i: number, patch: Partial<HppComponent>) {
-    const id = hpp[hppSelected]?.id;
-    if (!id) return;
-    setHpp((prev) =>
-      prev.map((p, idx) => {
-        if (idx !== hppSelected) return p;
-        const components = p.components.map((c, ci) => (ci === i ? { ...c, ...patch } : c));
-        return { ...p, components };
-      })
-    );
-    scheduleHppSave(id);
-  }
-
-  function hppAddComp() {
-    const id = hpp[hppSelected]?.id;
-    if (!id) return;
-    setHpp((prev) =>
-      prev.map((p, idx) =>
-        idx === hppSelected ? { ...p, components: [...p.components, { name: "", cost: 0 }] } : p
-      )
-    );
-    scheduleHppSave(id);
-  }
-
-  function hppRemoveComp(i: number) {
-    const id = hpp[hppSelected]?.id;
-    if (!id) return;
-    setHpp((prev) =>
-      prev.map((p, idx) =>
-        idx === hppSelected ? { ...p, components: p.components.filter((_, j) => j !== i) } : p
-      )
-    );
-    scheduleHppSave(id);
-  }
-
   // Derived data
   const saldo = kas.reduce((s, t) => s + (t.jenis === "masuk" ? t.nominal : -t.nominal), 0);
   const tm = monthKey(todayStr());
@@ -445,10 +331,6 @@ export default function KeuanganClient({
   const belanjaSorted = [...purchases].sort((a, b) => (b.tanggal + b.id).localeCompare(a.tanggal + a.id));
   const totalBelanja = purchases.reduce((s, b) => s + b.total, 0);
   const bTotal = parseNum(bQty) * parseNum(bHarga);
-
-  const hppProduct = hpp[hppSelected];
-  const hppTotal = hppProduct?.components.reduce((s, c) => s + (Number(c.cost) || 0), 0) || 0;
-  const hppPer = hppProduct && hppProduct.bottles > 0 ? Math.round(hppTotal / hppProduct.bottles) : 0;
 
   const labelStyle: React.CSSProperties = {
     fontSize: 10,
@@ -925,119 +807,8 @@ export default function KeuanganClient({
           </>
         )}
 
-        {/* HPP */}
-        {tab === "hpp" && (
-          <>
-            <p style={secTitle}>Kalkulator HPP per Batch</p>
-            <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
-              {hpp.map((p, i) => (
-                <button
-                  key={p.id}
-                  onClick={() => setHppSelected(i)}
-                  style={{ ...btnGhost, ...(i === hppSelected ? { background: C.dark, color: C.bg } : {}) }}
-                >
-                  {p.name}
-                </button>
-              ))}
-            </div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 28, flexWrap: "wrap" }}>
-              <input value={hppNewName} onChange={(e) => setHppNewName(e.target.value)} placeholder="Nama produk baru" style={{ ...inputStyle, maxWidth: 240 }} />
-              <button onClick={hppAddProduct} style={btnGhost}>+ Tambah Produk</button>
-            </div>
-
-            {hppProduct && (
-              <div style={{ background: C.white, border: `1px solid ${C.line}`, padding: 20 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
-                  <p style={{ fontFamily: "var(--font-cormorant)", fontStyle: "italic", fontSize: 22, margin: 0 }}>{hppProduct.name}</p>
-                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    {hppSaving && <span style={{ fontSize: 11, color: C.muted }}>Menyimpan…</span>}
-                    <button type="button" onClick={hppRemoveProduct} style={{ ...btnGhost, color: C.red, borderColor: "rgba(179,38,30,0.3)" }}>Hapus Produk</button>
-                  </div>
-                </div>
-                <div style={{ marginBottom: 20, maxWidth: 220 }}>
-                  <span style={labelStyle}>Jumlah Botol per Batch</span>
-                  <input
-                    inputMode="numeric"
-                    value={hppProduct.bottles || ""}
-                    onChange={(e) => hppSetBottles(parseNum(e.target.value))}
-                    style={inputStyle}
-                  />
-                </div>
-                <span style={labelStyle}>Komponen Biaya per Batch</span>
-                <div style={{ overflowX: "auto", border: `1px solid ${C.line}`, marginBottom: 12 }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 420 }}>
-                    <thead>
-                      <tr>
-                        {["No", "Komponen", "Biaya (Rp)", ""].map((h, i) => (
-                          <th key={h || "act"} style={{
-                            padding: "10px 12px", fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase",
-                            color: C.panel, background: C.dark, textAlign: i === 2 ? "right" : "left", fontWeight: 500,
-                          }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {hppProduct.components.map((c, i) => (
-                        <tr key={i} style={{ background: i % 2 === 1 ? C.rowAlt : undefined }}>
-                          <td style={{ padding: "9px 12px", color: C.muted, fontSize: 13 }}>{i + 1}</td>
-                          <td style={{ padding: "4px 8px" }}>
-                            <input
-                              value={c.name}
-                              placeholder="bibit, botol, BPOM, listrik…"
-                              onChange={(e) => hppSetComp(i, { name: e.target.value })}
-                              style={{ border: "none", padding: "6px 4px", width: "100%", fontSize: 13, outline: "none", fontFamily: "inherit", background: "transparent" }}
-                            />
-                          </td>
-                          <td style={{ padding: "4px 8px" }}>
-                            <input
-                              inputMode="numeric"
-                              value={c.cost ? formatMoneyInput(c.cost) : ""}
-                              onChange={(e) => hppSetComp(i, { cost: parseNum(e.target.value) })}
-                              placeholder="0"
-                              style={{ border: "none", padding: "6px 4px", width: "100%", fontSize: 13, textAlign: "right", outline: "none", fontFamily: "inherit", background: "transparent" }}
-                            />
-                          </td>
-                          <td style={{ padding: "9px 12px" }}>
-                            <button
-                              type="button"
-                              onClick={() => hppRemoveComp(i)}
-                              style={{ ...btnGhost, padding: "3px 9px", fontSize: 9, color: C.red, borderColor: "rgba(179,38,30,0.3)" }}
-                            >×</button>
-                          </td>
-                        </tr>
-                      ))}
-                      <tr style={{ background: C.panel, fontWeight: 600 }}>
-                        <td style={{ padding: "9px 12px" }} />
-                        <td style={{ padding: "9px 12px", fontWeight: 700 }}>TOTAL</td>
-                        <td style={{ padding: "9px 12px", textAlign: "right", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{fmtN(hppTotal)}</td>
-                        <td />
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <button
-                  type="button"
-                  onClick={hppAddComp}
-                  style={{ ...btnGhost, marginBottom: 16 }}
-                >+ Tambah Komponen</button>
-                <div style={{ marginTop: 24, background: C.dark, padding: 24, display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
-                  <div>
-                    <span style={{ ...labelStyle, color: C.gold }}>Total Modal per Batch</span>
-                    <p style={{ fontSize: 20, fontWeight: 300, color: C.panel, margin: 0 }}>{fmt(hppTotal)}</p>
-                  </div>
-                  <div>
-                    <span style={{ ...labelStyle, color: C.gold }}>HPP per Botol ({hppProduct.bottles} botol)</span>
-                    <p style={{ fontSize: 26, color: C.gold, margin: 0 }}>{fmt(hppPer)}</p>
-                  </div>
-                </div>
-                <p style={{ fontSize: 11, color: C.muted, marginTop: 10 }}>
-                  Tips: harga jual sehat 2.5–4× HPP → untuk HPP {fmt(hppPer)}, harga wajar ± {fmt(hppPer * 3)}.
-                  Masukkan juga biaya persyuratan (BPOM, halal), listrik, tenaga kerja, dan penyusutan alat sebagai komponen.
-                </p>
-              </div>
-            )}
-          </>
-        )}
+        {/* HPP — komponen terpisah agar ketikan tidak re-render seluruh halaman */}
+        {tab === "hpp" && <HppCalculator products={hpp} onChange={setHpp} />}
       </div>
     </div>
   );
