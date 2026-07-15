@@ -1,11 +1,9 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import { isValidMediaUrl } from "@/lib/product-media";
+import { isValidMediaUrl, type GalleryMedia } from "@/lib/product-media";
 
-export type GalleryMedia =
-  | { type: "image"; url: string }
-  | { type: "video"; url: string };
+export type { GalleryMedia };
 
 function GalleryImage({ src, alt, priority }: { src: string; alt: string; priority?: boolean }) {
   if (!isValidMediaUrl(src)) return null;
@@ -27,7 +25,7 @@ function GalleryImage({ src, alt, priority }: { src: string; alt: string; priori
     <img
       src={src}
       alt={alt}
-      style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+      style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }}
     />
   );
 }
@@ -42,16 +40,16 @@ export default function ProductGallery({
   comingSoon?: boolean;
 }) {
   const [active, setActive] = useState(0);
+  const safeMedia = Array.isArray(media) ? media.filter((m) => m && isValidMediaUrl(m.url)) : [];
+  const current = safeMedia[Math.min(active, Math.max(safeMedia.length - 1, 0))];
 
-  if (media.length === 0) {
+  if (safeMedia.length === 0 || !current) {
     return (
       <div style={{ background: "#F0EBE3", minHeight: "600px", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "48px", fontStyle: "italic", color: "rgba(107,90,74,0.2)" }}>{productName}</span>
       </div>
     );
   }
-
-  const current = media[active];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", background: "#F0EBE3" }} className="product-gallery">
@@ -73,16 +71,18 @@ export default function ProductGallery({
             Coming Soon
           </div>
         )}
-        {media.length > 1 && (
+        {safeMedia.length > 1 && (
           <>
             <button
-              onClick={() => setActive((a) => (a - 1 + media.length) % media.length)}
+              type="button"
+              onClick={() => setActive((a) => (a - 1 + safeMedia.length) % safeMedia.length)}
               style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", background: "rgba(250,248,244,0.8)", border: "none", width: "36px", height: "36px", cursor: "pointer", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center" }}
             >
               ‹
             </button>
             <button
-              onClick={() => setActive((a) => (a + 1) % media.length)}
+              type="button"
+              onClick={() => setActive((a) => (a + 1) % safeMedia.length)}
               style={{ position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)", background: "rgba(250,248,244,0.8)", border: "none", width: "36px", height: "36px", cursor: "pointer", fontSize: "18px", display: "flex", alignItems: "center", justifyContent: "center" }}
             >
               ›
@@ -91,11 +91,11 @@ export default function ProductGallery({
         )}
       </div>
 
-      {media.length > 1 && (
+      {safeMedia.length > 1 && (
         <div style={{ display: "flex", gap: "4px", padding: "8px", background: "#E8E0D4", overflowX: "auto" }}>
-          {media.map((item, i) => (
+          {safeMedia.map((item, i) => (
             <div
-              key={i}
+              key={`${item.type}-${item.url}-${i}`}
               onClick={() => setActive(i)}
               style={{
                 position: "relative",
@@ -121,13 +121,4 @@ export default function ProductGallery({
       )}
     </div>
   );
-}
-
-export function buildProductMedia(photos: string[], video?: string): GalleryMedia[] {
-  const media: GalleryMedia[] = [];
-  if (video && isValidMediaUrl(video)) media.push({ type: "video", url: video });
-  for (const url of photos) {
-    if (isValidMediaUrl(url) && (!video || url !== video)) media.push({ type: "image", url });
-  }
-  return media;
 }

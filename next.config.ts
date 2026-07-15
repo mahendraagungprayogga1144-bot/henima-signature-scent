@@ -4,7 +4,12 @@ function supabaseImagePatterns(): NonNullable<NextConfig["images"]>["remotePatte
   const patterns: NonNullable<NextConfig["images"]>["remotePatterns"] = [
     {
       protocol: "https",
-      hostname: "**.supabase.co",
+      hostname: "*.supabase.co",
+      pathname: "/storage/v1/object/public/**",
+    },
+    {
+      protocol: "https",
+      hostname: "auzlmqywzayjzurqythx.supabase.co",
       pathname: "/storage/v1/object/public/**",
     },
   ];

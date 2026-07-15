@@ -138,13 +138,14 @@ export default function ShopClient({ products, waNumber }: { products: Product[]
                 <Link
                   key={product.id}
                   href={"/shop/" + toSlug(product.name)}
-                  style={{background:"#FAF8F4", cursor:"pointer", textDecoration:"none", color:"#1C1917", display:"block"}}
-                  onMouseEnter={() => setHoveredId(product.id)} style={{position:"relative"}}
+                  style={{background:"#FAF8F4", cursor:"pointer", textDecoration:"none", color:"#1C1917", display:"block", position:"relative"}}
+                  onMouseEnter={() => setHoveredId(product.id)}
                   onMouseLeave={() => setHoveredId(null)}
                 >
                   <div style={{position:"relative", aspectRatio:"3/4", background:"#F0EBE3", overflow:"hidden"}}>
                     <WishlistButton productId={product.id} />
                     {product.photo ? (
+                      product.photo.startsWith("/") ? (
                       <Image
                         src={product.photo}
                         alt={product.name}
@@ -155,6 +156,20 @@ export default function ShopClient({ products, waNumber }: { products: Product[]
                           transition: "transform 0.8s cubic-bezier(0.16,1,0.3,1)",
                         }}
                       />
+                      ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={product.photo}
+                        alt={product.name}
+                        style={{
+                          width:"100%",
+                          height:"100%",
+                          objectFit:"cover",
+                          transform: isHovered ? "scale(1.04)" : "scale(1)",
+                          transition: "transform 0.8s cubic-bezier(0.16,1,0.3,1)",
+                        }}
+                      />
+                      )
                     ) : (
                       <div style={{position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center"}}>
                         <span style={{fontFamily:"var(--font-cormorant)", fontSize:"18px", fontStyle:"italic", color:"rgba(107,90,74,0.3)"}}>{product.name}</span>

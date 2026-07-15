@@ -31,3 +31,16 @@ export function getProductPhotoList(product: { photo?: string; photos?: unknown 
 export function isValidMediaUrl(url: string): boolean {
   return typeof url === "string" && (url.startsWith("http") || url.startsWith("/"));
 }
+
+export type GalleryMedia =
+  | { type: "image"; url: string }
+  | { type: "video"; url: string };
+
+export function buildProductMedia(photos: string[], video?: string): GalleryMedia[] {
+  const media: GalleryMedia[] = [];
+  if (video && isValidMediaUrl(video)) media.push({ type: "video", url: video });
+  for (const url of photos) {
+    if (isValidMediaUrl(url) && (!video || url !== video)) media.push({ type: "image", url });
+  }
+  return media;
+}
