@@ -1,16 +1,19 @@
 import { supabase } from "./supabase";
 import type { Database, Product, User, Order, Settings } from "./types";
+import { normalizeProductPhotos } from "./product-media";
 
 // ---------- Row <-> TypeScript mappers ----------
 
 function rowToProduct(row: Record<string, unknown>): Product {
+  const photo = (row.photo as string) ?? "/products/placeholder.svg";
+  const photos = normalizeProductPhotos(row.photos, photo);
   return {
     id: row.id as string,
     name: row.name as string,
     description: (row.description as string) ?? "",
-    photo: (row.photo as string) ?? "/products/placeholder.svg",
-    photos: (row.photos as string[]) ?? [],
-    video: (row.video as string) ?? undefined,
+    photo: photos[0] || photo,
+    photos,
+    video: typeof row.video === "string" && row.video.trim() ? row.video : undefined,
     originalPrice: row.original_price as number,
     discountPrice: row.discount_price as number,
     active: row.active as boolean,

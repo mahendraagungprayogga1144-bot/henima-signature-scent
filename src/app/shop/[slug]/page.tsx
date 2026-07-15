@@ -8,6 +8,7 @@ import StockNotifyButton from "@/components/StockNotifyButton";
 import ProductGallery, { buildProductMedia } from "@/components/ProductGallery";
 import ProductReviews from "@/components/ProductReviews";
 import { getProductReviews } from "@/lib/reviews";
+import { getProductPhotoList } from "@/lib/product-media";
 
 export const dynamic = "force-dynamic";
 
@@ -41,8 +42,11 @@ export default async function ProductDetailPage({
 
   const variants = product.variants.filter((v) => v.active);
   const totalStock = variants.reduce((sum, v) => sum + (v.stock || 0), 0);
-  const photos = product.photos?.length ? product.photos : product.photo ? [product.photo] : [];
+  const photos = getProductPhotoList(product);
   const media = buildProductMedia(photos, product.video);
+  const minVariantPrice = variants.length > 0
+    ? Math.min(...variants.map((v) => v.originalPrice))
+    : product.originalPrice || product.discountPrice || 0;
 
   return (
     <div style={{background:"#FAF8F4", minHeight:"100vh", color:"#1C1917", fontFamily:"var(--font-jost)"}}>
@@ -80,7 +84,7 @@ export default async function ProductDetailPage({
           <div style={{marginBottom:"32px"}}>
             {variants.length > 0 && (
               <p style={{fontFamily:"var(--font-cormorant)", fontSize:"32px", fontWeight:300, color:"#1C1917"}}>
-                Rp {Math.min(...variants.map(v => v.originalPrice)).toLocaleString("id-ID")}
+                Rp {minVariantPrice.toLocaleString("id-ID")}
               </p>
             )}
           </div>
@@ -215,18 +219,25 @@ export default async function ProductDetailPage({
       <div style={{padding:"80px 8vw", borderTop:"1px solid rgba(28,25,23,0.06)"}}>
         <p style={{fontSize:"10px", letterSpacing:"3px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"40px"}}>You May Also Like</p>
         <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:"2px", background:"rgba(28,25,23,0.06)"}}>
-          {products.filter(p => p.id !== product.id).slice(0,4).map((p) => (
+          {products.filter(p => p.id !== product.id).slice(0,4).map((p) => {
+            const relatedVariants = p.variants.filter(v => v.active);
+            const relatedPrice = relatedVariants.length > 0
+              ? Math.min(...relatedVariants.map(v => v.originalPrice))
+              : p.originalPrice || p.discountPrice || 0;
+            const relatedPhoto = getProductPhotoList(p)[0] || p.photo;
+            return (
             <Link key={p.id} href={"/shop/" + toSlug(p.name)} style={{textDecoration:"none", color:"#1C1917", display:"block", background:"#FAF8F4"}}>
               <div style={{position:"relative", aspectRatio:"3/4", background:"#F0EBE3", overflow:"hidden"}}>
-                {p.photo && <Image src={p.photo} alt={p.name} fill style={{objectFit:"cover"}} />}
+                {relatedPhoto && <Image src={relatedPhoto} alt={p.name} fill style={{objectFit:"cover"}} />}
               </div>
               <div style={{padding:"16px 18px 20px"}}>
                 <p style={{fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#C8B89A", marginBottom:"4px"}}>Extrait de Parfum</p>
                 <p style={{fontFamily:"var(--font-cormorant)", fontSize:"20px", fontWeight:400, color:"#1C1917"}}>{p.name}</p>
-                <p style={{fontSize:"13px", color:"#9A8F82", marginTop:"4px"}}>Rp {Math.min(...p.variants.filter(v=>v.active).map(v=>v.originalPrice)).toLocaleString("id-ID")}</p>
+                <p style={{fontSize:"13px", color:"#9A8F82", marginTop:"4px"}}>Rp {relatedPrice.toLocaleString("id-ID")}</p>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </div>
 

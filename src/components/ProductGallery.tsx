@@ -1,10 +1,36 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import { isValidMediaUrl } from "@/lib/product-media";
 
 export type GalleryMedia =
   | { type: "image"; url: string }
   | { type: "video"; url: string };
+
+function GalleryImage({ src, alt, priority }: { src: string; alt: string; priority?: boolean }) {
+  if (!isValidMediaUrl(src)) return null;
+
+  if (src.startsWith("/")) {
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        style={{ objectFit: "cover", objectPosition: "center" }}
+        priority={priority}
+      />
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={alt}
+      style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+    />
+  );
+}
 
 export default function ProductGallery({
   media,
@@ -40,13 +66,7 @@ export default function ProductGallery({
             style={{ width: "100%", height: "100%", objectFit: "cover", background: "#1C1917" }}
           />
         ) : (
-          <Image
-            src={current.url}
-            alt={productName}
-            fill
-            style={{ objectFit: "cover", objectPosition: "center" }}
-            priority
-          />
+          <GalleryImage src={current.url} alt={productName} priority />
         )}
         {comingSoon && (
           <div style={{ position: "absolute", top: "24px", left: "24px", background: "#1C1917", color: "#FAF8F4", fontSize: "9px", letterSpacing: "2px", textTransform: "uppercase", padding: "6px 14px" }}>
@@ -93,7 +113,7 @@ export default function ProductGallery({
               {item.type === "video" ? (
                 <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#C8B89A", fontSize: "18px" }}>▶</div>
               ) : (
-                <Image src={item.url} alt={`${productName} ${i + 1}`} fill style={{ objectFit: "cover" }} />
+                <GalleryImage src={item.url} alt={`${productName} ${i + 1}`} />
               )}
             </div>
           ))}
@@ -105,9 +125,9 @@ export default function ProductGallery({
 
 export function buildProductMedia(photos: string[], video?: string): GalleryMedia[] {
   const media: GalleryMedia[] = [];
-  if (video) media.push({ type: "video", url: video });
+  if (video && isValidMediaUrl(video)) media.push({ type: "video", url: video });
   for (const url of photos) {
-    if (url && (!video || url !== video)) media.push({ type: "image", url });
+    if (isValidMediaUrl(url) && (!video || url !== video)) media.push({ type: "image", url });
   }
   return media;
 }
