@@ -95,6 +95,11 @@ export default function ShopClient({ products, waNumber }: { products: Product[]
             {filtered.length} fragrance{filtered.length !== 1 ? "s" : ""}
           </p>
         </div>
+        <p style={{marginTop:16, fontSize:12, fontFamily:"var(--font-jost)"}}>
+          <Link href="/shop/international" style={{color:"#1C1917", letterSpacing:"1px", textTransform:"uppercase", fontSize:10, borderBottom:"1px solid rgba(28,25,23,0.25)", paddingBottom:2, textDecoration:"none"}}>
+            International checkout (Shopify Markets)
+          </Link>
+        </p>
       </div>
 
       {/* MOBILE FILTER BAR */}
