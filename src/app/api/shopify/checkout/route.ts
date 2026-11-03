@@ -38,7 +38,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const { cartId, checkoutUrl } = await createShopifyCheckout(normalized, country);
+    const { cartId, checkoutUrl } = await createShopifyCheckout(
+      normalized,
+      country,
+      ip !== "unknown" ? ip : undefined
+    );
     return NextResponse.json({ cartId, checkoutUrl });
   } catch (e) {
     console.error("Shopify checkout error:", e);

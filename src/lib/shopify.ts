@@ -63,20 +63,39 @@ export function shopifyConfigMissing(): string[] {
 export async function shopifyFetch<T>(
   query: string,
   variables?: Record<string, unknown>,
-  opts?: { private?: boolean }
+  opts?: { private?: boolean; buyerIp?: string }
 ): Promise<T> {
   const domain = storeDomain();
-  const token = storefrontToken(opts?.private !== false);
+  const usePrivate =
+    opts?.private !== false && Boolean(process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN);
+  const privateToken = process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN || "";
+  const publicToken =
+    process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN ||
+    process.env.SHOPIFY_STOREFRONT_PUBLIC_TOKEN ||
+    "";
+  const token = usePrivate ? privateToken : publicToken || storefrontToken(true);
+
   if (!domain || !token) {
     throw new Error("Shopify Storefront API is not configured");
   }
 
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  // Private Headless tokens must use Shopify-Storefront-Private-Token (not X-Shopify-...)
+  if (usePrivate) {
+    headers["Shopify-Storefront-Private-Token"] = privateToken;
+    if (opts?.buyerIp) {
+      headers["Shopify-Storefront-Buyer-IP"] = opts.buyerIp;
+    }
+  } else {
+    headers["X-Shopify-Storefront-Access-Token"] = token;
+  }
+
   const res = await fetch(`https://${domain}/api/${API_VERSION}/graphql.json`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Shopify-Storefront-Access-Token": token,
-    },
+    headers,
     body: JSON.stringify({ query, variables }),
     cache: "no-store",
   });
@@ -164,7 +183,8 @@ const CART_CREATE = `
 
 export async function createShopifyCheckout(
   lines: Array<{ merchandiseId: string; quantity: number }>,
-  buyerCountry?: string
+  buyerCountry?: string,
+  buyerIp?: string
 ): Promise<{ cartId: string; checkoutUrl: string }> {
   const input: Record<string, unknown> = {
     lines: lines.map((l) => ({
@@ -181,7 +201,7 @@ export async function createShopifyCheckout(
       cart: { id: string; checkoutUrl: string; totalQuantity: number } | null;
       userErrors: Array<{ field: string[] | null; message: string }>;
     };
-  }>(CART_CREATE, { input });
+  }>(CART_CREATE, { input }, { buyerIp });
 
   const errors = data.cartCreate.userErrors;
   if (errors?.length) {
