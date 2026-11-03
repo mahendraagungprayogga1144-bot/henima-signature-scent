@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
-import { getShopifyProducts, isShopifyConfigured } from "@/lib/shopify";
+import {
+  getShopifyProducts,
+  isShopifyConfigured,
+  shopifyConfigMissing,
+} from "@/lib/shopify";
 
 export async function GET() {
   if (!isShopifyConfigured()) {
+    const missing = shopifyConfigMissing();
     return NextResponse.json(
-      { error: "Shopify belum dikonfigurasi. Cek environment variables." },
+      {
+        error: `Shopify belum dikonfigurasi. Missing: ${missing.join("; ")}. Set di Vercel → Settings → Environment Variables (Production), lalu Redeploy.`,
+        missing,
+      },
       { status: 503 }
     );
   }

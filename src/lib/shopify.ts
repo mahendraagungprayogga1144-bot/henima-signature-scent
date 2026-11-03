@@ -46,6 +46,20 @@ export function isShopifyConfigured(): boolean {
   return Boolean(storeDomain() && storefrontToken(true));
 }
 
+/** Which env keys are missing (names only — never values). */
+export function shopifyConfigMissing(): string[] {
+  const missing: string[] = [];
+  if (!storeDomain()) {
+    missing.push("SHOPIFY_STORE_DOMAIN or NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN");
+  }
+  if (!storefrontToken(true)) {
+    missing.push(
+      "SHOPIFY_STOREFRONT_PRIVATE_TOKEN or NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN"
+    );
+  }
+  return missing;
+}
+
 export async function shopifyFetch<T>(
   query: string,
   variables?: Record<string, unknown>,
