@@ -2,26 +2,21 @@ import SplashScreen from "@/components/SplashScreen";
 import ChatWidget from "@/components/ChatWidget";
 import ScrollObserver from "@/components/ScrollObserver";
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Jost } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import FooterSubscribe from "@/components/FooterSubscribe";
-import { getDatabase } from "@/lib/db";
+import { getSettings } from "@/lib/db";
+import { assertEnv } from "@/lib/env";
 import { getCurrentUserSafe } from "@/lib/session";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
 
-const cormorant = Cormorant_Garamond({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
-  variable: "--font-cormorant",
-});
-
-const jost = Jost({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-jost",
+  variable: "--font-jakarta",
 });
 
 export const viewport: Viewport = {
@@ -48,8 +43,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const db = await getDatabase();
-  const socialLinks = (db.settings.company as any).socialLinks || {};
+  assertEnv();
+  const settings = await getSettings();
+  const socialLinks = (settings.company as { socialLinks?: Record<string, string> }).socialLinks || {};
   const user = await getCurrentUserSafe();
 
   return (
@@ -68,7 +64,7 @@ export default async function RootLayout({
         sameAs: ['https://www.instagram.com/henima.id'],
         contactPoint: { '@type': 'ContactPoint', telephone: '+6285190311230', contactType: 'customer service' }
       })}}/>
-      <body className={`min-h-screen font-sans antialiased ${jost.variable} ${cormorant.variable}`} style={{background:"#FAF8F4", color:"#1C1917", overflowX:"hidden"}}>
+      <body className={`min-h-screen font-sans antialiased ${jakarta.variable}`} style={{background:"#FAF8F4", color:"#1C1917", overflowX:"hidden", fontFamily:"var(--font-jakarta), system-ui, sans-serif"}}>
         <NavbarWrapper />
         <main style={{width:"100%", overflow:"hidden"}}>{children}</main>
         <footer style={{background:"#1C1917", padding:"80px 8vw 40px"}}>

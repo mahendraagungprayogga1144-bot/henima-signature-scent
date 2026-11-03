@@ -43,7 +43,7 @@ export default function WishlistPage() {
   const saved = products.filter(p=>wishlist.includes(p.id))
 
   return(<><style>{`
-    .wl{--bg:#FAF8F4;--bg2:#F0EDE6;--black:#1C1917;--ink:#2E2A25;--muted:#7A736A;--border:rgba(28,25,23,0.1);--serif:var(--font-cormorant),Georgia,serif;--sans:var(--font-jost),system-ui,sans-serif;background:var(--bg);min-height:100vh;font-family:var(--sans);font-weight:300;color:var(--ink)}
+    .wl{--bg:#FAF8F4;--bg2:#F0EDE6;--black:#1C1917;--ink:#2E2A25;--muted:#7A736A;--border:rgba(28,25,23,0.1);--serif:var(--font-cormorant),'Plus Jakarta Sans',Helvetica,Arial,sans-serif;--sans:var(--font-jost),system-ui,sans-serif;background:var(--bg);min-height:100vh;font-family:var(--sans);font-weight:300;color:var(--ink)}
     .wl-hero{background:var(--black);padding:120px 6vw 80px;text-align:center;position:relative;overflow:hidden}
     .wl-hero-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--serif);font-size:clamp(80px,18vw,200px);font-weight:400;font-style:italic;color:rgba(200,184,154,.04);white-space:nowrap;pointer-events:none}
     .wl-hero h1{font-family:var(--serif);font-size:clamp(2rem,4vw,3.5rem);font-weight:400;line-height:1.15;color:#F0EBE3;margin-bottom:16px;position:relative}

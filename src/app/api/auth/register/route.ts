@@ -5,12 +5,23 @@ import {
   applyReferralOnSignup,
   getOrCreateMemberProfile,
 } from "@/lib/membership";
+import { getClientIp, rateLimit } from "@/lib/rateLimit";
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  if (!rateLimit(`register:${ip}`, 5, 60_000)) {
+    return NextResponse.redirect(
+      new URL(
+        `/daftar?error=${encodeURIComponent("Terlalu banyak percobaan. Coba lagi nanti.")}`,
+        request.url
+      )
+    );
+  }
+
   const form = await request.formData();
   const firstName = String(form.get("firstName") || "").trim();
   const lastName = String(form.get("lastName") || "").trim();

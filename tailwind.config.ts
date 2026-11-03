@@ -9,8 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-jost)", "system-ui", "sans-serif"],
-        display: ["var(--font-cormorant)", "Georgia", "serif"],
+        sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
+        display: ["var(--font-jakarta)", "system-ui", "sans-serif"],
       },
       colors: {
         brand: {

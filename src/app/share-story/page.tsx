@@ -40,7 +40,7 @@ export default function ShareStoryPage() {
     setStatus(error?'error':'success')
   }
   return(<><style>{`
-    .ss{--bg:#F7F4EF;--bg2:#EFEBE3;--black:#1A1714;--ink:#2E2A25;--muted:#7A736A;--border:rgba(28,25,23,0.12);--serif:var(--font-cormorant),Georgia,serif;--sans:var(--font-jost),system-ui,sans-serif;background:var(--bg);min-height:100vh;font-family:var(--sans);font-weight:300;color:var(--ink)}
+    .ss{--bg:#F7F4EF;--bg2:#EFEBE3;--black:#1A1714;--ink:#2E2A25;--muted:#7A736A;--border:rgba(28,25,23,0.12);--serif:var(--font-cormorant),'Plus Jakarta Sans',Helvetica,Arial,sans-serif;--sans:var(--font-jost),system-ui,sans-serif;background:var(--bg);min-height:100vh;font-family:var(--sans);font-weight:300;color:var(--ink)}
     .ss-hero{background:var(--black);padding:120px 6vw 80px;text-align:center}
     .ss-hero h1{font-family:var(--serif);font-size:clamp(2.2rem,5vw,4.5rem);font-weight:400;line-height:1.15;color:#F0EBE3;margin-bottom:20px}
     .ss-hero h1 em{font-style:italic;color:#C8B89A}

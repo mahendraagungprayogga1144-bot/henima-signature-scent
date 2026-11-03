@@ -223,8 +223,8 @@ export default function OurStoryPage() {
         .os-wrap {
           --bg:#F7F4EF;--bg2:#EFEBE3;--black:#1A1714;--ink:#2E2A25;--muted:#7A736A;
           --gold:#B5874A;--gold2:#D4A96A;--border:rgba(181,135,74,.18);
-          --serif:'Playfair Display',Georgia,serif;
-          --sans:'Inter',system-ui,sans-serif;
+          --serif:var(--font-jakarta),system-ui,sans-serif;
+          --sans:var(--font-jakarta),system-ui,sans-serif;
           background:var(--bg);color:var(--ink);font-family:var(--sans);
           font-weight:300;line-height:1.75;overflow-x:hidden;
         }

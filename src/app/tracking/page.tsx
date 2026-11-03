@@ -13,6 +13,7 @@ const STATUS_COLORS: Record<string,string> = {
 
 export default function TrackingPage() {
   const [orderId, setOrderId] = useState("");
+  const [phone, setPhone] = useState("");
   const [order, setOrder] = useState<any>(null);
   const [tracking, setTracking] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -26,13 +27,16 @@ export default function TrackingPage() {
 
   async function search() {
     if (!orderId.trim()) return;
+    if (!phone.trim()) { setError("Masukkan nomor WhatsApp yang dipakai saat checkout."); return; }
     setLoading(true);
     setError("");
     setOrder(null);
     setTracking(null);
     setReviewSubmitted(false);
     try {
-      const res = await fetch("/api/orders/" + orderId.trim());
+      const qs = new URLSearchParams({ phone: phone.trim() });
+      const res = await fetch("/api/orders/" + encodeURIComponent(orderId.trim()) + "?" + qs.toString());
+      if (res.status === 401) { setError("Nomor WhatsApp tidak cocok dengan pesanan ini."); return; }
       if (!res.ok) { setError("Order tidak ditemukan. Pastikan Order ID benar."); return; }
       const data = await res.json();
       setOrder(data);
@@ -87,20 +91,25 @@ export default function TrackingPage() {
       <div style={{padding:"80px 8vw 60px",borderBottom:"1px solid rgba(28,25,23,0.08)",textAlign:"center"}}>
         <p style={{fontSize:"10px",letterSpacing:"4px",textTransform:"uppercase",color:"#9A8F82",marginBottom:"16px"}}>Henima Signature Scent</p>
         <h1 style={{fontFamily:"var(--font-cormorant,serif)",fontSize:"clamp(36px,6vw,64px)",fontWeight:300,fontStyle:"italic",color:"#1C1917",marginBottom:"16px"}}>Track Your Order</h1>
-        <p style={{fontSize:"14px",color:"#9A8F82",maxWidth:"400px",margin:"0 auto"}}>Masukkan Order ID untuk melacak perjalanan pesananmu.</p>
+        <p style={{fontSize:"14px",color:"#9A8F82",maxWidth:"400px",margin:"0 auto"}}>Masukkan Order ID dan nomor WhatsApp checkout untuk melacak pesananmu.</p>
       </div>
 
       <div style={{maxWidth:"640px",margin:"0 auto",padding:"64px 24px 80px"}}>
 
         {/* SEARCH */}
-        <div style={{display:"flex",marginBottom:"40px"}}>
+        <div style={{display:"flex",flexDirection:"column",gap:"12px",marginBottom:"40px"}}>
           <input type="text" value={orderId} onChange={e=>setOrderId(e.target.value)} onKeyDown={e=>e.key==="Enter"&&search()}
             placeholder="Order ID (contoh: ORD-1234567890-ABCD)"
-            style={{flex:1,border:"1px solid #D5CFC8",borderRight:"none",padding:"14px 16px",fontSize:"13px",color:"#1C1917",background:"#fff",outline:"none",fontFamily:"var(--font-jost)"}}/>
-          <button onClick={search} disabled={loading}
-            style={{background:"#1C1917",color:"#FAF8F4",border:"none",padding:"14px 28px",fontSize:"11px",letterSpacing:"2px",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--font-jost)",whiteSpace:"nowrap"}}>
-            {loading?"...":"Track"}
-          </button>
+            style={{width:"100%",border:"1px solid #D5CFC8",padding:"14px 16px",fontSize:"13px",color:"#1C1917",background:"#fff",outline:"none",fontFamily:"var(--font-jost)",boxSizing:"border-box"}}/>
+          <div style={{display:"flex"}}>
+            <input type="tel" value={phone} onChange={e=>setPhone(e.target.value)} onKeyDown={e=>e.key==="Enter"&&search()}
+              placeholder="No. WhatsApp saat checkout"
+              style={{flex:1,border:"1px solid #D5CFC8",borderRight:"none",padding:"14px 16px",fontSize:"13px",color:"#1C1917",background:"#fff",outline:"none",fontFamily:"var(--font-jost)"}}/>
+            <button onClick={search} disabled={loading}
+              style={{background:"#1C1917",color:"#FAF8F4",border:"none",padding:"14px 28px",fontSize:"11px",letterSpacing:"2px",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--font-jost)",whiteSpace:"nowrap"}}>
+              {loading?"...":"Track"}
+            </button>
+          </div>
         </div>
 
         {error && <div style={{background:"#fff5f5",border:"1px solid #ffc5c5",padding:"16px",fontSize:"13px",color:"#cc0000",marginBottom:"24px"}}>{error}</div>}

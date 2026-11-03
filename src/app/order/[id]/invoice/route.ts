@@ -1,4 +1,6 @@
 import { supabase } from "@/lib/supabase";
+import { getCurrentUser } from "@/lib/session";
+import { verifyOrderAccessToken } from "@/lib/order-access";
 
 export const dynamic = "force-dynamic";
 
@@ -7,6 +9,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const url = new URL(request.url);
+  const token = url.searchParams.get("t") || url.searchParams.get("token");
+
   const { data: order } = await supabase
     .from("retail_orders")
     .select("*")
@@ -15,6 +20,13 @@ export async function GET(
 
   if (!order) {
     return new Response("Order tidak ditemukan", { status: 404 });
+  }
+
+  const user = await getCurrentUser();
+  const isAdmin = user?.role === "admin";
+  const isOwner = !!(user && order.user_id && user.id === order.user_id);
+  if (!isAdmin && !isOwner && !verifyOrderAccessToken(token, id)) {
+    return new Response("Akses ditolak. Buka invoice dari tautan email/order confirmation.", { status: 401 });
   }
 
   const date = new Date(order.created_at).toLocaleDateString("id-ID", {

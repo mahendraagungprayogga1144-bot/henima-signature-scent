@@ -7,7 +7,7 @@ const MENUS = [
     { href: "/admin", icon: "grid", label: "Dashboard", exact: true },
   ]},
   { group: "OPERASIONAL", items: [
-    { href: "/admin/orders", icon: "bag", label: "Retail Orders" },
+    { href: "/admin/orders", icon: "bag", label: "Pesanan" },
     { href: "/admin/stok", icon: "package", label: "Stok Management" },
     { href: "/admin/bahan", icon: "flask", label: "Bahan Baku" },
     { href: "/admin/reseller", icon: "users", label: "Reseller & Member" },

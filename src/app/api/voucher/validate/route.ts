@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getClientIp, rateLimit } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    if (!rateLimit(`voucher:${ip}`, 20, 60_000)) {
+      return NextResponse.json({ error: "Terlalu banyak permintaan" }, { status: 429 });
+    }
+
     const { code, subtotal } = await request.json();
 
     if (!code) return NextResponse.json({ error: "Kode voucher wajib diisi" }, { status: 400 });

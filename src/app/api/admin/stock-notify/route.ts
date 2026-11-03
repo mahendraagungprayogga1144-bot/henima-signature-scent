@@ -28,10 +28,10 @@ export async function POST(request: Request) {
         html: `
           <!DOCTYPE html>
           <html>
-          <body style="font-family:Georgia,serif;background:#FAF8F4;margin:0;padding:0;">
+          <body style="font-family:'Plus Jakarta Sans',Helvetica,Arial,sans-serif;background:#FAF8F4;margin:0;padding:0;">
             <div style="max-width:560px;margin:0 auto;padding:40px 24px;">
               <div style="text-align:center;margin-bottom:40px;">
-                <h1 style="font-family:Georgia,serif;font-size:28px;font-weight:300;letter-spacing:8px;color:#1C1917;margin:0;">HENIMA</h1>
+                <h1 style="font-family:'Plus Jakarta Sans',Helvetica,Arial,sans-serif;font-size:28px;font-weight:300;letter-spacing:8px;color:#1C1917;margin:0;">HENIMA</h1>
                 <p style="font-size:10px;letter-spacing:3px;color:#9A8F82;text-transform:uppercase;margin-top:4px;">Signature Scent</p>
               </div>
               <div style="border-top:1px solid #E8E0D5;border-bottom:1px solid #E8E0D5;padding:32px 0;margin-bottom:32px;text-align:center;">

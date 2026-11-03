@@ -179,10 +179,15 @@ export default function CheckoutPage() {
         }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Gagal membuat pesanan");
+        return;
+      }
       if (data.orderId) {
         localStorage.removeItem("henima_cart");
         window.dispatchEvent(new Event("cart-updated"));
-        router.push("/order/" + data.orderId);
+        const qs = data.accessToken ? `?t=${encodeURIComponent(data.accessToken)}` : "";
+        router.push("/order/" + data.orderId + qs);
       }
     } catch { alert("Terjadi kesalahan, coba lagi"); }
     finally { setSubmitting(false); }

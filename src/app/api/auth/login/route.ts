@@ -1,12 +1,28 @@
 import { NextResponse } from "next/server";
-import { verifyPassword, setSessionCookie } from "@/lib/auth";
-import { getDatabase } from "@/lib/db";
+import {
+  verifyPassword,
+  setSessionCookie,
+  needsPasswordRehash,
+  hashPassword,
+} from "@/lib/auth";
+import { getDatabase, updateDatabase } from "@/lib/db";
+import { getClientIp, rateLimit } from "@/lib/rateLimit";
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  if (!rateLimit(`login:${ip}`, 8, 60_000)) {
+    return NextResponse.redirect(
+      new URL(
+        `/masuk?error=${encodeURIComponent("Terlalu banyak percobaan. Coba lagi nanti.")}`,
+        request.url
+      )
+    );
+  }
+
   const form = await request.formData();
   const email = String(form.get("email") || "").trim().toLowerCase();
   const password = String(form.get("password") || "");
@@ -41,6 +57,19 @@ export async function POST(request: Request) {
           request.url
         )
       );
+    }
+
+    // Upgrade legacy SHA256 hashes to bcrypt after successful login
+    if (needsPasswordRehash(user.passwordHash)) {
+      try {
+        const newHash = hashPassword(password);
+        await updateDatabase((data) => {
+          const u = data.users.find((x) => x.id === user.id);
+          if (u) u.passwordHash = newHash;
+        });
+      } catch (e) {
+        console.error("Password rehash failed:", e);
+      }
     }
 
     await setSessionCookie(user.id, remember);

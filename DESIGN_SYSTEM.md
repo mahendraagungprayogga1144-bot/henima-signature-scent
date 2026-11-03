@@ -26,8 +26,8 @@ Token visual yang dipakai di seluruh website. Pakai ini untuk halaman baru agar 
 
 ## Typography
 
-- **Display / heading:** `var(--font-cormorant)` — Cormorant Garamond (italic OK untuk hero)
-- **Body / UI:** `var(--font-jost)` — Jost
+- **Semua teks (display + body):** `var(--font-jakarta)` — Plus Jakarta Sans
+- Alias lama masih valid: `--font-jost` / `--font-cormorant` → Jakarta
 - Label form: 10–11px, uppercase, letter-spacing ~2–3px, warna muted
 - CTA: 10–12px, uppercase, letter-spacing ~2–3px
 

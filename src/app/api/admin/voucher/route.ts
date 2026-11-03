@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUser } from "@/lib/session";
+import { requireAdmin } from "@/lib/session";
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (!user || user.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const gate = await requireAdmin();
+  if (gate.error) return gate.error;
 
   const body = await request.json();
   const { code, type, value, min_order, max_uses, expires_at } = body;

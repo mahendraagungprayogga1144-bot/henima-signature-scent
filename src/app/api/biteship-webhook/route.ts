@@ -24,6 +24,17 @@ const ORDER_STATUS_MAP: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
+    const webhookSecret = process.env.BITESHIP_WEBHOOK_SECRET;
+    if (webhookSecret) {
+      const headerSecret =
+        request.headers.get("x-biteship-signature") ||
+        request.headers.get("x-webhook-secret") ||
+        request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+      if (headerSecret !== webhookSecret) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    }
+
     const body = await request.json();
     const { order_id, status, waybill_id, courier } = body;
 

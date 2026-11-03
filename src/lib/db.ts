@@ -168,6 +168,23 @@ const DEFAULT_SETTINGS: Settings = {
 
 // ---------- Public API ----------
 
+/** Lightweight settings-only fetch (avoids loading users/orders on every layout). */
+export async function getSettings(): Promise<Settings> {
+  const { data: settingsData } = await supabase
+    .from("settings")
+    .select("*")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (!settingsData) return DEFAULT_SETTINGS;
+
+  return {
+    company: settingsData.company as Settings["company"],
+    payment: settingsData.payment as Settings["payment"],
+    catalog: settingsData.catalog as Settings["catalog"],
+  };
+}
+
 export async function getDatabase(): Promise<Database> {
   const [
     { data: productsData, error: pErr },
