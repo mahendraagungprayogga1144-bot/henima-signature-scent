@@ -9,11 +9,12 @@
       "topNotes": "Citrus, Green Apple",
       "middleNotes": "Lavender, Jasmine",
       "baseNotes": "Vanilla, Pepper, Patchouli",
-      "photo": "/products/afternoon/lifestyle-car.jpg",
+      "photo": "/products/afternoon/bottle.png",
       "photos": [
+        "/products/afternoon/bottle.png",
+        "/products/afternoon/bottle-duo.png",
         "/products/afternoon/lifestyle-car.jpg",
-        "/products/afternoon/lifestyle-light.jpg",
-        "/layout/product-1.jpg"
+        "/products/afternoon/lifestyle-light.jpg"
       ],
       "originalPrice": 185000,
       "discountPrice": 185000,

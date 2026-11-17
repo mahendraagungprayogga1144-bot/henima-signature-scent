@@ -61,14 +61,15 @@ export default function AddToCartButton({
   if (kenzo) {
     const sorted = [...variants].sort((a, b) => a.sizeMl - b.sizeMl);
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 360 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 28, maxWidth: 280 }}>
         <div
           role="group"
           aria-label="Size"
           style={{
             fontFamily: FUTURA,
-            fontSize: 13,
-            letterSpacing: "0.08em",
+            fontSize: 14,
+            fontWeight: 700,
+            letterSpacing: "0.04em",
             textTransform: "uppercase",
             color: INK,
           }}
@@ -86,50 +87,24 @@ export default function AddToCartButton({
                     padding: 0,
                     cursor: "pointer",
                     fontFamily: FUTURA,
-                    fontSize: 13,
-                    letterSpacing: "0.08em",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    letterSpacing: "0.04em",
                     textTransform: "uppercase",
                     color: INK,
-                    fontWeight: active ? 600 : 400,
-                    textDecoration: active ? "underline" : "none",
-                    textUnderlineOffset: 4,
+                    opacity: active ? 1 : 0.45,
+                    textDecoration: "none",
                   }}
                 >
                   {v.sizeMl} ML
                 </button>
                 {i < sorted.length - 1 ? (
-                  <span style={{ color: "#999", margin: "0 6px" }}>|</span>
+                  <span style={{ color: INK, margin: "0 8px", opacity: 0.45 }}>|</span>
                 ) : null}
               </span>
             );
           })}
         </div>
-
-        {variant && (
-          <p
-            style={{
-              margin: 0,
-              fontFamily: FUTURA,
-              fontSize: 15,
-              letterSpacing: "0.04em",
-              color: flashPrice ? "#E53935" : INK,
-            }}
-          >
-            Rp {(flashPrice || variant.originalPrice).toLocaleString("id-ID")}
-            {flashPrice ? (
-              <span
-                style={{
-                  marginLeft: 10,
-                  color: "#999",
-                  textDecoration: "line-through",
-                  fontSize: 13,
-                }}
-              >
-                Rp {variant.originalPrice.toLocaleString("id-ID")}
-              </span>
-            ) : null}
-          </p>
-        )}
 
         <button
           type="button"
@@ -138,46 +113,23 @@ export default function AddToCartButton({
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            minWidth: 160,
-            width: "100%",
+            alignSelf: "flex-start",
+            minWidth: 168,
             height: 44,
-            padding: "0 24px",
+            padding: "0 28px",
             border: `1px solid ${INK}`,
             background: added ? INK : "transparent",
             color: added ? "#FFFFFF" : INK,
             fontFamily: FUTURA,
             fontSize: 12,
-            letterSpacing: "0.12em",
+            fontWeight: 500,
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
             cursor: "pointer",
             transition: "background 0.2s, color 0.2s",
           }}
         >
           {added ? "Added" : "Purchase"}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            handleAdd();
-            router.push("/cart");
-          }}
-          style={{
-            background: "none",
-            border: "none",
-            padding: 0,
-            cursor: "pointer",
-            fontFamily: FUTURA,
-            fontSize: 11,
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "#666",
-            textAlign: "left",
-            textDecoration: "underline",
-            textUnderlineOffset: 3,
-          }}
-        >
-          Buy now
         </button>
       </div>
     );
