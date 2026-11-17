@@ -35,7 +35,7 @@ const MEDIA = {
     { id: "p5", name: "Beloved", photo: "/layout/product-5.jpg", slug: "shop", line: "Henima", subtitle: "Beloved Extrait de Parfum" },
   ],
   discover: [
-    { name: "Afternoon", image: "/layout/discover-1.jpg?v=6", href: "/shop" },
+    { name: "Afternoon", image: "/products/afternoon/lifestyle-car.jpg", href: "/shop/afternoon" },
     { name: "The Distance", image: "/layout/discover-2.jpg?v=6", href: "/shop" },
     { name: "Signature", image: "/layout/discover-3.jpg?v=6", href: "/shop" },
     { name: "Intimate", image: "/layout/discover-4.jpg?v=6", href: "/shop" },
@@ -79,12 +79,14 @@ function DiscoverTile({
             fontWeight: 700,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            fontFamily: "var(--font-jakarta)",
+            fontFamily: "var(--font-futura-nav), FuturaBT-Medium, Futura, Century Gothic, sans-serif",
           }}
         >
           {name}
         </h2>
-        <span style={{ fontSize: 13 }}>Discover {name} ›</span>
+        <span style={{ fontSize: 13, fontFamily: "var(--font-futura-nav), Futura, sans-serif", letterSpacing: "0.06em" }}>
+          Discover {name} ›
+        </span>
       </div>
     </Link>
   );

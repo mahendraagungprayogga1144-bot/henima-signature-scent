@@ -7,6 +7,7 @@ import StockNotifyButton from "@/components/StockNotifyButton";
 import ProductGallery from "@/components/ProductGallery";
 import ProductLookbookRail from "@/components/ProductLookbookRail";
 import { buildProductMedia, getProductPhotoList } from "@/lib/product-media";
+import { getProductStory, mergeProductGallery } from "@/lib/product-stories";
 
 export const dynamic = "force-dynamic";
 
@@ -16,14 +17,6 @@ const INK = "#212529";
 
 function toSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-}
-
-/** Split story into paragraphs like Kenzo product-desc */
-function storyParagraphs(text: string): string[] {
-  return text
-    .split(/\n+/)
-    .map((p) => p.trim())
-    .filter(Boolean);
 }
 
 export default async function ProductDetailPage({
@@ -55,25 +48,45 @@ export default async function ProductDetailPage({
     }
   }
 
+  const story = getProductStory(slug);
   const variants = Array.isArray(product.variants)
     ? product.variants.filter((v) => v && v.active)
     : [];
   const totalStock = variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
-  const photos = getProductPhotoList(product);
+
+  const dbPhotos = getProductPhotoList(product);
+  const photos = mergeProductGallery(slug, dbPhotos, story);
   const media = buildProductMedia(photos, product.video);
 
   const concentration = product.isGiftSet
     ? "Gift Set"
-    : product.scentFamily || "Extrait de Parfum";
+    : product.scentFamily || story?.variantLabel || "Extrait de Parfum";
 
-  /** Kenzo: product-name = variant line, category-name = big line brand */
-  const productNameLine = `${product.name} ${concentration}`;
-  const categoryName = "HENIMA";
+  /** Kenzo hierarchy: small variant line, BIG product name (not brand) */
+  const variantLine = `${product.name} ${concentration}`;
+  const headline = (story?.headline || product.name).toUpperCase();
 
-  const storyRaw = [product.inspiration, product.description].filter(Boolean).join("\n\n");
-  const paragraphs = storyParagraphs(storyRaw);
+  const paragraphs =
+    story?.paragraphs?.length
+      ? story.paragraphs
+      : [product.inspiration, product.description]
+          .filter(Boolean)
+          .join("\n\n")
+          .split(/\n+/)
+          .map((p) => p.trim())
+          .filter(Boolean);
 
-  const storyImage = photos[1] || photos[0] || product.photo || "";
+  const topNotes = story?.topNotes || product.topNotes;
+  const middleNotes = story?.middleNotes || product.middleNotes;
+  const baseNotes = story?.baseNotes || product.baseNotes;
+
+  const storyImage =
+    photos.find((p) => p.includes("lifestyle")) ||
+    story?.gallery?.[1] ||
+    photos[1] ||
+    photos[0] ||
+    "";
+  const storyBandTitle = story?.storyBandTitle || `THE STORY BEHIND ${product.name.toUpperCase()}`;
 
   const related = products
     .filter((p) => p.id !== product.id)
@@ -89,7 +102,6 @@ export default async function ProductDetailPage({
 
   return (
     <div className="kz-pdp" style={{ background: "#FFFFFF", color: INK, fontFamily: FUTURA, minHeight: "100vh" }}>
-      {/* ===== MAIN: images | story (Kenzo product-detail) ===== */}
       <div className="kz-pdp-top">
         <div className="kz-pdp-images">
           <ProductGallery
@@ -102,14 +114,13 @@ export default async function ProductDetailPage({
 
         <div className="kz-pdp-buy">
           <div className="kz-pdp-sticky">
-            {/* Mobile: category first like Kenzo d-md-none */}
-            <h1 className="kz-pdp-category kz-pdp-category--mobile">{product.name}</h1>
+            {/* Mobile: big name first */}
+            <h1 className="kz-pdp-headline kz-pdp-headline--mobile">{headline}</h1>
 
-            {/* Desktop Kenzo order: product-name then category-name */}
-            <h2 className="kz-pdp-variant">{productNameLine}</h2>
-            <h1 className="kz-pdp-category kz-pdp-category--desktop">{categoryName}</h1>
+            {/* Desktop Kenzo: small variant → big product name */}
+            <p className="kz-pdp-variant">{variantLine}</p>
+            <h1 className="kz-pdp-headline kz-pdp-headline--desktop">{headline}</h1>
 
-            {/* Cerita — product-desc */}
             {paragraphs.length > 0 ? (
               <div className="kz-pdp-desc">
                 {paragraphs.map((p, i) => (
@@ -119,51 +130,35 @@ export default async function ProductDetailPage({
             ) : (
               <div className="kz-pdp-desc">
                 <p>
-                  {product.name} — wewangian {concentration.toLowerCase()} dari Henima Signature Scent.
-                  Setiap tetes menyimpan cerita cinta yang nyata, diracik dengan standar extrait untuk jejak yang bertahan.
+                  {product.name} — an extrait de parfum from Henima. Soft, lasting, made for the
+                  moments you want to keep close.
                 </p>
               </div>
             )}
 
-            {/* Notes as story accents */}
-            {(product.topNotes || product.middleNotes || product.baseNotes) && (
+            {(topNotes || middleNotes || baseNotes) && (
               <p className="kz-pdp-notes-line">
                 {[
-                  product.topNotes && `Top: ${product.topNotes}`,
-                  product.middleNotes && `Heart: ${product.middleNotes}`,
-                  product.baseNotes && `Base: ${product.baseNotes}`,
+                  topNotes && `Top: ${topNotes}`,
+                  middleNotes && `Heart: ${middleNotes}`,
+                  baseNotes && `Base: ${baseNotes}`,
                 ]
                   .filter(Boolean)
                   .join(" · ")}
               </p>
             )}
 
-            {/* Capacity: 30 ML | 50 ML */}
-            {variants.length > 0 && (
-              <div className="kz-pdp-capacity" aria-label="Size">
-                {variants
-                  .slice()
-                  .sort((a, b) => a.sizeMl - b.sizeMl)
-                  .map((v, i, arr) => (
-                    <span key={v.id}>
-                      <span className="kz-pdp-cap">{v.sizeMl} ML</span>
-                      {i < arr.length - 1 ? <span className="kz-pdp-cap-sep"> | </span> : null}
-                    </span>
-                  ))}
-              </div>
-            )}
-
-            {/* Purchase actions */}
             <div className="kz-pdp-actions">
               {!product.comingSoon && totalStock === 0 ? (
                 <>
-                  <div className="kz-pdp-outline-btn kz-pdp-outline-btn--muted">Stok Habis</div>
+                  <div className="kz-pdp-outline-btn kz-pdp-outline-btn--muted">Out of stock</div>
                   <StockNotifyButton productId={product.id} productName={product.name} />
                 </>
               ) : product.comingSoon ? (
                 <div className="kz-pdp-outline-btn kz-pdp-outline-btn--muted">Coming Soon</div>
               ) : (
                 <AddToCartButton
+                  kenzo
                   flashPrice={flashSale?.product_id === product.id ? flashSale?.flash_price : undefined}
                   flashSaleId={flashSale?.id}
                   productId={product.id}
@@ -181,7 +176,7 @@ export default async function ProductDetailPage({
 
             {product.isGiftSet && (product.bundleItems?.length ?? 0) > 0 && (
               <div className="kz-pdp-bundle">
-                <p className="kz-pdp-bundle-title">Isi Gift Set</p>
+                <p className="kz-pdp-bundle-title">Gift Set includes</p>
                 <ul>
                   {(product.bundleItems || []).map((item) => {
                     const linked = products.find((p) => p.id === item.productId);
@@ -203,20 +198,16 @@ export default async function ProductDetailPage({
         </div>
       </div>
 
-      {/* ===== STORY BAND — Kenzo grey commitment block ===== */}
+      {/* Story band — lifestyle + narrative */}
       <section className="kz-pdp-storyband">
         <div className="kz-pdp-storyband-inner">
           <div className="kz-pdp-storyband-card">
-            <h2>THE STORY BEHIND {product.name.toUpperCase()}</h2>
+            <h2>{storyBandTitle}</h2>
             <div className="kz-pdp-storyband-text">
-              {paragraphs.length > 0 ? (
-                paragraphs.map((p, i) => <p key={i}>{p}</p>)
-              ) : (
-                <p>
-                  Henima lahir dari kisah cinta jarak jauh. Setiap wewangian adalah pengingat bahwa cinta itu nyata —
-                  dan setiap tetes menyimpan memori yang ingin kamu bawa sepanjang hari.
-                </p>
-              )}
+              {story?.storyBandExtra ? <p>{story.storyBandExtra}</p> : null}
+              {paragraphs.slice(0, 2).map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
               {(product.sillage || product.longevity) && (
                 <p>
                   {[
@@ -239,7 +230,18 @@ export default async function ProductDetailPage({
         </div>
       </section>
 
-      {/* ===== LINE RAIL — Kenzo “THE … LINE” ===== */}
+      {/* Second lifestyle strip when curated gallery has 2+ shots */}
+      {story?.gallery && story.gallery.length > 1 ? (
+        <section className="kz-pdp-lifestyle">
+          <div className="kz-pdp-lifestyle-inner">
+            {story.gallery.slice(0, 2).map((src) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={src} src={src} alt="" />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       {related.length > 0 && (
         <ProductLookbookRail title="The Henima line" products={related} hrefAll="/shop" ctaLabel="Discover" />
       )}
@@ -270,31 +272,28 @@ export default async function ProductDetailPage({
         }
 
         .kz-pdp-variant {
-          margin: 0 0 8px;
+          margin: 0 0 10px;
           font-family: ${FUTURA};
           font-size: 15px;
           font-weight: 500;
           letter-spacing: 0.04em;
           line-height: 1.35;
           color: ${INK};
-          text-transform: none;
         }
-        .kz-pdp-category {
+        .kz-pdp-headline {
           margin: 0 0 28px;
           font-family: ${FUTURA};
-          font-size: clamp(32px, 4.2vw, 48px);
+          font-size: clamp(34px, 4.5vw, 52px);
           font-weight: 500;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.08em;
           line-height: 1.05;
           text-transform: uppercase;
           color: ${INK};
         }
-        .kz-pdp-category--mobile { display: none; }
-        .kz-pdp-category--desktop { display: block; }
+        .kz-pdp-headline--mobile { display: none; }
+        .kz-pdp-headline--desktop { display: block; }
 
-        .kz-pdp-desc {
-          margin: 0 0 24px;
-        }
+        .kz-pdp-desc { margin: 0 0 24px; }
         .kz-pdp-desc p {
           margin: 0 0 16px;
           font-size: 14px;
@@ -306,23 +305,12 @@ export default async function ProductDetailPage({
         .kz-pdp-desc p:last-child { margin-bottom: 0; }
 
         .kz-pdp-notes-line {
-          margin: 0 0 24px;
+          margin: 0 0 28px;
           font-size: 12px;
           line-height: 1.6;
           color: #666;
           font-family: ${FUTURA};
         }
-
-        .kz-pdp-capacity {
-          margin: 0 0 28px;
-          font-family: ${FUTURA};
-          font-size: 13px;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: ${INK};
-        }
-        .kz-pdp-cap { font-weight: 500; }
-        .kz-pdp-cap-sep { color: #999; margin: 0 2px; }
 
         .kz-pdp-actions { margin-bottom: 8px; max-width: 400px; }
 
@@ -359,7 +347,6 @@ export default async function ProductDetailPage({
         .kz-pdp-bundle li { margin: 0 0 8px; font-size: 14px; }
         .kz-pdp-bundle a { color: ${INK}; text-decoration: none; border-bottom: 1px solid rgba(33,37,41,0.25); }
 
-        /* Story band — Kenzo ke-greyBackground */
         .kz-pdp-storyband {
           background: #F5F5F5;
           padding: 72px 0;
@@ -401,14 +388,34 @@ export default async function ProductDetailPage({
           display: flex;
           align-items: center;
           justify-content: center;
+          overflow: hidden;
         }
         .kz-pdp-storyband-media img {
           width: 100%;
-          max-width: 420px;
-          height: auto;
-          max-height: 500px;
-          object-fit: contain;
+          max-width: 480px;
+          aspect-ratio: 1;
+          object-fit: cover;
           display: block;
+        }
+
+        .kz-pdp-lifestyle {
+          background: #FFFFFF;
+          padding: 0 0 72px;
+        }
+        .kz-pdp-lifestyle-inner {
+          max-width: 1120px;
+          margin: 0 auto;
+          padding: 0 40px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2px;
+        }
+        .kz-pdp-lifestyle-inner img {
+          width: 100%;
+          aspect-ratio: 1;
+          object-fit: cover;
+          display: block;
+          background: #F5F5F5;
         }
 
         @media (max-width: 900px) {
@@ -416,34 +423,30 @@ export default async function ProductDetailPage({
             grid-template-columns: 1fr;
             min-height: auto;
           }
-          .kz-pdp-images {
-            min-height: auto;
-          }
-          .kz-pdp-buy {
-            padding: 28px 20px 48px;
-          }
-          .kz-pdp-sticky {
-            position: static;
-            max-width: none;
-          }
-          .kz-pdp-category--mobile {
+          .kz-pdp-images { min-height: auto; }
+          .kz-pdp-buy { padding: 28px 20px 48px; }
+          .kz-pdp-sticky { position: static; max-width: none; }
+          .kz-pdp-headline--mobile {
             display: block;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             font-size: 28px;
           }
-          .kz-pdp-category--desktop { display: none; }
-          .kz-pdp-variant { order: 2; }
+          .kz-pdp-headline--desktop { display: none; }
           .kz-pdp-storyband { padding: 48px 0; }
           .kz-pdp-storyband-inner {
+            display: flex;
+            flex-direction: column-reverse;
             grid-template-columns: 1fr;
             padding: 0 16px;
             gap: 28px;
           }
-          .kz-pdp-storyband-inner {
-            display: flex;
-            flex-direction: column-reverse;
-          }
           .kz-pdp-storyband-card { padding: 28px 22px; }
+          .kz-pdp-lifestyle { padding-bottom: 48px; }
+          .kz-pdp-lifestyle-inner {
+            grid-template-columns: 1fr;
+            padding: 0 16px;
+            gap: 2px;
+          }
         }
       `}</style>
     </div>

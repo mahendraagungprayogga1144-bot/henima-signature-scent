@@ -3,9 +3,18 @@
     {
       "id": "prod-afternoon",
       "name": "Afternoon",
-      "description": "Blend lembut dengan aroma floral, cocok untuk sore hari.",
-      "photo": "/layout/product-1.jpg",
-      "photos": ["/layout/product-1.jpg"],
+      "description": "AFTERNOON, an enveloping floral-woody extrait inspired by the golden hour — when the day softens, and every memory feels closer.",
+      "inspiration": "From the first spray, bright citrus and crisp green apple open like late sunlight through leaves. At the heart, lavender and jasmine bloom with a quiet warmth. The base settles into vanilla, pepper, and soft woods — a trail that stays long after the afternoon fades.",
+      "scentFamily": "Extrait de Parfum",
+      "topNotes": "Citrus, Green Apple",
+      "middleNotes": "Lavender, Jasmine",
+      "baseNotes": "Vanilla, Pepper, Patchouli",
+      "photo": "/products/afternoon/lifestyle-car.jpg",
+      "photos": [
+        "/products/afternoon/lifestyle-car.jpg",
+        "/products/afternoon/lifestyle-light.jpg",
+        "/layout/product-1.jpg"
+      ],
       "originalPrice": 185000,
       "discountPrice": 185000,
       "active": true,
