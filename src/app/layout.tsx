@@ -53,7 +53,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  assertEnv();
+  try {
+    assertEnv();
+  } catch (err) {
+    console.error("[layout] env check failed", err);
+    if (process.env.VERCEL_ENV === "production") throw err;
+  }
   const settings = await getSettings();
   const socialLinks = (settings.company as { socialLinks?: Record<string, string> }).socialLinks || {};
   const user = await getCurrentUserSafe();

@@ -210,19 +210,27 @@ export async function getSettings(): Promise<Settings> {
     return loadLocalDatabase().settings;
   }
 
-  const { data: settingsData } = await supabase
-    .from("settings")
-    .select("*")
-    .eq("id", 1)
-    .maybeSingle();
+  try {
+    const { data: settingsData, error } = await supabase
+      .from("settings")
+      .select("*")
+      .eq("id", 1)
+      .maybeSingle();
 
-  if (!settingsData) return DEFAULT_SETTINGS;
+    if (error || !settingsData) {
+      if (error) console.error("[db] settings fetch failed", error.message);
+      return DEFAULT_SETTINGS;
+    }
 
-  return {
-    company: settingsData.company as Settings["company"],
-    payment: settingsData.payment as Settings["payment"],
-    catalog: settingsData.catalog as Settings["catalog"],
-  };
+    return {
+      company: settingsData.company as Settings["company"],
+      payment: settingsData.payment as Settings["payment"],
+      catalog: settingsData.catalog as Settings["catalog"],
+    };
+  } catch (err) {
+    console.error("[db] settings unexpected failure", err);
+    return DEFAULT_SETTINGS;
+  }
 }
 
 export async function getDatabase(): Promise<Database> {
@@ -231,39 +239,48 @@ export async function getDatabase(): Promise<Database> {
     return loadLocalDatabase();
   }
 
-  const [
-    { data: productsData, error: pErr },
-    { data: usersData, error: uErr },
-    { data: ordersData, error: oErr },
-    { data: settingsData },
-  ] = await Promise.all([
-    supabase.from("products").select("*").order("name"),
-    supabase.from("users").select("*").order("created_at"),
-    supabase.from("orders").select("*").order("created_at", { ascending: false }),
-    supabase.from("settings").select("*").eq("id", 1).maybeSingle(),
-  ]);
+  try {
+    const [
+      { data: productsData, error: pErr },
+      { data: usersData, error: uErr },
+      { data: ordersData, error: oErr },
+      { data: settingsData },
+    ] = await Promise.all([
+      supabase.from("products").select("*").order("name"),
+      supabase.from("users").select("*").order("created_at"),
+      supabase.from("orders").select("*").order("created_at", { ascending: false }),
+      supabase.from("settings").select("*").eq("id", 1).maybeSingle(),
+    ]);
 
-  if (pErr) throw new Error(`Products fetch failed: ${pErr.message}`);
-  if (uErr) throw new Error(`Users fetch failed: ${uErr.message}`);
-  if (oErr) throw new Error(`Orders fetch failed: ${oErr.message}`);
+    if (pErr || uErr || oErr) {
+      console.error("[db] Supabase query failed — falling back to local db.json", {
+        products: pErr?.message,
+        users: uErr?.message,
+        orders: oErr?.message,
+      });
+      return loadLocalDatabase();
+    }
 
-  const settings: Settings = settingsData
-    ? {
-        company: settingsData.company as Settings["company"],
-        payment: settingsData.payment as Settings["payment"],
-        catalog: settingsData.catalog as any,
-        gallery: settingsData.gallery as any,
-        marqueeItems: settingsData.marquee_items as any,
-        marqueeItems: settingsData.marquee_items as any,
-      }
-    : DEFAULT_SETTINGS;
+    const settings: Settings = settingsData
+      ? {
+          company: settingsData.company as Settings["company"],
+          payment: settingsData.payment as Settings["payment"],
+          catalog: settingsData.catalog as any,
+          gallery: settingsData.gallery as any,
+          marqueeItems: settingsData.marquee_items as any,
+        }
+      : DEFAULT_SETTINGS;
 
-  return {
-    products: (productsData ?? []).map(rowToProduct),
-    users: (usersData ?? []).map(rowToUser),
-    orders: (ordersData ?? []).map(rowToOrder),
-    settings,
-  };
+    return {
+      products: (productsData ?? []).map(rowToProduct),
+      users: (usersData ?? []).map(rowToUser),
+      orders: (ordersData ?? []).map(rowToOrder),
+      settings,
+    };
+  } catch (err) {
+    console.error("[db] Unexpected Supabase failure — falling back to local db.json", err);
+    return loadLocalDatabase();
+  }
 }
 
 export async function getUserById(id: string): Promise<User | null> {

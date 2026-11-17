@@ -20,12 +20,14 @@ export function assertEnv(): void {
   validated = true;
 
   const missing: string[] = [];
+  /** Vercel Preview also has NODE_ENV=production — only hard-fail on real Production. */
+  const isProdDeploy = process.env.VERCEL_ENV === "production";
 
   for (const key of REQUIRED_ALWAYS) {
     if (!process.env[key]) missing.push(key);
   }
 
-  if (process.env.NODE_ENV === "production") {
+  if (isProdDeploy || process.env.NODE_ENV === "production") {
     for (const key of REQUIRED_PRODUCTION) {
       if (!process.env[key]) missing.push(key);
     }
@@ -36,7 +38,8 @@ export function assertEnv(): void {
 
   if (missing.length) {
     const msg = `[env] Missing required variables: ${missing.join(", ")}`;
-    if (process.env.NODE_ENV === "production") {
+    // Preview / local: warn only — throwing here shows the white "Application error" page.
+    if (isProdDeploy) {
       throw new Error(msg);
     }
     console.warn(msg);

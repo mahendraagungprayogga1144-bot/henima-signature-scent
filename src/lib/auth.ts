@@ -10,7 +10,8 @@ const SESSION_MAX_AGE_REMEMBER = 60 * 60 * 24 * 30; // 30 hari
 function sessionSecret(): string {
   const secret = process.env.SESSION_SECRET;
   if (!secret) {
-    if (process.env.NODE_ENV === "production") {
+    // Preview deploys also run NODE_ENV=production; only hard-fail real Production.
+    if (process.env.VERCEL_ENV === "production") {
       throw new Error("SESSION_SECRET is required in production");
     }
     return "toko-dev-secret";
