@@ -45,20 +45,10 @@ const AFTERNOON: ProductStory = {
     image: "/products/afternoon/bottle.png",
     footnote: "Extrait de parfum · lasting intimacy.",
   },
-  lifestyle: [
-    {
-      src: "/products/afternoon/lifestyle-car.jpg",
-      title: "THE GOLDEN HOUR",
-      cta: "Discover Afternoon ›",
-    },
-    {
-      src: "/products/afternoon/lifestyle-light.jpg",
-      title: "AFTERNOON",
-      cta: "The story behind ›",
-    },
-  ],
+  /* No dual lifestyle tiles — same photos already in left gallery stack */
+  lifestyle: [],
   lineTitle: "THE AFTERNOON LINE",
-};
+}
 
 const STORIES: Record<string, ProductStory> = {
   afternoon: AFTERNOON,
