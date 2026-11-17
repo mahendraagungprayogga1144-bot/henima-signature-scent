@@ -42,12 +42,11 @@ export default function KenzoProductImages({
           color: rgba(33,37,41,0.12);
           font-size: clamp(28px, 5vw, 48px);
         }
-        /* Kenzo: .product-detail .primary-images .product-images */
+        /* Full-column squares so left stack is tall enough for sticky right */
         .kz-product-images {
-          max-width: 551px;
-          max-height: 551px;
           width: 100%;
-          margin: 0 auto 20px;
+          max-width: 100%;
+          margin: 0 0 2px;
           aspect-ratio: 1;
           display: flex;
           align-items: center;
@@ -61,14 +60,17 @@ export default function KenzoProductImages({
         .kz-product-images img {
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
           display: block;
+        }
+        /* Bottle shots stay contained; lifestyle can fill */
+        .kz-product-images:first-child img,
+        .kz-product-images:nth-child(4) img {
+          object-fit: contain;
         }
         @media (max-width: 768.98px) {
           .kz-product-images {
-            max-width: 100%;
-            max-height: none;
-            margin-bottom: 12px;
+            margin-bottom: 2px;
           }
         }
       `}</style>

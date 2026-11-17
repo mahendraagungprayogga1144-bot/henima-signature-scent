@@ -240,10 +240,11 @@ export default async function ProductDetailPage({
           min-height: 100vh;
         }
 
-        /* ===== Kenzo .product-container: images scroll, sidebar sticky ===== */
+        /* ===== Kenzo: left stack scrolls; right sticks until images done ===== */
         .kz-product-container {
           display: flex;
-          align-items: flex-start;
+          /* stretch = sidebar column as tall as 4-image stack → sticky has room */
+          align-items: stretch;
           justify-content: space-around;
           max-width: 1400px;
           margin: 0 auto;
@@ -261,13 +262,17 @@ export default async function ProductDetailPage({
           max-width: 50%;
           width: 50%;
           padding: 40px 7vw 80px 3rem;
+          /* inherit full height of image stack */
+          align-self: stretch;
         }
 
-        /* Kenzo: .sidebar__inner { position: sticky; top: 150px } */
+        /* Stays pinned while left 4 images scroll; releases after stack ends */
         .kz-sidebar__inner {
+          position: -webkit-sticky;
           position: sticky;
-          top: 150px;
+          top: 140px;
           max-width: 420px;
+          align-self: flex-start;
         }
 
         .kz-mobile-titles { display: none; }

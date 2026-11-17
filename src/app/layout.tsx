@@ -83,7 +83,8 @@ export default async function RootLayout({
         <SplashScreen />
         <ScrollObserver />
         <NavbarWrapper />
-        <main style={{width:"100%", overflow:"hidden"}}>{children}</main>
+        {/* overflow-x only — overflow:hidden on main kills position:sticky (Kenzo PDP) */}
+        <main style={{ width: "100%", overflowX: "hidden" }}>{children}</main>
         <footer style={{background:"#212121", padding:"64px 0 80px", marginTop:0}}>
           <div style={{maxWidth:1120, margin:"0 auto", padding:"0 24px", boxSizing:"border-box"}}>
             <div
