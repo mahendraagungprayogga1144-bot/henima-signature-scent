@@ -79,12 +79,11 @@ export default async function RootLayout({
           contactPoint: { '@type': 'ContactPoint', telephone: '+6285190311230', contactType: 'customer service' }
         })}}/>
       </head>
-      <body className={`min-h-screen font-sans antialiased ${jakarta.variable} ${futuraNav.variable}`} style={{background:"#FFFFFF", color:"#111111", overflowX:"hidden", fontFamily:"var(--font-jakarta), system-ui, sans-serif"}}>
+      <body className={`min-h-screen font-sans antialiased ${jakarta.variable} ${futuraNav.variable}`} style={{background:"#FFFFFF", color:"#111111", overflowX:"clip", fontFamily:"var(--font-jakarta), system-ui, sans-serif"}}>
         <SplashScreen />
         <ScrollObserver />
         <NavbarWrapper />
-        {/* overflow-x only — overflow:hidden on main kills position:sticky (Kenzo PDP) */}
-        <main style={{ width: "100%", overflowX: "hidden" }}>{children}</main>
+        <main style={{ width: "100%", overflowX: "clip" }}>{children}</main>
         <footer style={{background:"#212121", padding:"64px 0 80px", marginTop:0}}>
           <div style={{maxWidth:1120, margin:"0 auto", padding:"0 24px", boxSizing:"border-box"}}>
             <div

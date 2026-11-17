@@ -5,6 +5,7 @@ import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
 import StockNotifyButton from "@/components/StockNotifyButton";
 import KenzoProductImages from "@/components/KenzoProductImages";
+import KenzoStickyBuy from "@/components/KenzoStickyBuy";
 import ProductLookbookRail from "@/components/ProductLookbookRail";
 import { getProductPhotoList } from "@/lib/product-media";
 import { getProductStory, mergeProductGallery } from "@/lib/product-stories";
@@ -113,81 +114,83 @@ export default async function ProductDetailPage({
         </div>
 
         <aside className="kz-sidebar-col">
-          <div className="kz-sidebar__inner">
-            <p className="kz-product-name kz-desk-only">{productNameLine}</p>
-            <h1 className="kz-category-name kz-desk-only">{categoryName}</h1>
+          <KenzoStickyBuy top={140}>
+            <div className="kz-sidebar__inner">
+              <p className="kz-product-name kz-desk-only">{productNameLine}</p>
+              <h1 className="kz-category-name kz-desk-only">{categoryName}</h1>
 
-            <div className="kz-product-desc">
-              <p>{description}</p>
-            </div>
+              <div className="kz-product-desc">
+                <p>{description}</p>
+              </div>
 
-            {(story?.topNotes || story?.middleNotes || story?.baseNotes) && (
-              <div className="kz-notes">
-                {story.topNotes && (
-                  <p>
-                    <span>Top</span> {story.topNotes}
-                  </p>
-                )}
-                {story.middleNotes && (
-                  <p>
-                    <span>Heart</span> {story.middleNotes}
-                  </p>
-                )}
-                {story.baseNotes && (
-                  <p>
-                    <span>Base</span> {story.baseNotes}
-                  </p>
+              {(story?.topNotes || story?.middleNotes || story?.baseNotes) && (
+                <div className="kz-notes">
+                  {story.topNotes && (
+                    <p>
+                      <span>Top</span> {story.topNotes}
+                    </p>
+                  )}
+                  {story.middleNotes && (
+                    <p>
+                      <span>Heart</span> {story.middleNotes}
+                    </p>
+                  )}
+                  {story.baseNotes && (
+                    <p>
+                      <span>Base</span> {story.baseNotes}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="kz-prices-add-to-cart-actions">
+                {!product.comingSoon && totalStock === 0 ? (
+                  <>
+                    <div className="kz-outline-btn kz-outline-btn--muted">Out of stock</div>
+                    <StockNotifyButton productId={product.id} productName={product.name} />
+                  </>
+                ) : product.comingSoon ? (
+                  <div className="kz-outline-btn kz-outline-btn--muted">Coming Soon</div>
+                ) : (
+                  <AddToCartButton
+                    kenzo
+                    flashPrice={flashSale?.product_id === product.id ? flashSale?.flash_price : undefined}
+                    flashSaleId={flashSale?.id}
+                    productId={product.id}
+                    productName={product.name}
+                    productPhoto={photos[0] || product.photo || ""}
+                    variants={variants.map((v) => ({
+                      id: v.id,
+                      sizeMl: v.sizeMl,
+                      originalPrice: Number(v.originalPrice) || 0,
+                      active: Boolean(v.active),
+                    }))}
+                  />
                 )}
               </div>
-            )}
 
-            <div className="kz-prices-add-to-cart-actions">
-              {!product.comingSoon && totalStock === 0 ? (
-                <>
-                  <div className="kz-outline-btn kz-outline-btn--muted">Out of stock</div>
-                  <StockNotifyButton productId={product.id} productName={product.name} />
-                </>
-              ) : product.comingSoon ? (
-                <div className="kz-outline-btn kz-outline-btn--muted">Coming Soon</div>
-              ) : (
-                <AddToCartButton
-                  kenzo
-                  flashPrice={flashSale?.product_id === product.id ? flashSale?.flash_price : undefined}
-                  flashSaleId={flashSale?.id}
-                  productId={product.id}
-                  productName={product.name}
-                  productPhoto={photos[0] || product.photo || ""}
-                  variants={variants.map((v) => ({
-                    id: v.id,
-                    sizeMl: v.sizeMl,
-                    originalPrice: Number(v.originalPrice) || 0,
-                    active: Boolean(v.active),
-                  }))}
-                />
+              {product.isGiftSet && (product.bundleItems?.length ?? 0) > 0 && (
+                <div className="kz-bundle">
+                  <p className="kz-bundle-title">Gift Set includes</p>
+                  <ul>
+                    {(product.bundleItems || []).map((item) => {
+                      const linked = products.find((p) => p.id === item.productId);
+                      const label = item.label || linked?.name || item.productId;
+                      return (
+                        <li key={item.productId}>
+                          {linked ? (
+                            <Link href={`/shop/${toSlug(linked.name)}`}>{label}</Link>
+                          ) : (
+                            label
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               )}
             </div>
-
-            {product.isGiftSet && (product.bundleItems?.length ?? 0) > 0 && (
-              <div className="kz-bundle">
-                <p className="kz-bundle-title">Gift Set includes</p>
-                <ul>
-                  {(product.bundleItems || []).map((item) => {
-                    const linked = products.find((p) => p.id === item.productId);
-                    const label = item.label || linked?.name || item.productId;
-                    return (
-                      <li key={item.productId}>
-                        {linked ? (
-                          <Link href={`/shop/${toSlug(linked.name)}`}>{label}</Link>
-                        ) : (
-                          label
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-          </div>
+          </KenzoStickyBuy>
         </aside>
       </div>
 
@@ -262,17 +265,13 @@ export default async function ProductDetailPage({
           max-width: 50%;
           width: 50%;
           padding: 40px 7vw 80px 3rem;
-          /* inherit full height of image stack */
+          /* Must match left stack height so pin lasts through all 4 images */
           align-self: stretch;
+          position: relative;
         }
 
-        /* Stays pinned while left 4 images scroll; releases after stack ends */
         .kz-sidebar__inner {
-          position: -webkit-sticky;
-          position: sticky;
-          top: 140px;
           max-width: 420px;
-          align-self: flex-start;
         }
 
         .kz-mobile-titles { display: none; }
