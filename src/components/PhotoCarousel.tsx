@@ -40,9 +40,9 @@ export default function PhotoCarousel({ images }: { images: string[] }) {
   const translateX = -(current * 100) + (dragOffset / (containerWidth.current || (typeof window !== "undefined" ? window.innerWidth : 375))) * 100;
 
   return (
-    <section style={{ background: "#FAF8F4", borderTop: "1px solid rgba(28,25,23,0.06)" }}>
+    <section style={{ background: "#FFFFFF", borderTop: "1px solid rgba(17,17,17,0.06)" }}>
       <div style={{ padding: "48px 8vw 24px" }}>
-        <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#9A8F82", fontFamily: "var(--font-jost)" }}>Gallery</p>
+        <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#A3A3A3", fontFamily: "var(--font-jakarta)" }}>Gallery</p>
       </div>
 
       <div
@@ -63,7 +63,7 @@ export default function PhotoCarousel({ images }: { images: string[] }) {
           willChange: "transform"
         }}>
           {images.map((img, i) => (
-            <div key={i} style={{ minWidth: "100%", position: "relative", height: "85vh", background: "#1C1917", flexShrink: 0 }}>
+            <div key={i} style={{ minWidth: "100%", position: "relative", height: "85vh", background: "#111111", flexShrink: 0 }}>
               <Image src={img} alt={"Gallery " + (i + 1)} fill style={{ objectFit: "cover", objectPosition: "center", pointerEvents: "none" }} draggable={false} />
             </div>
           ))}
@@ -73,13 +73,13 @@ export default function PhotoCarousel({ images }: { images: string[] }) {
         {images.length > 1 && (
           <div style={{ position: "absolute", bottom: "28px", left: "50%", transform: "translateX(-50%)", display: "flex", gap: "8px", alignItems: "center" }}>
             {images.map((_, i) => (
-              <button key={i} onClick={() => setCurrent(i)} style={{ width: i === current ? "32px" : "8px", height: "8px", borderRadius: "4px", background: i === current ? "#FAF8F4" : "rgba(250,248,244,0.35)", border: "none", cursor: "pointer", transition: "all 0.4s ease", padding: 0 }} />
+              <button key={i} onClick={() => setCurrent(i)} style={{ width: i === current ? "32px" : "8px", height: "8px", borderRadius: "4px", background: i === current ? "#FFFFFF" : "rgba(250,248,244,0.35)", border: "none", cursor: "pointer", transition: "all 0.4s ease", padding: 0 }} />
             ))}
           </div>
         )}
 
         {/* Counter */}
-        <div style={{ position: "absolute", top: "20px", right: "20px", background: "rgba(28,25,23,0.45)", backdropFilter: "blur(12px)", color: "#FAF8F4", fontSize: "11px", letterSpacing: "2px", padding: "6px 14px", fontFamily: "var(--font-jost)" }}>
+        <div style={{ position: "absolute", top: "20px", right: "20px", background: "rgba(17,17,17,0.45)", backdropFilter: "blur(12px)", color: "#FFFFFF", fontSize: "11px", letterSpacing: "2px", padding: "6px 14px", fontFamily: "var(--font-jakarta)" }}>
           {current + 1} / {images.length}
         </div>
       </div>

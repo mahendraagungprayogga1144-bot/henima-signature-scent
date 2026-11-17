@@ -110,8 +110,8 @@ export default async function KatalogDigitalPage() {
         .catalog-page {
           background: #ffffff;
           min-height: 100vh;
-          color: #1C1917;
-          font-family: var(--font-jost);
+          color: #111111;
+          font-family: var(--font-jakarta);
           width: 100%;
           margin: 0;
           padding: 0;
@@ -123,7 +123,7 @@ export default async function KatalogDigitalPage() {
           width: 100%;
           min-height: calc(100svh - 60px);
           overflow: hidden;
-          border-bottom: 2px solid #1C1917;
+          border-bottom: 2px solid #111111;
         }
         .catalog-hero-media {
           position: absolute;
@@ -149,16 +149,16 @@ export default async function KatalogDigitalPage() {
           font-size: 11px;
           letter-spacing: 4px;
           text-transform: uppercase;
-          color: #1C1917;
+          color: #111111;
           margin-bottom: 24px;
           font-weight: 500;
           text-shadow: 0 0 32px rgba(255, 255, 255, 0.95);
         }
         .catalog-hero-title {
-          font-family: var(--font-jost);
+          font-family: var(--font-jakarta);
           font-size: clamp(48px, 8vw, 96px);
           font-weight: 700;
-          color: #1C1917;
+          color: #111111;
           line-height: 0.95;
           letter-spacing: -2px;
           text-shadow: 0 0 40px rgba(255, 255, 255, 0.95), 0 0 80px rgba(255, 255, 255, 0.7);
@@ -172,7 +172,7 @@ export default async function KatalogDigitalPage() {
           align-items: center;
           gap: 8px;
           background: #ffffff;
-          color: #1C1917;
+          color: #111111;
           padding: 12px 20px;
           font-size: 12px;
           letter-spacing: 0.5px;
@@ -202,7 +202,7 @@ export default async function KatalogDigitalPage() {
           width: 100%;
           height: 100%;
           background: #F0F0F0;
-          color: #9A8F82;
+          color: #A3A3A3;
           font-size: 13px;
           letter-spacing: 1px;
           text-align: center;
@@ -224,31 +224,31 @@ export default async function KatalogDigitalPage() {
           margin-bottom: 40px;
         }
         .catalog-product-name {
-          font-family: var(--font-jost);
+          font-family: var(--font-jakarta);
           font-size: clamp(32px, 5vw, 56px);
           font-weight: 700;
-          color: #1C1917;
+          color: #111111;
           line-height: 1;
           margin-bottom: 10px;
           letter-spacing: -1px;
         }
         .catalog-product-info {
           font-size: 13px;
-          color: #6B6560;
+          color: #737373;
           margin-bottom: 8px;
         }
         .catalog-product-info strong {
           font-weight: 700;
-          color: #1C1917;
+          color: #111111;
         }
         .catalog-product-price {
           font-size: 15px;
           font-weight: 600;
-          color: #1C1917;
+          color: #111111;
         }
         .catalog-product-coming-soon {
           font-size: 13px;
-          color: #9A8F82;
+          color: #A3A3A3;
         }
         .catalog-product-body {
           display: grid;
@@ -274,7 +274,7 @@ export default async function KatalogDigitalPage() {
         }
         .catalog-product-story {
           font-size: 15px;
-          color: #4A4440;
+          color: #525252;
           line-height: 1.8;
           font-weight: 300;
           margin-bottom: 28px;
@@ -288,12 +288,12 @@ export default async function KatalogDigitalPage() {
         .catalog-note-label {
           font-size: 13px;
           font-weight: 700;
-          color: #1C1917;
+          color: #111111;
           margin-bottom: 4px;
         }
         .catalog-note-value {
           font-size: 14px;
-          color: #6B6560;
+          color: #737373;
           font-weight: 300;
           line-height: 1.6;
         }
@@ -304,7 +304,7 @@ export default async function KatalogDigitalPage() {
         }
         .catalog-performance {
           font-size: 13px;
-          color: #1C1917;
+          color: #111111;
           line-height: 1.8;
         }
         .catalog-performance-label {
@@ -312,12 +312,12 @@ export default async function KatalogDigitalPage() {
         }
         .catalog-performance-sep {
           font-weight: 400;
-          color: #6B6560;
+          color: #737373;
         }
 
         /* ── Footer CTA ── */
         .catalog-cta {
-          background: #1C1917;
+          background: #111111;
           padding: 80px 8vw;
           display: flex;
           justify-content: space-between;
@@ -326,7 +326,7 @@ export default async function KatalogDigitalPage() {
           flex-wrap: wrap;
         }
         .catalog-cta-title {
-          font-family: var(--font-jost);
+          font-family: var(--font-jakarta);
           font-size: clamp(24px, 3vw, 36px);
           font-weight: 700;
           color: #fff;

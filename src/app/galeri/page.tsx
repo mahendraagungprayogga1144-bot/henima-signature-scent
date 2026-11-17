@@ -10,13 +10,13 @@ export default async function GaleriPage() {
   const allImages = [...images, ...galleryImages].filter(Boolean);
 
   return (
-    <div style={{background:"#FAF8F4",minHeight:"100vh",fontFamily:"var(--font-jost,sans-serif)"}}>
+    <div style={{background:"#FFFFFF",minHeight:"100vh",fontFamily:"var(--font-jost,sans-serif)"}}>
 
       {/* HERO */}
       <div style={{padding:"clamp(80px,10vw,140px) clamp(20px,8vw,80px) clamp(40px,6vw,60px)",borderBottom:"1px solid rgba(28,25,23,0.08)"}}>
-        <p style={{fontSize:"10px",letterSpacing:"4px",textTransform:"uppercase",color:"#9A8F82",marginBottom:"20px"}}>{company.name}</p>
-        <h1 style={{fontFamily:"var(--font-cormorant,serif)",fontSize:"clamp(40px,7vw,90px)",fontWeight:400,fontStyle:"italic",color:"#1C1917",lineHeight:1,marginBottom:"20px"}}>Gallery</h1>
-        <p style={{fontSize:"clamp(13px,1.4vw,16px)",color:"#9A8F82",maxWidth:"360px",lineHeight:1.8}}>Momen, produk, dan cerita di balik {company.name}.</p>
+        <p style={{fontSize:"10px",letterSpacing:"4px",textTransform:"uppercase",color:"#A3A3A3",marginBottom:"20px"}}>{company.name}</p>
+        <h1 style={{fontFamily:"var(--font-cormorant,serif)",fontSize:"clamp(40px,7vw,90px)",fontWeight:400,fontStyle:"italic",color:"#111111",lineHeight:1,marginBottom:"20px"}}>Gallery</h1>
+        <p style={{fontSize:"clamp(13px,1.4vw,16px)",color:"#A3A3A3",maxWidth:"360px",lineHeight:1.8}}>Momen, produk, dan cerita di balik {company.name}.</p>
       </div>
 
       {/* MASONRY GRID */}

@@ -1,6 +1,42 @@
+import { readFileSync, existsSync } from "fs";
+import path from "path";
 import { supabase } from "./supabase";
 import type { Database, Product, User, Order, Settings } from "./types";
 import { normalizeProductPhotos } from "./product-media";
+
+/** Local preview fallback when Supabase env is missing (uses data/db.json). */
+function loadLocalDatabase(): Database {
+  const file = path.join(process.cwd(), "data", "db.json");
+  if (!existsSync(file)) {
+    console.warn("[db] data/db.json missing — empty preview DB");
+    return {
+      products: [],
+      users: [],
+      orders: [],
+      settings: DEFAULT_SETTINGS,
+    };
+  }
+  try {
+    const raw = JSON.parse(readFileSync(file, "utf8")) as Partial<Database>;
+    return {
+      products: (raw.products ?? []).map((p) => {
+        const photos = normalizeProductPhotos((p as any).photos, p.photo);
+        return { ...p, photo: photos[0] || p.photo, photos };
+      }),
+      users: raw.users ?? [],
+      orders: raw.orders ?? [],
+      settings: raw.settings ?? DEFAULT_SETTINGS,
+    };
+  } catch (e) {
+    console.warn("[db] failed to read data/db.json", e);
+    return {
+      products: [],
+      users: [],
+      orders: [],
+      settings: DEFAULT_SETTINGS,
+    };
+  }
+}
 
 // ---------- Row <-> TypeScript mappers ----------
 
@@ -170,6 +206,10 @@ const DEFAULT_SETTINGS: Settings = {
 
 /** Lightweight settings-only fetch (avoids loading users/orders on every layout). */
 export async function getSettings(): Promise<Settings> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return loadLocalDatabase().settings;
+  }
+
   const { data: settingsData } = await supabase
     .from("settings")
     .select("*")
@@ -186,6 +226,11 @@ export async function getSettings(): Promise<Settings> {
 }
 
 export async function getDatabase(): Promise<Database> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.warn("[db] Supabase env missing — using data/db.json for local preview");
+    return loadLocalDatabase();
+  }
+
   const [
     { data: productsData, error: pErr },
     { data: usersData, error: uErr },

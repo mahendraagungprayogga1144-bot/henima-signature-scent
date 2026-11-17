@@ -195,24 +195,24 @@ export default function CheckoutPage() {
 
   const inp: React.CSSProperties = {
     width:"100%", padding:"14px 0", background:"transparent",
-    border:"none", borderBottom:"1px solid rgba(28,25,23,0.15)",
-    fontSize:"14px", color:"#1C1917", fontFamily:"var(--font-jost)",
+    border:"none", borderBottom:"1px solid rgba(17,17,17,0.15)",
+    fontSize:"14px", color:"#111111", fontFamily:"var(--font-jakarta)",
     outline:"none", boxSizing:"border-box",
   };
 
   return (
-    <div style={{background:"#FAF8F4", minHeight:"100vh", color:"#1C1917", fontFamily:"var(--font-jost)"}}>
+    <div style={{background:"#FFFFFF", minHeight:"100vh", color:"#111111", fontFamily:"var(--font-jakarta)"}}>
 
       {/* BREADCRUMB */}
-      <div style={{padding:"16px 8vw", borderBottom:"1px solid rgba(28,25,23,0.06)"}}>
+      <div style={{padding:"16px 8vw", borderBottom:"1px solid rgba(17,17,17,0.06)"}}>
         <div style={{display:"flex", alignItems:"center", justifyContent:"center", gap:"12px", fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase"}}>
-          <Link href="/cart" style={{color:"#9A8F82", textDecoration:"none"}}>Cart</Link>
-          <span style={{color:"#C8B89A"}}>›</span>
-          <span style={{color:"#1C1917", fontWeight:500}}>Information</span>
-          <span style={{color:"#C8B89A"}}>›</span>
-          <span style={{color:"#C8B89A"}}>Shipping</span>
-          <span style={{color:"#C8B89A"}}>›</span>
-          <span style={{color:"#C8B89A"}}>Payment</span>
+          <Link href="/cart" style={{color:"#A3A3A3", textDecoration:"none"}}>Cart</Link>
+          <span style={{color:"#A3A3A3"}}>›</span>
+          <span style={{color:"#111111", fontWeight:500}}>Information</span>
+          <span style={{color:"#A3A3A3"}}>›</span>
+          <span style={{color:"#A3A3A3"}}>Shipping</span>
+          <span style={{color:"#A3A3A3"}}>›</span>
+          <span style={{color:"#A3A3A3"}}>Payment</span>
         </div>
       </div>
 
@@ -225,16 +225,16 @@ export default function CheckoutPage() {
             {/* CONTACT */}
             <div style={{marginBottom:"40px"}}>
               <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"20px", gap:"12px", flexWrap:"wrap"}}>
-                <h2 style={{fontSize:"18px", fontWeight:600, color:"#1C1917", margin:0}}>Contact</h2>
+                <h2 style={{fontSize:"18px", fontWeight:600, color:"#111111", margin:0}}>Contact</h2>
                 {membership.loggedIn && membership.tierLabel && (
                   <span style={{
                     display:"inline-flex", alignItems:"center", gap:"8px",
                     fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase",
-                    fontWeight:700, color: membership.tierColor || "#B5935A",
-                    border:`1px solid ${membership.tierColor || "#B5935A"}`,
+                    fontWeight:700, color: membership.tierColor || "#737373",
+                    border:`1px solid ${membership.tierColor || "#737373"}`,
                     padding:"6px 12px",
                   }}>
-                    <span style={{width:6, height:6, borderRadius:"50%", background: membership.tierColor || "#B5935A"}} />
+                    <span style={{width:6, height:6, borderRadius:"50%", background: membership.tierColor || "#737373"}} />
                     The Intimate · {membership.tierLabel}
                     {membership.totalPoints != null ? ` · ${membership.totalPoints} pts` : ""}
                   </span>
@@ -251,7 +251,7 @@ export default function CheckoutPage() {
                 <input required value={phone} onChange={e => setPhone(e.target.value)}
                   placeholder="Phone number" style={inp} type="tel" />
               </div>
-              <label style={{display:"flex", alignItems:"center", gap:"10px", marginTop:"16px", fontSize:"13px", color:"#6B6560", cursor:"pointer"}}>
+              <label style={{display:"flex", alignItems:"center", gap:"10px", marginTop:"16px", fontSize:"13px", color:"#737373", cursor:"pointer"}}>
                 <input type="checkbox" style={{width:"14px", height:"14px"}} />
                 Email me with news and offers
               </label>
@@ -259,7 +259,7 @@ export default function CheckoutPage() {
 
             {/* SHIPPING ADDRESS */}
             <div style={{marginBottom:"40px"}}>
-              <h2 style={{fontSize:"18px", fontWeight:600, color:"#1C1917", marginBottom:"20px"}}>Shipping Address</h2>
+              <h2 style={{fontSize:"18px", fontWeight:600, color:"#111111", marginBottom:"20px"}}>Shipping Address</h2>
               <div style={{display:"flex", flexDirection:"column", gap:"0"}}>
                 <AddressForm
                   value={addressData}
@@ -271,9 +271,9 @@ export default function CheckoutPage() {
                   }}
                   inputStyle={inp}
                 />
-                <input value={phone} readOnly placeholder="Phone" style={{...inp, color:"#9A8F82"}} />
+                <input value={phone} readOnly placeholder="Phone" style={{...inp, color:"#A3A3A3"}} />
               </div>
-              <label style={{display:"flex", alignItems:"center", gap:"10px", marginTop:"16px", fontSize:"13px", color:"#6B6560", cursor:"pointer"}}>
+              <label style={{display:"flex", alignItems:"center", gap:"10px", marginTop:"16px", fontSize:"13px", color:"#737373", cursor:"pointer"}}>
                 <input type="checkbox" style={{width:"14px", height:"14px"}} />
                 Save this information for next time
               </label>
@@ -282,29 +282,29 @@ export default function CheckoutPage() {
             {/* SHIPPING METHOD */}
             <div style={{marginBottom:"40px"}}>
               <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"20px"}}>
-                <h2 style={{fontSize:"18px", fontWeight:600, color:"#1C1917"}}>Shipping Method</h2>
+                <h2 style={{fontSize:"18px", fontWeight:600, color:"#111111"}}>Shipping Method</h2>
                 <button type="button" onClick={checkShipping} disabled={loadingShipping || !selectedCityId}
-                  style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", background:"none", border:"1px solid rgba(28,25,23,0.3)", padding:"8px 16px", cursor:"pointer", color:"#1C1917", fontFamily:"var(--font-jost)", opacity:!selectedCityId?0.4:1}}>
+                  style={{fontSize:"11px", letterSpacing:"2px", textTransform:"uppercase", background:"none", border:"1px solid rgba(17,17,17,0.3)", padding:"8px 16px", cursor:"pointer", color:"#111111", fontFamily:"var(--font-jakarta)", opacity:!selectedCityId?0.4:1}}>
                   {loadingShipping ? "Checking..." : "Check Shipping"}
                 </button>
               </div>
               {shippingOptions.length === 0 ? (
-                <div style={{padding:"20px", border:"1px solid rgba(28,25,23,0.1)", background:"#F0EBE3"}}>
-                  <p style={{fontSize:"13px", color:"#9A8F82", textAlign:"center"}}>Fill city and postal code, then click Check Shipping</p>
+                <div style={{padding:"20px", border:"1px solid rgba(17,17,17,0.1)", background:"#F5F5F4"}}>
+                  <p style={{fontSize:"13px", color:"#A3A3A3", textAlign:"center"}}>Fill city and postal code, then click Check Shipping</p>
                 </div>
               ) : (
                 <div style={{display:"flex", flexDirection:"column", gap:"8px"}}>
                   {shippingOptions.map((opt: any) => (
                     <label key={opt.courier_service_code} onClick={() => setSelectedShipping(opt)}
-                      style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px", border: selectedShipping?.courier_service_code === opt.courier_service_code ? "1px solid #1C1917" : "1px solid rgba(28,25,23,0.12)", cursor:"pointer", background: selectedShipping?.courier_service_code === opt.courier_service_code ? "#F0EBE3" : "#FAF8F4"}}>
+                      style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px", border: selectedShipping?.courier_service_code === opt.courier_service_code ? "1px solid #111111" : "1px solid rgba(17,17,17,0.12)", cursor:"pointer", background: selectedShipping?.courier_service_code === opt.courier_service_code ? "#F5F5F4" : "#FFFFFF"}}>
                       <div style={{display:"flex", alignItems:"center", gap:"12px"}}>
-                        <div style={{width:"16px", height:"16px", borderRadius:"50%", border: selectedShipping?.courier_service_code === opt.courier_service_code ? "5px solid #1C1917" : "1px solid rgba(28,25,23,0.3)", flexShrink:0}} />
+                        <div style={{width:"16px", height:"16px", borderRadius:"50%", border: selectedShipping?.courier_service_code === opt.courier_service_code ? "5px solid #111111" : "1px solid rgba(17,17,17,0.3)", flexShrink:0}} />
                         <div>
-                          <p style={{fontSize:"14px", color:"#1C1917", fontWeight:500}}>{opt.courier_service_name?.includes(opt.courier_name) ? opt.courier_service_name : `${opt.courier_name} ${opt.courier_service_name}`}</p>
-                          <p style={{fontSize:"12px", color:"#9A8F82"}}>{opt.duration || "Estimasi tidak tersedia"}</p>
+                          <p style={{fontSize:"14px", color:"#111111", fontWeight:500}}>{opt.courier_service_name?.includes(opt.courier_name) ? opt.courier_service_name : `${opt.courier_name} ${opt.courier_service_name}`}</p>
+                          <p style={{fontSize:"12px", color:"#A3A3A3"}}>{opt.duration || "Estimasi tidak tersedia"}</p>
                         </div>
                       </div>
-                      <p style={{fontSize:"14px", fontWeight:600, color:"#1C1917"}}>
+                      <p style={{fontSize:"14px", fontWeight:600, color:"#111111"}}>
                         Rp {opt.price?.toLocaleString("id-ID")}
                       </p>
                     </label>
@@ -314,38 +314,38 @@ export default function CheckoutPage() {
             </div>
 
             {/* PAYMENT INFO */}
-            <div style={{marginBottom:"32px", background:"#F0EBE3", padding:"24px", border:"1px solid rgba(28,25,23,0.08)"}}>
-              <h2 style={{fontSize:"14px", fontWeight:600, color:"#1C1917", marginBottom:"16px", letterSpacing:"0.5px"}}>Informasi Pembayaran</h2>
-              <p style={{fontSize:"13px", color:"#6B5E52", lineHeight:1.8, marginBottom:"16px"}}>
+            <div style={{marginBottom:"32px", background:"#F5F5F4", padding:"24px", border:"1px solid rgba(17,17,17,0.08)"}}>
+              <h2 style={{fontSize:"14px", fontWeight:600, color:"#111111", marginBottom:"16px", letterSpacing:"0.5px"}}>Informasi Pembayaran</h2>
+              <p style={{fontSize:"13px", color:"#737373", lineHeight:1.8, marginBottom:"16px"}}>
                 Setelah order dikonfirmasi, lakukan transfer ke rekening berikut:
               </p>
               <div style={{display:"flex", flexDirection:"column", gap:"10px"}}>
                 <div style={{display:"flex", justifyContent:"space-between", fontSize:"13px"}}>
-                  <span style={{color:"#9A8F82"}}>Bank</span>
-                  <span style={{fontWeight:600, color:"#1C1917"}}>BCA</span>
+                  <span style={{color:"#A3A3A3"}}>Bank</span>
+                  <span style={{fontWeight:600, color:"#111111"}}>BCA</span>
                 </div>
                 <div style={{display:"flex", justifyContent:"space-between", fontSize:"13px"}}>
-                  <span style={{color:"#9A8F82"}}>No. Rekening</span>
-                  <span style={{fontWeight:600, color:"#1C1917"}}>2712008173</span>
+                  <span style={{color:"#A3A3A3"}}>No. Rekening</span>
+                  <span style={{fontWeight:600, color:"#111111"}}>2712008173</span>
                 </div>
                 <div style={{display:"flex", justifyContent:"space-between", fontSize:"13px"}}>
-                  <span style={{color:"#9A8F82"}}>Atas Nama</span>
-                  <span style={{fontWeight:600, color:"#1C1917"}}>PT Henima Collection Indo</span>
+                  <span style={{color:"#A3A3A3"}}>Atas Nama</span>
+                  <span style={{fontWeight:600, color:"#111111"}}>PT Henima Collection Indo</span>
                 </div>
               </div>
-              <div style={{height:"1px", background:"rgba(28,25,23,0.1)", margin:"16px 0"}} />
-              <p style={{fontSize:"12px", color:"#9A8F82", lineHeight:1.7}}>
+              <div style={{height:"1px", background:"rgba(17,17,17,0.1)", margin:"16px 0"}} />
+              <p style={{fontSize:"12px", color:"#A3A3A3", lineHeight:1.7}}>
                 Tim Henima akan mengkonfirmasi pembayaran dan mengirimkan pesanan dalam 1x24 jam setelah transfer diterima.
               </p>
             </div>
 
             {/* SUBMIT MOBILE */}
             <button type="submit" disabled={submitting || !selectedShipping} className="submit-mobile"
-              style={{display:"none", width:"100%", background: (!selectedShipping||submitting) ? "#9A8F82" : "#1C1917", color:"#FAF8F4", padding:"16px", fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", border:"none", cursor:"pointer", fontFamily:"var(--font-jost)", fontWeight:500, marginBottom:"40px"}}>
+              style={{display:"none", width:"100%", background: (!selectedShipping||submitting) ? "#A3A3A3" : "#111111", color:"#FFFFFF", padding:"16px", fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", border:"none", cursor:"pointer", fontFamily:"var(--font-jakarta)", fontWeight:500, marginBottom:"40px"}}>
               {submitting ? "Processing..." : "Continue to Payment"}
             </button>
 
-            <Link href="/cart" style={{fontSize:"12px", color:"#9A8F82", textDecoration:"none", display:"flex", alignItems:"center", gap:"8px"}}>
+            <Link href="/cart" style={{fontSize:"12px", color:"#A3A3A3", textDecoration:"none", display:"flex", alignItems:"center", gap:"8px"}}>
               ‹ Return to cart
             </Link>
           </div>
@@ -354,19 +354,19 @@ export default function CheckoutPage() {
           <div style={{position:"sticky", top:"80px"}}>
             {items.map((item) => (
               <div key={item.productId + item.variantId} style={{display:"flex", gap:"16px", marginBottom:"20px", alignItems:"center"}}>
-                <div style={{position:"relative", width:"64px", height:"64px", background:"#F0EBE3", flexShrink:0, overflow:"hidden", border:"1px solid rgba(28,25,23,0.08)"}}>
+                <div style={{position:"relative", width:"64px", height:"64px", background:"#F5F5F4", flexShrink:0, overflow:"hidden", border:"1px solid rgba(17,17,17,0.08)"}}>
                   {item.productPhoto && <Image src={item.productPhoto} alt={item.productName} fill className="object-cover" />}
-                  <span style={{position:"absolute", top:"-8px", right:"-8px", background:"#9A8F82", color:"#fff", borderRadius:"50%", width:"18px", height:"18px", fontSize:"10px", display:"flex", alignItems:"center", justifyContent:"center"}}>{item.quantity}</span>
+                  <span style={{position:"absolute", top:"-8px", right:"-8px", background:"#A3A3A3", color:"#fff", borderRadius:"50%", width:"18px", height:"18px", fontSize:"10px", display:"flex", alignItems:"center", justifyContent:"center"}}>{item.quantity}</span>
                 </div>
                 <div style={{flex:1}}>
-                  <p style={{fontSize:"14px", fontWeight:500, color:"#1C1917"}}>{item.productName}</p>
-                  <p style={{fontSize:"12px", color:"#9A8F82"}}>{item.sizeMl}ml</p>
+                  <p style={{fontSize:"14px", fontWeight:500, color:"#111111"}}>{item.productName}</p>
+                  <p style={{fontSize:"12px", color:"#A3A3A3"}}>{item.sizeMl}ml</p>
                 </div>
                 <p style={{fontSize:"14px", fontWeight:500}}>Rp {(item.price * item.quantity).toLocaleString("id-ID")}</p>
               </div>
             ))}
 
-            <div style={{height:"1px", background:"rgba(28,25,23,0.08)", margin:"16px 0"}} />
+            <div style={{height:"1px", background:"rgba(17,17,17,0.08)", margin:"16px 0"}} />
 
             {/* Voucher */}
             <div style={{marginBottom:"16px"}}>
@@ -375,10 +375,10 @@ export default function CheckoutPage() {
                   value={voucherCode}
                   onChange={e => { setVoucherCode(e.target.value.toUpperCase()); setVoucher(null); setVoucherMsg(""); }}
                   placeholder="Kode voucher"
-                  style={{flex:1, padding:"12px 16px", border:"1px solid rgba(28,25,23,0.15)", background:"transparent", fontSize:"13px", color:"#1C1917", fontFamily:"var(--font-jost)", outline:"none"}}
+                  style={{flex:1, padding:"12px 16px", border:"1px solid rgba(17,17,17,0.15)", background:"transparent", fontSize:"13px", color:"#111111", fontFamily:"var(--font-jakarta)", outline:"none"}}
                 />
                 <button type="button" onClick={applyVoucher} disabled={voucherLoading}
-                  style={{padding:"12px 20px", background:"#1C1917", color:"#FAF8F4", border:"none", fontSize:"12px", letterSpacing:"1px", textTransform:"uppercase", cursor:"pointer", fontFamily:"var(--font-jost)"}}>
+                  style={{padding:"12px 20px", background:"#111111", color:"#FFFFFF", border:"none", fontSize:"12px", letterSpacing:"1px", textTransform:"uppercase", cursor:"pointer", fontFamily:"var(--font-jakarta)"}}>
                   {voucherLoading ? "..." : "Apply"}
                 </button>
               </div>
@@ -387,15 +387,15 @@ export default function CheckoutPage() {
               )}
             </div>
 
-            <div style={{height:"1px", background:"rgba(28,25,23,0.08)", margin:"16px 0"}} />
+            <div style={{height:"1px", background:"rgba(17,17,17,0.08)", margin:"16px 0"}} />
 
             <div style={{display:"flex", justifyContent:"space-between", marginBottom:"8px"}}>
-              <span style={{fontSize:"13px", color:"#6B6560"}}>Subtotal</span>
-              <span style={{fontSize:"13px", color:"#1C1917"}}>Rp {subtotal.toLocaleString("id-ID")}</span>
+              <span style={{fontSize:"13px", color:"#737373"}}>Subtotal</span>
+              <span style={{fontSize:"13px", color:"#111111"}}>Rp {subtotal.toLocaleString("id-ID")}</span>
             </div>
             <div style={{display:"flex", justifyContent:"space-between", marginBottom:"8px"}}>
-              <span style={{fontSize:"13px", color:"#6B6560"}}>Shipping</span>
-              <span style={{fontSize:"13px", color: shippingCost > 0 ? "#1C1917" : "#9A8F82"}}>
+              <span style={{fontSize:"13px", color:"#737373"}}>Shipping</span>
+              <span style={{fontSize:"13px", color: shippingCost > 0 ? "#111111" : "#A3A3A3"}}>
                 {membership.freeShipping && rawShipping > 0
                   ? "GRATIS (Beloved)"
                   : shippingCost > 0
@@ -416,18 +416,18 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            <div style={{height:"1px", background:"rgba(28,25,23,0.08)", marginBottom:"20px"}} />
+            <div style={{height:"1px", background:"rgba(17,17,17,0.08)", marginBottom:"20px"}} />
 
             <div style={{display:"flex", justifyContent:"space-between", marginBottom:"28px", alignItems:"baseline"}}>
-              <span style={{fontSize:"15px", fontWeight:600, color:"#1C1917"}}>Total</span>
+              <span style={{fontSize:"15px", fontWeight:600, color:"#111111"}}>Total</span>
               <div style={{textAlign:"right"}}>
-                <span style={{fontSize:"11px", color:"#9A8F82", letterSpacing:"1px", marginRight:"8px"}}>IDR</span>
-                <span style={{fontSize:"20px", fontWeight:600, color:"#1C1917"}}>Rp {total.toLocaleString("id-ID")}</span>
+                <span style={{fontSize:"11px", color:"#A3A3A3", letterSpacing:"1px", marginRight:"8px"}}>IDR</span>
+                <span style={{fontSize:"20px", fontWeight:600, color:"#111111"}}>Rp {total.toLocaleString("id-ID")}</span>
               </div>
             </div>
 
             <button type="submit" disabled={submitting || !selectedShipping}
-              style={{display:"block", width:"100%", background: (!selectedShipping||submitting) ? "#9A8F82" : "#1C1917", color:"#FAF8F4", padding:"16px", fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", border:"none", cursor: (!selectedShipping||submitting) ? "not-allowed" : "pointer", fontFamily:"var(--font-jost)", fontWeight:500}}>
+              style={{display:"block", width:"100%", background: (!selectedShipping||submitting) ? "#A3A3A3" : "#111111", color:"#FFFFFF", padding:"16px", fontSize:"11px", letterSpacing:"3px", textTransform:"uppercase", border:"none", cursor: (!selectedShipping||submitting) ? "not-allowed" : "pointer", fontFamily:"var(--font-jakarta)", fontWeight:500}}>
               {submitting ? "Processing..." : "Continue to Payment"}
             </button>
           </div>
@@ -439,8 +439,8 @@ export default function CheckoutPage() {
           .checkout-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
           .submit-mobile { display: block !important; }
         }
-        input::placeholder, textarea::placeholder { color: #9A8F82; }
-        input:focus, textarea:focus, select:focus { border-bottom-color: #1C1917 !important; }
+        input::placeholder, textarea::placeholder { color: #A3A3A3; }
+        input:focus, textarea:focus, select:focus { border-bottom-color: #111111 !important; }
       `}</style>
     </div>
   );

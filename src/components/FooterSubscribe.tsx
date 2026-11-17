@@ -1,69 +1,120 @@
 "use client";
 import { useState } from "react";
 
+/** Kenzo footer newsletter — input + checkbox + privacy text */
 export default function FooterSubscribe() {
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle"|"loading"|"success"|"error">("idle");
+  const [checked, setChecked] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   async function subscribe() {
-    if (!email.trim() || !name.trim()) return;
+    if (!email.trim() || !checked) return;
     setStatus("loading");
     try {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name }),
+        body: JSON.stringify({ email, name: "Subscriber" }),
       });
       if (res.ok) {
         setStatus("success");
-        setName(""); setEmail("");
-      } else {
-        setStatus("error");
-      }
+        setEmail("");
+      } else setStatus("error");
     } catch {
       setStatus("error");
     }
   }
 
   return (
-    <div style={{textAlign:"center", marginBottom:"56px", paddingBottom:"56px", borderBottom:"1px solid rgba(200,184,154,0.12)"}}>
-      <p style={{fontSize:"10px", letterSpacing:"4px", textTransform:"uppercase", color:"rgba(200,184,154,0.4)", marginBottom:"12px", fontWeight:500}}>Exclusive</p>
-      <h3 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(24px,4vw,36px)", fontWeight:300, fontStyle:"italic", color:"#F0EBE3", marginBottom:"8px"}}>
-        Dapatkan info promo eksklusif Henima
-      </h3>
-      <p style={{fontSize:"13px", color:"rgba(200,184,154,0.4)", fontWeight:300, marginBottom:"28px"}}>
-        Jadilah yang pertama tahu koleksi terbaru, promo spesial, dan cerita di balik setiap wewangian.
+    <div>
+      <p style={{ fontSize: 14, color: "#FFFFFF", marginBottom: 14, fontWeight: 500 }}>
+        Subscribe to our newsletter
       </p>
       {status === "success" ? (
-        <p style={{fontSize:"14px", color:"#B5935A", fontStyle:"italic"}}>Terima kasih! Kamu sudah terdaftar. ✨</p>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>Thank you.</p>
       ) : (
         <>
-          <div style={{display:"flex", gap:"10px", justifyContent:"center", flexWrap:"wrap", maxWidth:"520px", margin:"0 auto"}}>
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="Nama kamu"
-              style={{flex:1, minWidth:"130px", background:"transparent", border:"1px solid rgba(200,184,154,0.2)", padding:"12px 16px", fontSize:"13px", color:"#F0EBE3", fontFamily:"var(--font-jost)", outline:"none"}}
-            />
+          <div style={{ display: "flex", alignItems: "stretch", maxWidth: 260, marginBottom: 14 }}>
             <input
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="Alamat email"
-              onKeyDown={e => e.key === "Enter" && subscribe()}
-              style={{flex:2, minWidth:"180px", background:"transparent", border:"1px solid rgba(200,184,154,0.2)", padding:"12px 16px", fontSize:"13px", color:"#F0EBE3", fontFamily:"var(--font-jost)", outline:"none"}}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email address"
+              onKeyDown={(e) => e.key === "Enter" && subscribe()}
+              style={{
+                flex: 1,
+                background: "transparent",
+                border: "1px solid rgba(255,255,255,0.55)",
+                borderRight: "none",
+                padding: "12px 14px",
+                fontSize: 12,
+                color: "#FFFFFF",
+                fontFamily: "var(--font-jakarta)",
+                outline: "none",
+              }}
             />
             <button
+              type="button"
               onClick={subscribe}
-              disabled={status === "loading" || !email.trim() || !name.trim()}
-              style={{background:"#B5935A", border:"none", color:"#1C1917", padding:"12px 24px", fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", cursor:"pointer", fontFamily:"var(--font-jost)", fontWeight:600, whiteSpace:"nowrap", opacity: !email.trim() || !name.trim() ? 0.5 : 1}}
+              disabled={status === "loading" || !email.trim() || !checked}
+              aria-label="Subscribe"
+              style={{
+                width: 42,
+                background: "#8A8A8A",
+                border: "none",
+                color: "#FFFFFF",
+                cursor: "pointer",
+                fontSize: 16,
+                opacity: !email.trim() || !checked ? 0.55 : 1,
+              }}
             >
-              {status === "loading" ? "..." : "Subscribe"}
+              →
             </button>
           </div>
-          {status === "error" && <p style={{fontSize:"12px", color:"rgba(200,100,100,0.7)", marginTop:"10px"}}>Terjadi kesalahan. Coba lagi.</p>}
+
+          <label
+            style={{
+              display: "flex",
+              gap: 8,
+              alignItems: "flex-start",
+              fontSize: 11,
+              color: "rgba(255,255,255,0.65)",
+              cursor: "pointer",
+              marginBottom: 12,
+              maxWidth: 280,
+              lineHeight: 1.4,
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={(e) => setChecked(e.target.checked)}
+              style={{ marginTop: 2, flexShrink: 0 }}
+            />
+            <span>I want to subscribe to Henima newsletter.</span>
+          </label>
+
+          <p
+            style={{
+              margin: 0,
+              fontSize: 10,
+              color: "rgba(255,255,255,0.4)",
+              lineHeight: 1.5,
+              maxWidth: 280,
+            }}
+          >
+            Henima is the processing controller of your data. The information you provide above is used to
+            send communications about Henima offers, news and events. For more information about the
+            processing of your personal data and to know your rights, please consult our{" "}
+            <a href="/kebijakan-pengembalian" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>
+              Privacy Policy
+            </a>
+            .
+          </p>
+
+          {status === "error" && (
+            <p style={{ fontSize: 11, color: "rgba(255,140,140,0.8)", marginTop: 8 }}>Try again.</p>
+          )}
         </>
       )}
     </div>

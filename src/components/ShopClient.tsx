@@ -2,7 +2,7 @@
 import WishlistButton from "@/components/WishlistButton";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface Product {
   id: string;
@@ -14,224 +14,682 @@ interface Product {
   discountPrice: number;
   variants: { id: string; sizeMl: number; active: boolean; originalPrice: number; discountPrice: number }[];
   comingSoon?: boolean;
-  topNotes?: string;
-  middleNotes?: string;
-  baseNotes?: string;
+  isGiftSet?: boolean;
 }
 
 function toSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-export default function ShopClient({ products, waNumber }: { products: Product[]; waNumber: string }) {
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
-  const [selectedAvail, setSelectedAvail] = useState<string[]>([]);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+function formatRp(n: number) {
+  return "Rp " + n.toLocaleString("id-ID");
+}
 
-  const allSizes = Array.from(new Set(
-    products.flatMap((p) => p.variants.filter((v) => v.active).map((v) => v.sizeMl))
-  )).sort((a, b) => a - b);
+function productPrice(p: Product) {
+  const variants = p.variants.filter((v) => v.active);
+  if (variants.length > 0) {
+    const prices = variants.map((v) => v.discountPrice || v.originalPrice).filter((n) => n > 0);
+    if (prices.length) return Math.min(...prices);
+  }
+  return p.discountPrice || p.originalPrice || 0;
+}
+
+/** Kenzo subtitle — sentence case like "Eau de toilette" */
+function productVariantLabel(p: Product) {
+  if (p.isGiftSet) return "Gift set";
+  const sizes = p.variants.filter((v) => v.active).map((v) => v.sizeMl).sort((a, b) => a - b);
+  const conc = "Extrait de Parfum";
+  if (sizes.length === 1) return `${conc} ${sizes[0]} ml`;
+  if (sizes.length > 1) return `${conc} · from ${sizes[0]} ml`;
+  return conc;
+}
+
+/** Kenzo filter bar — rgb(163, 1, 22) */
+const KENZO_RED = "#A30116";
+
+const FILTER_TABS = [
+  { key: "category", label: "Category" },
+  { key: "line", label: "Line" },
+  { key: "volume", label: "Volume" },
+  { key: "concentration", label: "Concentration" },
+  { key: "notes", label: "Olfactory notes" },
+  { key: "mood", label: "Mood" },
+] as const;
+
+export default function ShopClient({ products }: { products: Product[]; waNumber: string }) {
+  const [openFilter, setOpenFilter] = useState<string | null>(null);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [selectedSizes, setSelectedSizes] = useState<number[]>([]);
+  const [selectedLines, setSelectedLines] = useState<string[]>([]);
+  const [selectedAvail, setSelectedAvail] = useState<string[]>([]);
+
+  const allSizes = useMemo(
+    () =>
+      Array.from(
+        new Set(products.flatMap((p) => p.variants.filter((v) => v.active).map((v) => v.sizeMl)))
+      ).sort((a, b) => a - b),
+    [products]
+  );
+
+  const allLines = useMemo(() => Array.from(new Set(products.map((p) => p.name))).sort(), [products]);
 
   const filtered = products.filter((p) => {
     const variants = p.variants.filter((v) => v.active);
     if (selectedSizes.length > 0 && !variants.some((v) => selectedSizes.includes(v.sizeMl))) return false;
+    if (selectedLines.length > 0 && !selectedLines.includes(p.name)) return false;
     if (selectedAvail.length > 0) {
-      const isComingSoon = !!(p as any).comingSoon;
+      const isComingSoon = !!p.comingSoon;
       if (selectedAvail.includes("Available Now") && isComingSoon) return false;
       if (selectedAvail.includes("Coming Soon") && !isComingSoon) return false;
     }
     return true;
   });
 
-  const toggleSize = (s: number) => setSelectedSizes((prev) => prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]);
-  const toggleAvail = (a: string) => setSelectedAvail((prev) => prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]);
-  const activeFilters = selectedSizes.length + selectedAvail.length;
+  const toggleSize = (s: number) =>
+    setSelectedSizes((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
+  const toggleLine = (n: string) =>
+    setSelectedLines((prev) => (prev.includes(n) ? prev.filter((x) => x !== n) : [...prev, n]));
+  const toggleAvail = (a: string) =>
+    setSelectedAvail((prev) => (prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]));
 
-  const sidebarContent = (
-    <>
-      {allSizes.length > 0 && (
-        <div style={{marginBottom:"24px"}}>
-          <p style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#1C1917", fontFamily:"var(--font-jost)", fontWeight:500, marginBottom:"16px"}}>Size</p>
-          {allSizes.map((size) => (
-            <label key={size} onClick={() => toggleSize(size)} style={{display:"flex", alignItems:"center", gap:"10px", marginBottom:"12px", cursor:"pointer"}}>
-              <span style={{width:"14px", height:"14px", border:"1px solid rgba(28,25,23,0.3)", display:"inline-block", flexShrink:0, background: selectedSizes.includes(size) ? "#1C1917" : "transparent", transition:"background 0.2s"}} />
-              <span style={{fontSize:"12px", color:"#6B6560", fontFamily:"var(--font-jost)", fontWeight:300}}>{size}ml</span>
-            </label>
-          ))}
-          <div style={{height:"1px", background:"rgba(28,25,23,0.08)", margin:"20px 0"}} />
-        </div>
-      )}
-      <div>
-        <p style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#1C1917", fontFamily:"var(--font-jost)", fontWeight:500, marginBottom:"16px"}}>Availability</p>
-        {["Available Now","Coming Soon"].map((s) => (
-          <label key={s} onClick={() => toggleAvail(s)} style={{display:"flex", alignItems:"center", gap:"10px", marginBottom:"12px", cursor:"pointer"}}>
-            <span style={{width:"14px", height:"14px", border:"1px solid rgba(28,25,23,0.3)", display:"inline-block", flexShrink:0, background: selectedAvail.includes(s) ? "#1C1917" : "transparent", transition:"background 0.2s"}} />
-            <span style={{fontSize:"12px", color:"#6B6560", fontFamily:"var(--font-jost)", fontWeight:300}}>{s}</span>
-          </label>
-        ))}
-      </div>
-      {activeFilters > 0 && (
-        <button onClick={() => { setSelectedSizes([]); setSelectedAvail([]); }} style={{marginTop:"24px", fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#9A8F82", background:"none", border:"1px solid rgba(28,25,23,0.15)", padding:"8px 16px", cursor:"pointer", fontFamily:"var(--font-jost)", width:"100%"}}>
-          Clear All ({activeFilters})
+  const clearAll = () => {
+    setSelectedSizes([]);
+    setSelectedLines([]);
+    setSelectedAvail([]);
+  };
+
+  const activeCount = selectedSizes.length + selectedLines.length + selectedAvail.length;
+
+  /** Layout test only — shown when Supabase has no products */
+  const testProducts: Product[] = [
+    { id: "test-1", name: "Afternoon", description: "", photo: "/layout/product-1.jpg", active: true, originalPrice: 450000, discountPrice: 450000, variants: [{ id: "t1v", sizeMl: 50, active: true, originalPrice: 450000, discountPrice: 450000 }] },
+    { id: "test-2", name: "The Distance", description: "", photo: "/layout/product-2.jpg", active: true, originalPrice: 450000, discountPrice: 450000, variants: [{ id: "t2v", sizeMl: 50, active: true, originalPrice: 450000, discountPrice: 450000 }] },
+    { id: "test-3", name: "Signature", description: "", photo: "/layout/product-3.jpg", active: true, originalPrice: 480000, discountPrice: 480000, variants: [{ id: "t3v", sizeMl: 50, active: true, originalPrice: 480000, discountPrice: 480000 }] },
+    { id: "test-4", name: "Intimate", description: "", photo: "/layout/product-4.jpg", active: true, originalPrice: 450000, discountPrice: 450000, variants: [{ id: "t4v", sizeMl: 30, active: true, originalPrice: 450000, discountPrice: 450000 }] },
+    { id: "test-5", name: "Beloved", description: "", photo: "/layout/product-5.jpg", active: true, originalPrice: 520000, discountPrice: 520000, variants: [{ id: "t5v", sizeMl: 50, active: true, originalPrice: 520000, discountPrice: 520000 }] },
+    { id: "test-6", name: "Discovery", description: "", photo: "/layout/discover-1.jpg", active: true, originalPrice: 350000, discountPrice: 350000, variants: [{ id: "t6v", sizeMl: 10, active: true, originalPrice: 350000, discountPrice: 350000 }], isGiftSet: true },
+    { id: "test-7", name: "Afternoon", description: "", photo: "/layout/chapter-afternoon.jpg", active: true, originalPrice: 450000, discountPrice: 450000, variants: [{ id: "t7v", sizeMl: 100, active: true, originalPrice: 650000, discountPrice: 650000 }] },
+    { id: "test-8", name: "The Distance", description: "", photo: "/layout/chapter-distance.jpg", active: true, originalPrice: 450000, discountPrice: 450000, variants: [{ id: "t8v", sizeMl: 100, active: true, originalPrice: 650000, discountPrice: 650000 }] },
+  ];
+
+  const displayList =
+    products.length > 0
+      ? filtered
+      : testProducts.filter((p) => {
+          const variants = p.variants.filter((v) => v.active);
+          if (selectedSizes.length > 0 && !variants.some((v) => selectedSizes.includes(v.sizeMl))) return false;
+          if (selectedLines.length > 0 && !selectedLines.includes(p.name)) return false;
+          if (selectedAvail.length > 0) {
+            const isComingSoon = !!p.comingSoon;
+            if (selectedAvail.includes("Available Now") && isComingSoon) return false;
+            if (selectedAvail.includes("Coming Soon") && !isComingSoon) return false;
+          }
+          return true;
+        });
+
+  const sizesForFilter =
+    products.length > 0
+      ? allSizes
+      : Array.from(new Set(testProducts.flatMap((p) => p.variants.map((v) => v.sizeMl)))).sort((a, b) => a - b);
+  const linesForFilter =
+    products.length > 0 ? allLines : Array.from(new Set(testProducts.map((p) => p.name))).sort();
+
+  function panelContent(key: string) {
+    if (key === "volume") {
+      if (sizesForFilter.length === 0) return <p style={emptyHint}>No sizes yet</p>;
+      return sizesForFilter.map((size) => (
+        <button key={size} type="button" onClick={() => toggleSize(size)} style={optBtn(selectedSizes.includes(size))}>
+          {size} ml
         </button>
-      )}
-    </>
-  );
+      ));
+    }
+    if (key === "line") {
+      if (linesForFilter.length === 0) return <p style={emptyHint}>No lines yet</p>;
+      return linesForFilter.map((name) => (
+        <button key={name} type="button" onClick={() => toggleLine(name)} style={optBtn(selectedLines.includes(name))}>
+          {name}
+        </button>
+      ));
+    }
+    if (key === "category") {
+      return ["Available Now", "Coming Soon"].map((s) => (
+        <button key={s} type="button" onClick={() => toggleAvail(s)} style={optBtn(selectedAvail.includes(s))}>
+          {s}
+        </button>
+      ));
+    }
+    return <p style={emptyHint}>Coming soon</p>;
+  }
+
+  function FilterChevron({ open }: { open: boolean }) {
+    return (
+      <svg
+        width="10"
+        height="6"
+        viewBox="0 0 10 6"
+        fill="none"
+        aria-hidden
+        style={{
+          flexShrink: 0,
+          transform: open ? "rotate(180deg)" : "none",
+          transition: "transform 0.18s ease",
+        }}
+      >
+        <path d="M1 1l4 4 4-4" stroke="#fff" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
 
   return (
-    <div style={{background:"#FAF8F4", minHeight:"100vh", color:"#1C1917"}}>
-
-      {/* HEADER */}
-      <div style={{padding:"64px 6vw 40px", borderBottom:"1px solid rgba(28,25,23,0.08)"}}>
-        <p style={{fontSize:"10px", letterSpacing:"4px", textTransform:"uppercase", color:"#9A8F82", marginBottom:"12px", fontFamily:"var(--font-jost)", fontWeight:300}}>
-          Henima Signature Scent
-        </p>
-        <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-end", flexWrap:"wrap", gap:"16px"}}>
-          <h1 style={{fontFamily:"var(--font-cormorant)", fontSize:"clamp(36px,6vw,64px)", fontWeight:300, color:"#1C1917", lineHeight:1, fontStyle:"italic", margin:0}}>
-            Our Scents
-          </h1>
-          <p style={{fontSize:"12px", color:"#9A8F82", fontFamily:"var(--font-jost)", fontWeight:300, margin:0}}>
-            {filtered.length} fragrance{filtered.length !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <p style={{marginTop:16, fontSize:12, fontFamily:"var(--font-jost)"}}>
-          <Link href="/shop/international" style={{color:"#1C1917", letterSpacing:"1px", textTransform:"uppercase", fontSize:10, borderBottom:"1px solid rgba(28,25,23,0.25)", paddingBottom:2, textDecoration:"none"}}>
-            International checkout (Shopify Markets)
-          </Link>
-        </p>
+    <div
+      className="shop-catalog"
+      style={{
+        background: "#FFFFFF",
+        minHeight: "100vh",
+        color: "#212529",
+        fontFamily: "var(--font-futura-catalog), FuturaBT-Medium, Futura, sans-serif",
+        fontSize: 16,
+        fontWeight: 400,
+        lineHeight: "24px",
+        boxSizing: "border-box",
+        textAlign: "left",
+      }}
+    >
+      {/* Desktop: Kenzo red filter bar — full-bleed, inner 1140 */}
+      <div
+        className="shop-red-bar shop-red-bar--desktop"
+        style={{
+          background: KENZO_RED,
+          width: "100%",
+          height: 74,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "relative",
+          zIndex: 20,
+        }}
+      >
+        <ul
+          className="shop-red-filters"
+          style={{
+            listStyle: "none",
+            margin: 0,
+            padding: 0,
+            width: "100%",
+            maxWidth: 1140,
+            height: 74,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: 0,
+            boxSizing: "border-box",
+          }}
+        >
+          {FILTER_TABS.map((tab) => {
+            const open = openFilter === tab.key;
+            return (
+              <li
+                key={tab.key}
+                className="shop-red-item"
+                style={{
+                  position: "relative",
+                  flex: "1 1 0",
+                  minWidth: 0,
+                  height: 69,
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0 20px",
+                  boxSizing: "border-box",
+                  background: KENZO_RED,
+                }}
+              >
+                <button
+                  type="button"
+                  className="shop-red-tab"
+                  onClick={() => setOpenFilter(open ? null : tab.key)}
+                  aria-expanded={open}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    width: "100%",
+                    appearance: "none",
+                    WebkitAppearance: "none",
+                    background: "transparent",
+                    border: "none",
+                    borderBottom: "1px solid rgba(255,255,255,0.5)",
+                    margin: 0,
+                    padding: "6px 0",
+                    color: "#FFFFFF",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    fontSize: 16,
+                    fontWeight: 400,
+                    lineHeight: "24px",
+                    textAlign: "left",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {tab.label}
+                  </span>
+                  <FilterChevron open={open} />
+                </button>
+                {open && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: 20,
+                      right: 20,
+                      top: "100%",
+                      background: "#FFFFFF",
+                      border: "1px solid rgba(0,0,0,0.08)",
+                      boxShadow: "0 12px 28px rgba(0,0,0,0.12)",
+                      padding: 16,
+                      zIndex: 30,
+                      minWidth: 180,
+                    }}
+                  >
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>{panelContent(tab.key)}</div>
+                    {activeCount > 0 && (
+                      <button type="button" onClick={clearAll} style={clearBtn}>
+                        Clear ({activeCount})
+                      </button>
+                    )}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       </div>
 
-      {/* MOBILE FILTER BAR */}
-      <div className="mobile-filter-bar" style={{display:"none", padding:"14px 6vw", borderBottom:"1px solid rgba(28,25,23,0.08)", justifyContent:"space-between", alignItems:"center"}}>
-        <button onClick={() => setFilterOpen(true)} style={{display:"flex", alignItems:"center", gap:"8px", background:"none", border:"1px solid rgba(28,25,23,0.2)", padding:"8px 16px", cursor:"pointer", fontFamily:"var(--font-jost)", fontSize:"10px", letterSpacing:"1.5px", textTransform:"uppercase", color:"#1C1917"}}>
-          {activeFilters > 0 && <span style={{background:"#1C1917", color:"#FAF8F4", borderRadius:"50%", width:"16px", height:"16px", fontSize:"9px", display:"inline-flex", alignItems:"center", justifyContent:"center"}}>{activeFilters}</span>}
+      {/* Mobile: Kenzo row — Results left + red Filter button right */}
+      <div
+        className="shop-mobile-filter-row"
+        style={{
+          display: "none",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+          maxWidth: 1140,
+          margin: "0 auto",
+          padding: "16px 20px 8px",
+          boxSizing: "border-box",
+          position: "relative",
+          zIndex: 20,
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: 14,
+            fontWeight: 500,
+            lineHeight: "16.8px",
+            letterSpacing: "normal",
+            textTransform: "uppercase",
+            color: "#666666",
+            fontFamily: "inherit",
+          }}
+        >
+          {displayList.length} Results
+        </p>
+        <button
+          type="button"
+          className="shop-mobile-filter-btn"
+          onClick={() => {
+            setMobileFiltersOpen((v) => !v);
+            setOpenFilter(null);
+          }}
+          aria-expanded={mobileFiltersOpen}
+          style={{
+            appearance: "none",
+            WebkitAppearance: "none",
+            background: KENZO_RED,
+            color: "#FFFFFF",
+            border: "none",
+            padding: "12px 20px",
+            fontFamily: "inherit",
+            fontSize: 16,
+            fontWeight: 400,
+            lineHeight: "24px",
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
           Filter
+          <FilterChevron open={mobileFiltersOpen} />
         </button>
       </div>
 
-      {/* FILTER OVERLAY mobile */}
-      {filterOpen && (
-        <div style={{position:"fixed", inset:0, zIndex:200, background:"#FAF8F4", padding:"0 6vw 40px", overflowY:"auto"}}>
-          <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", height:"60px", borderBottom:"1px solid rgba(28,25,23,0.08)", marginBottom:"28px"}}>
-            <p style={{fontSize:"12px", letterSpacing:"2px", textTransform:"uppercase", fontFamily:"var(--font-jost)", fontWeight:500, color:"#1C1917"}}>Filter</p>
-            <button onClick={() => setFilterOpen(false)} style={{background:"none", border:"none", cursor:"pointer", fontSize:"22px", color:"#1C1917"}}>×</button>
-          </div>
-          {sidebarContent}
-          <button onClick={() => setFilterOpen(false)} style={{marginTop:"32px", width:"100%", background:"#1C1917", color:"#FAF8F4", border:"none", padding:"14px", fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", cursor:"pointer", fontFamily:"var(--font-jost)"}}>
-            Show {filtered.length} Results
-          </button>
+      {mobileFiltersOpen && (
+        <div
+          className="shop-mobile-filter-panel"
+          style={{
+            display: "none",
+            background: KENZO_RED,
+            padding: "0 12px 16px",
+            position: "relative",
+            zIndex: 20,
+          }}
+        >
+          {FILTER_TABS.map((tab) => {
+            const open = openFilter === tab.key;
+            return (
+              <div key={tab.key} style={{ borderBottom: "1px solid rgba(255,255,255,0.35)" }}>
+                <button
+                  type="button"
+                  onClick={() => setOpenFilter(open ? null : tab.key)}
+                  aria-expanded={open}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    appearance: "none",
+                    WebkitAppearance: "none",
+                    background: "transparent",
+                    border: "none",
+                    padding: "12px 8px",
+                    color: "#FFFFFF",
+                    fontFamily: "inherit",
+                    fontSize: 16,
+                    fontWeight: 400,
+                    lineHeight: "24px",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  {tab.label}
+                  <FilterChevron open={open} />
+                </button>
+                {open && (
+                  <div style={{ background: "#FFFFFF", padding: 16, marginBottom: 8 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>{panelContent(tab.key)}</div>
+                    {activeCount > 0 && (
+                      <button type="button" onClick={clearAll} style={clearBtn}>
+                        Clear ({activeCount})
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* BODY */}
-      <div style={{display:"flex", padding:"40px 6vw 80px", alignItems:"start", gap:"0"}}>
+      {/* Results + 4-col grid — Kenzo proportions */}
+      <div
+        className="shop-catalog-inner"
+        style={{ maxWidth: 1140, margin: "0 auto", padding: "24px 15px 96px", boxSizing: "border-box" }}
+      >
+        <h1
+          className="shop-results-desktop"
+          style={{
+            textAlign: "center",
+            fontSize: 14,
+            fontWeight: 500,
+            lineHeight: "16.8px",
+            letterSpacing: "normal",
+            textTransform: "uppercase",
+            color: "#666666",
+            margin: "0 0 8px",
+            padding: 0,
+          }}
+        >
+          {displayList.length} Results
+        </h1>
 
-        {/* SIDEBAR desktop */}
-        <aside className="shop-sidebar" style={{width:"180px", flexShrink:0, paddingRight:"40px", position:"sticky", top:"80px"}}>
-          {sidebarContent}
-        </aside>
-
-        {/* GRID */}
-        <div style={{flex:1, paddingLeft:"40px"}} className="shop-grid-wrap">
-          <div style={{display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:"2px", background:"rgba(28,25,23,0.06)"}}>
-            {filtered.map((product) => {
-              const variants = product.variants.filter((v) => v.active);
-              const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.originalPrice)) : product.originalPrice;
-              const isHovered = hoveredId === product.id;
+        {displayList.length === 0 ? (
+          <p
+            style={{
+              textAlign: "center",
+              padding: "80px 0",
+              color: "#666666",
+              fontSize: 16,
+              lineHeight: "24px",
+              margin: 0,
+            }}
+          >
+            Tidak ada produk yang cocok.
+          </p>
+        ) : (
+          <div
+            className="shop-kenzo-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+              columnGap: 30,
+              rowGap: 0,
+              marginTop: 16,
+            }}
+          >
+            {displayList.map((product) => {
+              const price = productPrice(product);
+              const href = "/shop/" + toSlug(product.name);
               return (
-                <Link
+                <article
                   key={product.id}
-                  href={"/shop/" + toSlug(product.name)}
-                  style={{background:"#FAF8F4", cursor:"pointer", textDecoration:"none", color:"#1C1917", display:"block", position:"relative"}}
-                  onMouseEnter={() => setHoveredId(product.id)}
-                  onMouseLeave={() => setHoveredId(null)}
+                  className="shop-product"
+                  style={{ display: "flex", flexDirection: "column", textAlign: "center", margin: 0 }}
                 >
-                  <div style={{position:"relative", aspectRatio:"3/4", background:"#F0EBE3", overflow:"hidden"}}>
-                    <WishlistButton productId={product.id} />
-                    {product.photo ? (
-                      product.photo.startsWith("/") ? (
-                      <Image
-                        src={product.photo}
-                        alt={product.name}
-                        fill
-                        style={{
-                          objectFit:"cover",
-                          transform: isHovered ? "scale(1.04)" : "scale(1)",
-                          transition: "transform 0.8s cubic-bezier(0.16,1,0.3,1)",
-                        }}
-                      />
+                  <Link href={href} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
+                    {/* Square product image — Kenzo 1:1 */}
+                    <div
+                      style={{
+                        position: "relative",
+                        width: "100%",
+                        aspectRatio: "1",
+                        background: "#F5F5F5",
+                        overflow: "hidden",
+                        margin: 0,
+                      }}
+                    >
+                      <WishlistButton productId={product.id} />
+                      {product.photo ? (
+                        product.photo.startsWith("/") ? (
+                          <Image
+                            src={product.photo}
+                            alt={product.name}
+                            fill
+                            sizes="(max-width:768px) 50vw, 240px"
+                            style={{
+                              objectFit: "contain",
+                              padding: "12%",
+                              transition: "transform 0.7s cubic-bezier(0.16,1,0.3,1)",
+                            }}
+                            className="shop-prod-img"
+                          />
+                        ) : (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={product.photo}
+                            alt={product.name}
+                            style={{
+                              width: "76%",
+                              height: "76%",
+                              objectFit: "contain",
+                              margin: "12% auto",
+                              display: "block",
+                              transition: "transform 0.7s cubic-bezier(0.16,1,0.3,1)",
+                            }}
+                            className="shop-prod-img"
+                          />
+                        )
                       ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={product.photo}
-                        alt={product.name}
-                        style={{
-                          width:"100%",
-                          height:"100%",
-                          objectFit:"cover",
-                          transform: isHovered ? "scale(1.04)" : "scale(1)",
-                          transition: "transform 0.8s cubic-bezier(0.16,1,0.3,1)",
-                        }}
-                      />
-                      )
-                    ) : (
-                      <div style={{position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center"}}>
-                        <span style={{fontFamily:"var(--font-cormorant)", fontSize:"18px", fontStyle:"italic", color:"rgba(107,90,74,0.3)"}}>{product.name}</span>
-                      </div>
-                    )}
-                    {(product as any).comingSoon && (
-                      <div style={{position:"absolute", top:"14px", left:"14px", background:"#1C1917", color:"#FAF8F4", fontSize:"8px", letterSpacing:"2px", textTransform:"uppercase", padding:"4px 10px", fontFamily:"var(--font-jost)"}}>
-                        Coming Soon
-                      </div>
-                    )}
-                    {(product as any).isGiftSet && !(product as any).comingSoon && (
-                      <div style={{position:"absolute", top:"14px", left:"14px", background:"#C8B89A", color:"#1C1917", fontSize:"8px", letterSpacing:"2px", textTransform:"uppercase", padding:"4px 10px", fontFamily:"var(--font-jost)"}}>
-                        Gift Set
-                      </div>
-                    )}
-                    {/* Overlay on hover */}
-                    <div style={{
-                      position:"absolute", inset:0,
-                      background:"rgba(28,25,23,0.12)",
-                      opacity: isHovered ? 1 : 0,
-                      transition:"opacity 0.4s ease",
-                      display:"flex", alignItems:"flex-end", justifyContent:"center",
-                      paddingBottom:"24px",
-                    }}>
-                      <span style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#FAF8F4", fontFamily:"var(--font-jost)", borderBottom:"1px solid rgba(250,248,244,0.5)", paddingBottom:"2px"}}>
-                        View Details
-                      </span>
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#BCBCBC",
+                            fontSize: 14,
+                          }}
+                        >
+                          Henima
+                        </div>
+                      )}
+                      {product.comingSoon && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: 12,
+                            left: 12,
+                            background: "#212121",
+                            color: "#fff",
+                            fontSize: 10,
+                            letterSpacing: "0.08em",
+                            textTransform: "uppercase",
+                            padding: "4px 8px",
+                          }}
+                        >
+                          Coming Soon
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <div style={{padding:"16px 18px 20px", background:"#FAF8F4"}}>
-                    <p style={{fontSize:"9px", letterSpacing:"2px", textTransform:"uppercase", color:"#C8B89A", fontFamily:"var(--font-jost)", marginBottom:"6px"}}>
-                      {(product as any).isGiftSet ? "Gift Set / Bundling" : "Extrait de Parfum"}
-                    </p>
-                    <h2 style={{fontFamily:"var(--font-cormorant)", fontSize:"22px", fontWeight:400, color:"#1C1917", marginBottom:"6px", lineHeight:1.2}}>{product.name}</h2>
-                    <p style={{fontSize:"11px", color:"#9A8F82", fontFamily:"var(--font-jost)", fontWeight:300, marginBottom:"14px", lineHeight:1.6, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden"}}>{product.description}</p>
-                    {(product as any).comingSoon ? (
-                      <span style={{fontSize:"10px", color:"#9A8F82", fontFamily:"var(--font-jost)", letterSpacing:"1px"}}>Coming Soon</span>
-                    ) : (
-                      <p style={{fontFamily:"var(--font-jost)", fontSize:"15px", fontWeight:400, color:"#1C1917"}}>
-                        Rp {minPrice.toLocaleString("id-ID")}
+
+                    {/* tile-body — Kenzo padding-bottom 30px */}
+                    <div style={{ padding: "0 0 30px", textAlign: "center" }}>
+                      {/* Product name — Kenzo h2.category-name: 20/500/#212121, m 8 0, pb 10 */}
+                      <h2
+                        style={{
+                          fontFamily: "inherit",
+                          fontSize: 20,
+                          fontWeight: 500,
+                          lineHeight: "20px",
+                          letterSpacing: "normal",
+                          textTransform: "uppercase",
+                          textAlign: "center",
+                          color: "#212121",
+                          margin: "8px 0",
+                          padding: "0 0 10px",
+                        }}
+                      >
+                        {product.name}
+                      </h2>
+
+                      {/* Variant — Kenzo a.link: 16/400/#BCBCBC, lh 19.2 */}
+                      <p
+                        style={{
+                          fontFamily: "inherit",
+                          fontSize: 16,
+                          fontWeight: 400,
+                          lineHeight: "19.2px",
+                          letterSpacing: "normal",
+                          textTransform: "none",
+                          textAlign: "center",
+                          color: "#BCBCBC",
+                          margin: 0,
+                          padding: 0,
+                        }}
+                      >
+                        {productVariantLabel(product)}
+                        {product.comingSoon ? " · Coming soon" : ""}
                       </p>
-                    )}
-                  </div>
-                </Link>
+
+                      {/* Price — Henima commerce (Kenzo PLP often omits price) */}
+                      {price > 0 && !product.comingSoon && (
+                        <p
+                          style={{
+                            fontFamily: "inherit",
+                            fontSize: 14,
+                            fontWeight: 500,
+                            lineHeight: "24px",
+                            textAlign: "center",
+                            color: "#212529",
+                            margin: "8px 0 0",
+                            padding: 0,
+                          }}
+                        >
+                          {formatRp(price)}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                </article>
               );
             })}
           </div>
-        </div>
+        )}
       </div>
 
+      {(openFilter || mobileFiltersOpen) && (
+        <div
+          aria-hidden
+          onClick={() => {
+            setOpenFilter(null);
+            setMobileFiltersOpen(false);
+          }}
+          style={{ position: "fixed", inset: 0, zIndex: 15 }}
+        />
+      )}
+
       <style>{`
-        @media (max-width: 768px) {
-          .shop-sidebar { display: none !important; }
-          .shop-grid-wrap { padding-left: 0 !important; }
-          .mobile-filter-bar { display: flex !important; }
+        .shop-catalog *, .shop-catalog *::before, .shop-catalog *::after { box-sizing: border-box; }
+        .shop-kenzo-grid a:hover .shop-prod-img { transform: scale(1.03); }
+        .shop-red-tab:focus { outline: none; }
+        .shop-red-tab:focus-visible { border-bottom-color: #fff !important; }
+        @media (max-width: 1024px) {
+          .shop-kenzo-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            column-gap: 24px !important;
+          }
+        }
+        @media (max-width: 767px) {
+          .shop-red-bar--desktop { display: none !important; }
+          .shop-mobile-filter-row { display: flex !important; }
+          .shop-mobile-filter-panel { display: block !important; }
+          .shop-results-desktop { display: none !important; }
+          .shop-kenzo-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            column-gap: 16px !important;
+            margin-top: 8px !important;
+          }
+          .shop-catalog-inner { padding: 8px 15px 72px !important; }
+          .shop-product h2 { font-size: 16px !important; line-height: 18px !important; }
         }
       `}</style>
     </div>
   );
+}
+
+const emptyHint = {
+  margin: 0,
+  fontSize: 14,
+  color: "#888",
+  lineHeight: "24px",
+} as const;
+
+const clearBtn = {
+  marginTop: 14,
+  width: "100%",
+  border: "1px solid #212529",
+  background: "none",
+  padding: "8px",
+  fontSize: 12,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase" as const,
+  cursor: "pointer" as const,
+  fontFamily: "inherit",
+  color: "#212529",
+};
+
+function optBtn(active: boolean) {
+  return {
+    textAlign: "left" as const,
+    background: active ? "#212121" : "none",
+    color: active ? "#fff" : "#212529",
+    border: "1px solid " + (active ? "#212121" : "rgba(0,0,0,0.15)"),
+    padding: "8px 10px",
+    fontSize: 14,
+    lineHeight: "20px",
+    cursor: "pointer" as const,
+    fontFamily: "inherit",
+  };
 }

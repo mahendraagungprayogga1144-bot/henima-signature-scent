@@ -1,16 +1,25 @@
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
 
-const STATUS_STEPS = ["pending_payment","paid","processing","shipped","delivered"];
-const STATUS_LABELS: Record<string,string> = {
-  pending_payment:"Menunggu Bayar",paid:"Sudah Bayar",
-  processing:"Dikemas",shipped:"Dikirim",delivered:"Selesai",
+const STATUS_STEPS = ["pending_payment", "paid", "processing", "shipped", "delivered"];
+const STATUS_LABELS: Record<string, string> = {
+  pending_payment: "Menunggu Bayar",
+  paid: "Sudah Bayar",
+  processing: "Dikemas",
+  shipped: "Dikirim",
+  delivered: "Selesai",
 };
-const STATUS_COLORS: Record<string,string> = {
-  pending_payment:"#C8B89A",paid:"#B5935A",processing:"#DAA520",shipped:"#4CAF50",delivered:"#2E7D32",
+const STATUS_COLORS: Record<string, string> = {
+  pending_payment: "#868e96",
+  paid: "#495057",
+  processing: "#A30116",
+  shipped: "#2f9e44",
+  delivered: "#2b8a3e",
 };
 
+/** Track Order — panel rapat, Futura, CTA merah (bukan form mengambang) */
 export default function TrackingPage() {
   const [orderId, setOrderId] = useState("");
   const [phone, setPhone] = useState("");
@@ -27,7 +36,10 @@ export default function TrackingPage() {
 
   async function search() {
     if (!orderId.trim()) return;
-    if (!phone.trim()) { setError("Masukkan nomor WhatsApp yang dipakai saat checkout."); return; }
+    if (!phone.trim()) {
+      setError("Masukkan nomor WhatsApp yang dipakai saat checkout.");
+      return;
+    }
     setLoading(true);
     setError("");
     setOrder(null);
@@ -35,17 +47,34 @@ export default function TrackingPage() {
     setReviewSubmitted(false);
     try {
       const qs = new URLSearchParams({ phone: phone.trim() });
-      const res = await fetch("/api/orders/" + encodeURIComponent(orderId.trim()) + "?" + qs.toString());
-      if (res.status === 401) { setError("Nomor WhatsApp tidak cocok dengan pesanan ini."); return; }
-      if (!res.ok) { setError("Order tidak ditemukan. Pastikan Order ID benar."); return; }
+      const res = await fetch(
+        "/api/orders/" + encodeURIComponent(orderId.trim()) + "?" + qs.toString()
+      );
+      if (res.status === 401) {
+        setError("Nomor WhatsApp tidak cocok dengan pesanan ini.");
+        return;
+      }
+      if (!res.ok) {
+        setError("Order tidak ditemukan. Pastikan Order ID benar.");
+        return;
+      }
       const data = await res.json();
       setOrder(data);
       if (data.resi) {
-        const tr = await fetch("/api/tracking?resi=" + data.resi + (data.courier_code || data.courier ? "&courier=" + (data.courier_code || data.courier) : ""));
+        const tr = await fetch(
+          "/api/tracking?resi=" +
+            data.resi +
+            (data.courier_code || data.courier
+              ? "&courier=" + (data.courier_code || data.courier)
+              : "")
+        );
         if (tr.ok) setTracking(await tr.json());
       }
-    } catch { setError("Terjadi kesalahan. Coba lagi."); }
-    finally { setLoading(false); }
+    } catch {
+      setError("Terjadi kesalahan. Coba lagi.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   function copyResi() {
@@ -74,246 +103,776 @@ export default function TrackingPage() {
         }),
       });
       setReviewSubmitted(true);
-    } catch {}
-    finally { setReviewLoading(false); }
+    } catch {
+    } finally {
+      setReviewLoading(false);
+    }
   }
 
   const currentIndex = order ? STATUS_STEPS.indexOf(order.status) : -1;
-
-  // Hitung ETA (estimasi +3 hari dari tanggal order)
-  const etaDate = order?.created_at ? new Date(new Date(order.created_at).getTime() + 3 * 24 * 60 * 60 * 1000) : null;
-  const daysLeft = etaDate ? Math.max(0, Math.ceil((etaDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : null;
+  const etaDate = order?.created_at
+    ? new Date(new Date(order.created_at).getTime() + 3 * 24 * 60 * 60 * 1000)
+    : null;
+  const daysLeft = etaDate
+    ? Math.max(0, Math.ceil((etaDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : null;
 
   return (
-    <div style={{minHeight:"100vh",background:"#FAF8F4",fontFamily:"var(--font-jost,sans-serif)",color:"#1C1917"}}>
-
-      {/* HERO */}
-      <div style={{padding:"80px 8vw 60px",borderBottom:"1px solid rgba(28,25,23,0.08)",textAlign:"center"}}>
-        <p style={{fontSize:"10px",letterSpacing:"4px",textTransform:"uppercase",color:"#9A8F82",marginBottom:"16px"}}>Henima Signature Scent</p>
-        <h1 style={{fontFamily:"var(--font-cormorant,serif)",fontSize:"clamp(36px,6vw,64px)",fontWeight:300,fontStyle:"italic",color:"#1C1917",marginBottom:"16px"}}>Track Your Order</h1>
-        <p style={{fontSize:"14px",color:"#9A8F82",maxWidth:"400px",margin:"0 auto"}}>Masukkan Order ID dan nomor WhatsApp checkout untuk melacak pesananmu.</p>
-      </div>
-
-      <div style={{maxWidth:"640px",margin:"0 auto",padding:"64px 24px 80px"}}>
-
-        {/* SEARCH */}
-        <div style={{display:"flex",flexDirection:"column",gap:"12px",marginBottom:"40px"}}>
-          <input type="text" value={orderId} onChange={e=>setOrderId(e.target.value)} onKeyDown={e=>e.key==="Enter"&&search()}
-            placeholder="Order ID (contoh: ORD-1234567890-ABCD)"
-            style={{width:"100%",border:"1px solid #D5CFC8",padding:"14px 16px",fontSize:"13px",color:"#1C1917",background:"#fff",outline:"none",fontFamily:"var(--font-jost)",boxSizing:"border-box"}}/>
-          <div style={{display:"flex"}}>
-            <input type="tel" value={phone} onChange={e=>setPhone(e.target.value)} onKeyDown={e=>e.key==="Enter"&&search()}
-              placeholder="No. WhatsApp saat checkout"
-              style={{flex:1,border:"1px solid #D5CFC8",borderRight:"none",padding:"14px 16px",fontSize:"13px",color:"#1C1917",background:"#fff",outline:"none",fontFamily:"var(--font-jost)"}}/>
-            <button onClick={search} disabled={loading}
-              style={{background:"#1C1917",color:"#FAF8F4",border:"none",padding:"14px 28px",fontSize:"11px",letterSpacing:"2px",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--font-jost)",whiteSpace:"nowrap"}}>
-              {loading?"...":"Track"}
-            </button>
+    <div className="tr-wrap">
+      <div className="tr-shell">
+        {/* Left brand strip — desktop */}
+        <aside className="tr-aside">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/layout/chapter-distance.jpg" alt="" className="tr-aside-img" />
+          <div className="tr-aside-shade" />
+          <div className="tr-aside-copy">
+            <p className="tr-aside-eyebrow">Henima Signature Scent</p>
+            <h2 className="tr-aside-title">
+              Track.
+              <br />
+              Stay close.
+            </h2>
           </div>
-        </div>
+        </aside>
 
-        {error && <div style={{background:"#fff5f5",border:"1px solid #ffc5c5",padding:"16px",fontSize:"13px",color:"#cc0000",marginBottom:"24px"}}>{error}</div>}
+        {/* Form / results — logo + Futura seperti /masuk */}
+        <section className="tr-main">
+          <div className="tr-main-inner">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/henima-logo-tight.png" alt="Henima" className="tr-logo" />
+            <p className="tr-eyebrow">Tracking</p>
+            <h1 className="tr-title">Track Your Order</h1>
+            <p className="tr-sub">
+              Masukkan Order ID dan nomor WhatsApp yang dipakai saat checkout.
+            </p>
 
-        {order && (
-          <div>
+            <div className="tr-form">
+              <label className="tr-label" htmlFor="tr-order">
+                Order ID
+              </label>
+              <input
+                id="tr-order"
+                type="text"
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && search()}
+                placeholder="ORD-1234567890-ABCD"
+                className="tr-input"
+              />
 
-            {/* ETA BANNER */}
-            {order.status === "shipped" && etaDate && (
-              <div style={{background:"#1C1917",padding:"24px 28px",marginBottom:"28px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"16px"}}>
-                <div>
-                  <p style={{fontSize:"10px",letterSpacing:"3px",textTransform:"uppercase",color:"rgba(200,184,154,0.6)",marginBottom:"6px"}}>Estimasi Tiba</p>
-                  <p style={{fontSize:"20px",fontWeight:300,color:"#F0EBE3",letterSpacing:"1px"}}>{etaDate.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p>
-                  <p style={{fontSize:"11px",color:"rgba(200,184,154,0.5)",marginTop:"4px"}}>{order.courier_name}</p>
-                </div>
-                {daysLeft !== null && (
-                  <div style={{background:"rgba(200,184,154,0.15)",border:"1px solid rgba(200,184,154,0.3)",padding:"12px 20px",textAlign:"center"}}>
-                    <p style={{fontSize:"28px",fontWeight:300,color:"#C8B89A",lineHeight:1}}>{daysLeft}</p>
-                    <p style={{fontSize:"9px",letterSpacing:"2px",textTransform:"uppercase",color:"rgba(200,184,154,0.5)",marginTop:"4px"}}>Hari lagi</p>
+              <label className="tr-label" htmlFor="tr-phone">
+                WhatsApp checkout
+              </label>
+              <input
+                id="tr-phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && search()}
+                placeholder="08xxxxxxxxxx"
+                className="tr-input"
+              />
+
+              <div className="tr-actions">
+                <button type="button" onClick={search} disabled={loading} className="tr-btn">
+                  {loading ? "..." : "Track Order"}
+                </button>
+              </div>
+            </div>
+
+            {error && <div className="tr-error">{error}</div>}
+
+            {order && (
+              <div className="tr-result">
+                {order.status === "shipped" && etaDate && (
+                  <div className="tr-eta">
+                    <div>
+                      <p className="tr-label-light">Estimasi tiba</p>
+                      <p className="tr-eta-date">
+                        {etaDate.toLocaleDateString("id-ID", {
+                          weekday: "long",
+                          day: "numeric",
+                          month: "long",
+                        })}
+                      </p>
+                      <p className="tr-eta-courier">{order.courier_name}</p>
+                    </div>
+                    {daysLeft !== null && (
+                      <div className="tr-eta-days">
+                        <p className="tr-eta-num">{daysLeft}</p>
+                        <p className="tr-label-light">Hari</p>
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-            )}
 
-            {/* ORDER HEADER */}
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"20px",flexWrap:"wrap",gap:"12px"}}>
-              <div>
-                <p style={{fontSize:"10px",color:"#9A8F82",letterSpacing:"1px",marginBottom:"4px"}}>Order ID</p>
-                <p style={{fontSize:"15px",fontWeight:600,color:"#1C1917"}}>{order.id}</p>
-              </div>
-              <div style={{background:STATUS_COLORS[order.status]||"#C8B89A",color:"#fff",padding:"6px 16px",fontSize:"10px",letterSpacing:"2px",textTransform:"uppercase",fontWeight:600}}>
-                {STATUS_LABELS[order.status]||order.status}
-              </div>
-            </div>
-
-            {/* COURIER + RESI */}
-            {order.resi && (
-              <div style={{background:"#F0EBE3",padding:"16px 20px",marginBottom:"28px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"12px"}}>
-                <div>
-                  <p style={{fontSize:"14px",fontWeight:600,color:"#1C1917",marginBottom:"2px"}}>{order.courier_name}</p>
-                  <p style={{fontSize:"11px",color:"#9A8F82"}}>Dikirim dari Sidoarjo, Jawa Timur</p>
-                </div>
-                <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
+                <div className="tr-order-head">
                   <div>
-                    <p style={{fontSize:"10px",letterSpacing:"1px",textTransform:"uppercase",color:"#9A8F82",marginBottom:"3px"}}>Nomor Resi</p>
-                    <p style={{fontSize:"16px",fontWeight:700,color:"#1C1917",letterSpacing:"2px"}}>{order.resi}</p>
+                    <p className="tr-meta">Order ID</p>
+                    <p className="tr-order-id">{order.id}</p>
                   </div>
-                  <button onClick={copyResi}
-                    style={{background:"#1C1917",color:"#F0EBE3",border:"none",padding:"8px 14px",fontSize:"9px",letterSpacing:"1px",textTransform:"uppercase",cursor:"pointer"}}>
-                    {copied?"✓ Disalin":"Salin"}
-                  </button>
+                  <div
+                    className="tr-badge"
+                    style={{ background: STATUS_COLORS[order.status] || "#868e96" }}
+                  >
+                    {STATUS_LABELS[order.status] || order.status}
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {/* PROGRESS STEPS */}
-            <div style={{marginBottom:"36px"}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",position:"relative"}}>
-                <div style={{position:"absolute",top:"14px",left:"10%",right:"10%",height:"2px",background:"#E8E0D5",zIndex:0}}/>
-                <div style={{position:"absolute",top:"14px",left:"10%",width:currentIndex>=0?`${(currentIndex/4)*80}%`:"0%",height:"2px",background:"#1C1917",zIndex:1,transition:"width 0.5s ease"}}/>
-                {STATUS_STEPS.map((step,i)=>{
-                  const isPast = i <= currentIndex;
-                  return (
-                    <div key={step} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"8px",zIndex:2}}>
-                      <div style={{width:"28px",height:"28px",borderRadius:"50%",background:isPast?"#1C1917":"#E8E0D5",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.3s"}}>
-                        {isPast && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#FAF8F4" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                      </div>
-                      <p style={{fontSize:"9px",letterSpacing:"0.5px",textTransform:"uppercase",color:isPast?"#1C1917":"#C8B89A",textAlign:"center",maxWidth:"56px",lineHeight:1.3,fontWeight:isPast?600:400}}>{STATUS_LABELS[step]}</p>
+                {order.resi && (
+                  <div className="tr-resi">
+                    <div>
+                      <p className="tr-resi-name">{order.courier_name}</p>
+                      <p className="tr-meta">Sidoarjo, Jawa Timur</p>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* PETA RUTE */}
-            {tracking?.history && tracking.history.length > 0 && (
-              <div style={{marginBottom:"32px"}}>
-                <p style={{fontSize:"10px",letterSpacing:"3px",textTransform:"uppercase",color:"#B5935A",marginBottom:"16px",fontWeight:600}}>Rute Pengiriman</p>
-                <div style={{background:"#F0EBE3",padding:"20px",overflowX:"auto"}}>
-                  <div style={{display:"flex",alignItems:"center",minWidth:"360px"}}>
-                    {Array.from(new Set(tracking.history.map((h:any) => h.location).filter(Boolean).reverse())).map((loc:any, i:number, arr:any[]) => (
-                      <div key={i} style={{display:"flex",alignItems:"center",flex:1}}>
-                        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"6px"}}>
-                          <div style={{width:"12px",height:"12px",borderRadius:"50%",background: i===arr.length-1?"#B5935A":"#1C1917",boxShadow: i===arr.length-1?"0 0 0 4px rgba(181,147,90,0.25)":""}}/>
-                          <p style={{fontSize:"9px",letterSpacing:"0.5px",textTransform:"uppercase",color:i===arr.length-1?"#B5935A":"#1C1917",textAlign:"center",maxWidth:"60px",lineHeight:1.4,fontWeight:600}}>{loc}</p>
-                        </div>
-                        {i < arr.length - 1 && <div style={{flex:1,height:"2px",background:"#1C1917",margin:"0 4px",marginBottom:"18px"}}/>}
+                    <div className="tr-resi-right">
+                      <div>
+                        <p className="tr-meta">Resi</p>
+                        <p className="tr-resi-code">{order.resi}</p>
                       </div>
-                    ))}
+                      <button type="button" onClick={copyResi} className="tr-btn-ghost">
+                        {copied ? "Disalin" : "Salin"}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )}
+                )}
 
-            {/* TIMELINE PERJALANAN */}
-            {tracking?.history && tracking.history.length > 0 && (
-              <div style={{marginBottom:"32px"}}>
-                <p style={{fontSize:"10px",letterSpacing:"3px",textTransform:"uppercase",color:"#B5935A",marginBottom:"20px",fontWeight:600}}>Perjalanan Paket</p>
-                <div style={{position:"relative",paddingLeft:"24px"}}>
-                  <div style={{position:"absolute",left:"6px",top:"8px",bottom:"8px",width:"1px",background:"#E8E0D5"}}/>
-                  {tracking.history.map((h:any,i:number)=>(
-                    <div key={i} style={{position:"relative",marginBottom:"24px"}}>
-                      <div style={{position:"absolute",left:"-22px",top:"6px",width:i===0?"12px":"10px",height:i===0?"12px":"10px",borderRadius:"50%",background:i===0?"#1C1917":"#E8E0D5",border:"2px solid #FAF8F4",marginLeft:i===0?"-1px":"0"}}/>
-                      <p style={{fontSize:"11px",color:i===0?"#1C1917":"#9A8F82",marginBottom:"3px",fontWeight:i===0?600:400}}>
-                        {h.updated_at ? new Date(h.updated_at).toLocaleString("id-ID",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}) : ""}
-                      </p>
-                      <p style={{fontSize:"13px",color:i===0?"#1C1917":"#6B5E52",lineHeight:1.6,fontWeight:i===0?500:400}}>{h.note||h.status}</p>
-                      {h.location && <p style={{fontSize:"11px",color:"#B5935A",marginTop:"3px"}}>📍 {h.location}</p>}
+                <div className="tr-steps">
+                  <div className="tr-steps-line" />
+                  <div
+                    className="tr-steps-progress"
+                    style={{
+                      width: currentIndex >= 0 ? `${(currentIndex / 4) * 80}%` : "0%",
+                    }}
+                  />
+                  {STATUS_STEPS.map((step, i) => {
+                    const isPast = i <= currentIndex;
+                    return (
+                      <div key={step} className="tr-step">
+                        <div className={`tr-step-dot ${isPast ? "on" : ""}`}>
+                          {isPast && (
+                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                              <path
+                                d="M2 6l3 3 5-5"
+                                stroke="#fff"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <p className={isPast ? "on" : ""}>{STATUS_LABELS[step]}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {tracking?.history?.length > 0 && (
+                  <div className="tr-block">
+                    <p className="tr-section">Perjalanan paket</p>
+                    <div className="tr-timeline">
+                      {tracking.history.map((h: any, i: number) => (
+                        <div key={i} className={`tr-tl-item ${i === 0 ? "first" : ""}`}>
+                          <p className="tr-tl-date">
+                            {h.updated_at
+                              ? new Date(h.updated_at).toLocaleString("id-ID", {
+                                  day: "numeric",
+                                  month: "short",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : ""}
+                          </p>
+                          <p className="tr-tl-note">{h.note || h.status}</p>
+                          {h.location && <p className="tr-tl-loc">{h.location}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {order.status === "shipped" && (
+                  <div className="tr-notif">
+                    <div>
+                      <p className="tr-notif-title">Update otomatis via WA?</p>
+                      <p className="tr-meta">Kami kabari tiap kali paket bergerak.</p>
+                    </div>
+                    <a
+                      href={
+                        "https://wa.me/6285190311230?text=" +
+                        encodeURIComponent(
+                          "Halo Henima, aktifkan notifikasi tracking untuk " + order.id
+                        )
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setNotifSent(true)}
+                      className="tr-btn-ghost"
+                    >
+                      {notifSent ? "Terkirim" : "Aktifkan"}
+                    </a>
+                  </div>
+                )}
+
+                <p className="tr-section">Dikirim ke</p>
+                <div className="tr-card">
+                  <p className="tr-card-name">{order.customer?.name}</p>
+                  <p className="tr-card-text">
+                    {order.customer?.address}, {order.customer?.city},{" "}
+                    {order.customer?.province} {order.customer?.postalCode}
+                  </p>
+                  <p className="tr-meta" style={{ marginTop: 6 }}>
+                    {order.customer?.phone}
+                  </p>
+                </div>
+
+                <p className="tr-section">Rincian</p>
+                <div className="tr-items">
+                  {order.items?.map((item: any, i: number) => (
+                    <div key={i} className="tr-item-row">
+                      <span>
+                        {item.productName} {item.sizeMl}ml × {item.quantity}
+                      </span>
+                      <span>Rp {(item.price * item.quantity).toLocaleString("id-ID")}</span>
                     </div>
                   ))}
+                  <div className="tr-item-row muted">
+                    <span>Ongkir ({order.courier_name})</span>
+                    <span>Rp {order.shipping_cost?.toLocaleString("id-ID")}</span>
+                  </div>
+                  <div className="tr-item-row total">
+                    <span>Total</span>
+                    <span>Rp {order.total?.toLocaleString("id-ID")}</span>
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {/* NOTIFIKASI WA */}
-            {order.status === "shipped" && (
-              <div style={{border:"1px solid rgba(28,25,23,0.1)",padding:"20px 24px",marginBottom:"28px",display:"flex",alignItems:"center",gap:"16px",flexWrap:"wrap"}}>
-                <div style={{fontSize:"22px"}}>🔔</div>
-                <div style={{flex:1}}>
-                  <p style={{fontSize:"14px",fontWeight:600,color:"#1C1917",marginBottom:"3px"}}>Mau dapat update otomatis?</p>
-                  <p style={{fontSize:"12px",color:"#9A8F82"}}>Kami kirim notifikasi WA tiap kali paket bergerak.</p>
-                </div>
-                <a href={"https://wa.me/6285190311230?text=" + encodeURIComponent("Halo Henima, saya ingin mengaktifkan notifikasi tracking untuk pesanan " + order.id)}
-                  target="_blank" rel="noopener noreferrer"
-                  onClick={()=>setNotifSent(true)}
-                  style={{background:"#1C1917",color:"#FAF8F4",border:"none",padding:"10px 20px",fontSize:"10px",letterSpacing:"2px",textTransform:"uppercase",cursor:"pointer",textDecoration:"none",whiteSpace:"nowrap"}}>
-                  {notifSent?"✓ Terkirim":"Aktifkan via WA"}
+                {order.status === "delivered" && (
+                  <div className="tr-block">
+                    <p className="tr-section">Ulasan</p>
+                    {reviewSubmitted ? (
+                      <div className="tr-review-done">
+                        <p className="tr-card-name">Terima kasih atas ulasanmu!</p>
+                      </div>
+                    ) : (
+                      <div className="tr-review">
+                        <p className="tr-review-q">Bagaimana pengalamanmu?</p>
+                        <div className="tr-stars">
+                          {[1, 2, 3, 4, 5].map((n) => (
+                            <button
+                              key={n}
+                              type="button"
+                              onClick={() => setReviewRating(n)}
+                              className={n <= reviewRating ? "on" : ""}
+                              aria-label={`${n} bintang`}
+                            >
+                              ★
+                            </button>
+                          ))}
+                        </div>
+                        <textarea
+                          value={reviewText}
+                          onChange={(e) => setReviewText(e.target.value)}
+                          placeholder="Ceritakan pengalamanmu..."
+                          rows={3}
+                          className="tr-textarea"
+                        />
+                        <button
+                          type="button"
+                          onClick={submitReview}
+                          disabled={reviewLoading || !reviewRating || !reviewText.trim()}
+                          className="tr-btn"
+                          style={{
+                            opacity: reviewRating && reviewText.trim() ? 1 : 0.5,
+                          }}
+                        >
+                          {reviewLoading ? "Mengirim..." : "Kirim Ulasan"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <a
+                  className="tr-wa"
+                  href={
+                    "https://wa.me/6285190311230?text=" +
+                    encodeURIComponent("Halo Henima, saya ingin menanyakan pesanan " + order.id)
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Chat WhatsApp
                 </a>
               </div>
             )}
 
-            {/* DIKIRIM KE */}
-            <p style={{fontSize:"10px",letterSpacing:"3px",textTransform:"uppercase",color:"#B5935A",marginBottom:"16px",fontWeight:600}}>Dikirim ke</p>
-            <div style={{background:"#F0EBE3",padding:"20px 24px",marginBottom:"28px"}}>
-              <p style={{fontSize:"14px",fontWeight:600,color:"#1C1917",marginBottom:"4px"}}>{order.customer?.name}</p>
-              <p style={{fontSize:"13px",color:"#6B5E52",lineHeight:1.7}}>{order.customer?.address}, {order.customer?.city}, {order.customer?.province} {order.customer?.postalCode}</p>
-              <p style={{fontSize:"12px",color:"#9A8F82",marginTop:"6px"}}>{order.customer?.phone}</p>
-            </div>
-
-            {/* RINCIAN PESANAN */}
-            <p style={{fontSize:"10px",letterSpacing:"3px",textTransform:"uppercase",color:"#B5935A",marginBottom:"16px",fontWeight:600}}>Rincian Pesanan</p>
-            <div style={{background:"#fff",border:"1px solid #E8E0D5",marginBottom:"28px"}}>
-              {order.items?.map((item:any,i:number)=>(
-                <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"14px 20px",borderBottom:"1px solid #F0EBE3",fontSize:"13px"}}>
-                  <span style={{color:"#1C1917"}}>{item.productName} {item.sizeMl}ml × {item.quantity}</span>
-                  <span style={{fontWeight:500}}>Rp {(item.price*item.quantity).toLocaleString("id-ID")}</span>
-                </div>
-              ))}
-              <div style={{display:"flex",justifyContent:"space-between",padding:"14px 20px",borderBottom:"1px solid #F0EBE3",fontSize:"13px"}}>
-                <span style={{color:"#9A8F82"}}>Ongkir ({order.courier_name})</span>
-                <span>Rp {order.shipping_cost?.toLocaleString("id-ID")}</span>
-              </div>
-              <div style={{display:"flex",justifyContent:"space-between",padding:"14px 20px",background:"#F0EBE3",fontSize:"15px",fontWeight:700}}>
-                <span>Total</span>
-                <span>Rp {order.total?.toLocaleString("id-ID")}</span>
-              </div>
-            </div>
-
-            {/* ULASAN PRODUK */}
-            {order.status === "delivered" && (
-              <div style={{marginBottom:"28px"}}>
-                <p style={{fontSize:"10px",letterSpacing:"3px",textTransform:"uppercase",color:"#B5935A",marginBottom:"16px",fontWeight:600}}>Ulasan Produk</p>
-                {reviewSubmitted ? (
-                  <div style={{background:"#F0EBE3",padding:"28px",textAlign:"center"}}>
-                    <p style={{fontSize:"20px",marginBottom:"8px"}}>✨</p>
-                    <p style={{fontSize:"15px",fontWeight:500,color:"#1C1917",marginBottom:"4px"}}>Terima kasih atas ulasanmu!</p>
-                    <p style={{fontSize:"13px",color:"#9A8F82"}}>Ulasanmu sangat berarti bagi kami dan pelanggan lain.</p>
-                  </div>
-                ) : (
-                  <div style={{border:"1px solid rgba(28,25,23,0.1)",padding:"28px",textAlign:"center"}}>
-                    <p style={{fontFamily:"var(--font-cormorant,serif)",fontSize:"22px",fontWeight:300,fontStyle:"italic",color:"#1C1917",marginBottom:"6px"}}>Bagaimana pengalamanmu?</p>
-                    <p style={{fontSize:"13px",color:"#9A8F82",marginBottom:"20px"}}>Bantu pelanggan lain dengan ulasan jujurmu.</p>
-                    <div style={{display:"flex",justifyContent:"center",gap:"10px",marginBottom:"20px"}}>
-                      {[1,2,3,4,5].map(n=>(
-                        <span key={n} onClick={()=>setReviewRating(n)}
-                          style={{fontSize:"32px",cursor:"pointer",color:n<=reviewRating?"#C8B89A":"#E8E0D5",transition:"color 0.2s"}}>★</span>
-                      ))}
-                    </div>
-                    <textarea value={reviewText} onChange={e=>setReviewText(e.target.value)}
-                      placeholder="Ceritakan pengalamanmu dengan produk ini..."
-                      rows={3}
-                      style={{width:"100%",border:"1px solid #E8E0D5",padding:"12px 14px",fontSize:"13px",outline:"none",resize:"vertical",marginBottom:"16px",fontFamily:"var(--font-jost)",boxSizing:"border-box" as const}}/>
-                    <button onClick={submitReview} disabled={reviewLoading||!reviewRating||!reviewText.trim()}
-                      style={{background:"#1C1917",color:"#FAF8F4",border:"none",padding:"12px 32px",fontSize:"10px",letterSpacing:"2px",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--font-jost)",opacity:reviewRating&&reviewText.trim()?1:0.5}}>
-                      {reviewLoading?"Mengirim...":"Kirim Ulasan"}
-                    </button>
-                  </div>
-                )}
-              </div>
+            {!order && (
+              <p className="tr-hint">
+                Butuh bantuan? <Link href="/faq">FAQ</Link>
+                {" · "}
+                <Link href="/shop">Kembali belanja</Link>
+              </p>
             )}
-
-            {/* CTA WA */}
-            <div style={{background:"#1C1917",padding:"28px",textAlign:"center"}}>
-              <p style={{fontSize:"12px",color:"rgba(200,184,154,0.6)",marginBottom:"12px"}}>Ada pertanyaan tentang pesananmu?</p>
-              <a href={"https://wa.me/6285190311230?text=" + encodeURIComponent("Halo Henima, saya ingin menanyakan pesanan " + order.id)}
-                target="_blank" rel="noopener noreferrer"
-                style={{display:"inline-block",color:"#F0EBE3",border:"1px solid rgba(200,184,154,0.3)",padding:"12px 28px",fontSize:"10px",letterSpacing:"2px",textTransform:"uppercase",textDecoration:"none"}}>
-                Chat WhatsApp
-              </a>
-            </div>
-
           </div>
-        )}
+        </section>
       </div>
+
+      <style>{`
+        .tr-wrap,
+        .tr-wrap input,
+        .tr-wrap button,
+        .tr-wrap textarea,
+        .tr-wrap a,
+        .tr-wrap p,
+        .tr-wrap h1,
+        .tr-wrap h2,
+        .tr-wrap label,
+        .tr-wrap span {
+          font-family: var(--font-futura-nav), FuturaBT-Medium, Futura, "Century Gothic", sans-serif !important;
+        }
+        .tr-wrap {
+          background: #fff;
+          color: #212529;
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 24px;
+          padding-top: 28px;
+        }
+        .tr-shell {
+          display: grid;
+          grid-template-columns: 1.05fr 0.95fr;
+          min-height: calc(100vh - 140px);
+          gap: 0 28px;
+          padding: 0 28px 28px;
+          box-sizing: border-box;
+        }
+        .tr-aside {
+          position: relative;
+          background: #111;
+          overflow: hidden;
+          min-height: 100%;
+        }
+        .tr-aside-img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .tr-aside-shade {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 45%, transparent 100%);
+        }
+        .tr-aside-copy {
+          position: absolute;
+          left: 48px;
+          right: 48px;
+          bottom: 48px;
+          z-index: 1;
+          color: #fff;
+        }
+        .tr-aside-eyebrow {
+          margin: 0 0 12px;
+          font-size: 11px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.7);
+          font-weight: 400;
+        }
+        .tr-aside-title {
+          margin: 0;
+          font-size: clamp(28px, 4vw, 44px);
+          font-weight: 500;
+          letter-spacing: 0.02em;
+          line-height: 1.2;
+          color: #fff;
+        }
+
+        .tr-main {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 48px 56px;
+          background: #fff;
+        }
+        .tr-main-inner {
+          width: 100%;
+          max-width: 400px;
+        }
+        .tr-logo {
+          display: block;
+          width: 148px;
+          height: auto;
+          margin: 0 0 36px;
+        }
+        .tr-eyebrow {
+          margin: 0 0 12px;
+          font-size: 11px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #868e96;
+          font-weight: 400;
+        }
+        .tr-title {
+          margin: 0 0 10px;
+          font-size: clamp(26px, 3.2vw, 34px);
+          font-weight: 500;
+          letter-spacing: 0.02em;
+          color: #212529;
+          line-height: 1.2;
+          text-transform: none;
+        }
+        .tr-sub {
+          margin: 0 0 32px;
+          font-size: 15px;
+          line-height: 1.7;
+          color: #495057;
+        }
+
+        .tr-form { margin-bottom: 8px; }
+        .tr-label {
+          display: block;
+          margin: 0 0 8px;
+          font-size: 11px;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: #868e96;
+          font-weight: 400;
+        }
+        .tr-input {
+          display: block;
+          width: 100%;
+          border: none;
+          border-bottom: 1px solid rgba(33,37,41,0.18);
+          padding: 10px 0;
+          margin: 0 0 24px;
+          font-size: 15px;
+          color: #212529;
+          background: transparent;
+          outline: none;
+          box-sizing: border-box;
+        }
+        .tr-input:focus { border-bottom-color: #212529; }
+        .tr-input::placeholder { color: #adb5bd; }
+
+        .tr-actions {
+          display: flex;
+          justify-content: flex-end;
+          margin-top: 4px;
+        }
+        .tr-btn {
+          display: inline-block;
+          width: auto;
+          margin-top: 0;
+          background: #A30116;
+          color: #fff;
+          border: none;
+          padding: 10px 18px;
+          font-size: 10px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          cursor: pointer;
+          font-weight: 400;
+          transition: opacity 0.2s;
+        }
+        .tr-btn:hover { opacity: 0.9; }
+        .tr-btn:disabled { opacity: 0.6; cursor: wait; }
+
+        .tr-btn-ghost {
+          background: #212121;
+          color: #fff;
+          border: none;
+          padding: 8px 14px;
+          font-size: 10px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          cursor: pointer;
+          font-family: inherit;
+          text-decoration: none;
+          display: inline-block;
+          white-space: nowrap;
+        }
+
+        .tr-error {
+          background: #fff5f5;
+          border: 1px solid #ffc5c5;
+          padding: 12px 14px;
+          font-size: 13px;
+          color: #A30116;
+          margin: 18px 0 0;
+        }
+        .tr-hint {
+          margin: 28px 0 0;
+          font-size: 13px;
+          color: #868e96;
+        }
+        .tr-hint a {
+          color: #212529;
+          text-decoration: none;
+          border-bottom: 1px solid rgba(33,37,41,0.25);
+        }
+
+        .tr-result { margin-top: 36px; padding-top: 28px; border-top: 1px solid rgba(33,37,41,0.1); }
+
+        .tr-eta {
+          background: #111;
+          padding: 18px 20px;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          color: #fff;
+        }
+        .tr-label-light {
+          margin: 0;
+          font-size: 10px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.5);
+        }
+        .tr-eta-date { margin: 6px 0 0; font-size: 16px; color: #f5f5f4; }
+        .tr-eta-courier { margin: 4px 0 0; font-size: 11px; color: rgba(255,255,255,0.4); }
+        .tr-eta-days {
+          border: 1px solid rgba(255,255,255,0.22);
+          padding: 10px 14px;
+          text-align: center;
+        }
+        .tr-eta-num { margin: 0; font-size: 24px; line-height: 1; }
+
+        .tr-order-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+        .tr-meta {
+          margin: 0;
+          font-size: 10px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #868e96;
+        }
+        .tr-order-id { margin: 4px 0 0; font-size: 14px; font-weight: 500; }
+        .tr-badge {
+          color: #fff;
+          padding: 5px 12px;
+          font-size: 9px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          font-weight: 500;
+        }
+
+        .tr-resi {
+          background: #FAFAFA;
+          padding: 14px 16px;
+          margin-bottom: 24px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+        .tr-resi-name { margin: 0 0 4px; font-size: 14px; font-weight: 500; }
+        .tr-resi-right { display: flex; align-items: center; gap: 10px; }
+        .tr-resi-code {
+          margin: 3px 0 0;
+          font-size: 14px;
+          font-weight: 500;
+          letter-spacing: 0.06em;
+        }
+
+        .tr-steps {
+          position: relative;
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 28px;
+        }
+        .tr-steps-line {
+          position: absolute;
+          top: 12px;
+          left: 8%;
+          right: 8%;
+          height: 2px;
+          background: #dee2e6;
+        }
+        .tr-steps-progress {
+          position: absolute;
+          top: 12px;
+          left: 8%;
+          height: 2px;
+          background: #212121;
+          transition: width 0.45s ease;
+        }
+        .tr-step {
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        }
+        .tr-step-dot {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #dee2e6;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .tr-step-dot.on { background: #212121; }
+        .tr-step p {
+          margin: 0;
+          font-size: 8px;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          color: #868e96;
+          text-align: center;
+          max-width: 52px;
+          line-height: 1.25;
+        }
+        .tr-step p.on { color: #212529; font-weight: 500; }
+
+        .tr-block { margin-bottom: 22px; }
+        .tr-section {
+          margin: 0 0 12px;
+          font-size: 11px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #868e96;
+          font-weight: 500;
+        }
+        .tr-timeline { position: relative; padding-left: 18px; }
+        .tr-timeline::before {
+          content: "";
+          position: absolute;
+          left: 3px;
+          top: 4px;
+          bottom: 4px;
+          width: 1px;
+          background: #dee2e6;
+        }
+        .tr-tl-item { position: relative; margin-bottom: 16px; }
+        .tr-tl-item::before {
+          content: "";
+          position: absolute;
+          left: -18px;
+          top: 5px;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #dee2e6;
+          border: 2px solid #fff;
+        }
+        .tr-tl-item.first::before { background: #212121; }
+        .tr-tl-date { margin: 0 0 2px; font-size: 11px; color: #868e96; }
+        .tr-tl-item.first .tr-tl-date { color: #212529; font-weight: 500; }
+        .tr-tl-note { margin: 0; font-size: 13px; line-height: 1.55; color: #495057; }
+        .tr-tl-item.first .tr-tl-note { color: #212529; font-weight: 500; }
+        .tr-tl-loc { margin: 3px 0 0; font-size: 11px; color: #868e96; }
+
+        .tr-notif {
+          border: 1px solid rgba(33,37,41,0.1);
+          padding: 14px 16px;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+        .tr-notif-title { margin: 0 0 3px; font-size: 13px; font-weight: 500; }
+
+        .tr-card {
+          background: #FAFAFA;
+          padding: 14px 16px;
+          margin-bottom: 22px;
+        }
+        .tr-card-name { margin: 0 0 4px; font-size: 14px; font-weight: 500; }
+        .tr-card-text { margin: 0; font-size: 13px; line-height: 1.65; color: #495057; }
+
+        .tr-items {
+          border: 1px solid rgba(33,37,41,0.1);
+          margin-bottom: 22px;
+        }
+        .tr-item-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          padding: 11px 14px;
+          border-bottom: 1px solid #f1f3f5;
+          font-size: 13px;
+        }
+        .tr-item-row.muted { color: #868e96; }
+        .tr-item-row.total {
+          background: #FAFAFA;
+          font-weight: 500;
+          border-bottom: none;
+        }
+
+        .tr-review, .tr-review-done {
+          border: 1px solid rgba(33,37,41,0.1);
+          padding: 22px;
+          text-align: center;
+        }
+        .tr-review-done { background: #FAFAFA; border: none; }
+        .tr-review-q { margin: 0 0 12px; font-size: 16px; }
+        .tr-stars { display: flex; justify-content: center; gap: 6px; margin-bottom: 14px; }
+        .tr-stars button {
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: #dee2e6;
+          padding: 0;
+          line-height: 1;
+        }
+        .tr-stars button.on { color: #A30116; }
+        .tr-textarea {
+          width: 100%;
+          border: 1px solid rgba(33,37,41,0.18);
+          padding: 10px 12px;
+          font-size: 13px;
+          outline: none;
+          resize: vertical;
+          margin-bottom: 12px;
+          font-family: inherit;
+          box-sizing: border-box;
+        }
+
+        .tr-wa {
+          display: block;
+          text-align: center;
+          background: #111;
+          color: #fff;
+          padding: 14px;
+          font-size: 11px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          text-decoration: none;
+        }
+
+        @media (max-width: 900px) {
+          .tr-wrap { padding-top: 20px; }
+          .tr-shell {
+            grid-template-columns: 1fr;
+            min-height: auto;
+            gap: 0;
+            padding: 0 16px 24px;
+          }
+          .tr-aside { min-height: 32vh; }
+          .tr-aside-copy { left: 24px; right: 24px; bottom: 24px; }
+          .tr-main {
+            align-items: flex-start;
+            padding: 36px 20px 56px;
+          }
+          .tr-logo { width: 128px; margin-bottom: 28px; }
+        }
+      `}</style>
     </div>
   );
 }

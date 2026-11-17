@@ -43,11 +43,11 @@ export default function WishlistPage() {
   const saved = products.filter(p=>wishlist.includes(p.id))
 
   return(<><style>{`
-    .wl{--bg:#FAF8F4;--bg2:#F0EDE6;--black:#1C1917;--ink:#2E2A25;--muted:#7A736A;--border:rgba(28,25,23,0.1);--serif:var(--font-cormorant),'Plus Jakarta Sans',Helvetica,Arial,sans-serif;--sans:var(--font-jost),system-ui,sans-serif;background:var(--bg);min-height:100vh;font-family:var(--sans);font-weight:300;color:var(--ink)}
+    .wl{--bg:#FFFFFF;--bg2:#F0EDE6;--black:#111111;--ink:#2E2A25;--muted:#7A736A;--border:rgba(28,25,23,0.1);--serif:var(--font-jakarta),'Plus Jakarta Sans',Helvetica,Arial,sans-serif;--sans:var(--font-jakarta),system-ui,sans-serif;background:var(--bg);min-height:100vh;font-family:var(--sans);font-weight:300;color:var(--ink)}
     .wl-hero{background:var(--black);padding:120px 6vw 80px;text-align:center;position:relative;overflow:hidden}
     .wl-hero-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--serif);font-size:clamp(80px,18vw,200px);font-weight:400;font-style:italic;color:rgba(200,184,154,.04);white-space:nowrap;pointer-events:none}
-    .wl-hero h1{font-family:var(--serif);font-size:clamp(2rem,4vw,3.5rem);font-weight:400;line-height:1.15;color:#F0EBE3;margin-bottom:16px;position:relative}
-    .wl-hero h1 em{font-style:italic;color:#C8B89A}
+    .wl-hero h1{font-family:var(--serif);font-size:clamp(2rem,4vw,3.5rem);font-weight:400;line-height:1.15;color:#F5F5F4;margin-bottom:16px;position:relative}
+    .wl-hero h1 em{font-style:italic;color:#A3A3A3}
     .wl-hero p{font-size:14px;color:rgba(240,235,227,.4);position:relative}
     .wl-label{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:rgba(200,184,154,.6);margin-bottom:20px;display:block;position:relative}
     .wl-body{max-width:1080px;margin:0 auto;padding:80px 6vw}
@@ -56,18 +56,18 @@ export default function WishlistPage() {
     .wl-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(28,25,23,0.08)}
     .wl-img{position:relative;aspect-ratio:4/3;background:var(--bg2);overflow:hidden}
     .wl-remove{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(250,248,244,.92);border:1px solid rgba(28,25,23,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:background .2s;z-index:10}
-    .wl-remove:hover{background:#1C1917;color:#FAF8F4}
+    .wl-remove:hover{background:#111111;color:#FFFFFF}
     .wl-info{padding:20px}
     .wl-name{font-family:var(--serif);font-size:19px;font-weight:400;color:var(--black);margin-bottom:6px}
     .wl-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px}
     .wl-price{font-size:15px;color:var(--black);margin-bottom:16px}
     .wl-price s{font-size:12px;color:var(--muted);margin-right:8px}
-    .wl-btn{display:block;text-align:center;padding:12px;background:var(--black);color:#FAF8F4;font-size:10px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;font-family:var(--sans);transition:opacity .2s}
+    .wl-btn{display:block;text-align:center;padding:12px;background:var(--black);color:#FFFFFF;font-size:10px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;font-family:var(--sans);transition:opacity .2s}
     .wl-btn:hover{opacity:.8}
     .wl-empty{text-align:center;padding:80px 20px}
     .wl-empty h2{font-family:var(--serif);font-size:28px;font-weight:400;color:var(--black);margin-bottom:12px}
     .wl-empty p{font-size:14px;color:var(--muted);margin-bottom:32px}
-    .wl-shop-btn{display:inline-block;padding:14px 40px;background:var(--black);color:#FAF8F4;font-size:10px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;font-family:var(--sans)}
+    .wl-shop-btn{display:inline-block;padding:14px 40px;background:var(--black);color:#FFFFFF;font-size:10px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;font-family:var(--sans)}
     .wl-count{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:32px}
     .wl-login-note{font-size:12px;color:var(--muted);text-align:center;margin-bottom:32px;padding:16px;background:var(--bg2);border:1px solid var(--border)}
     @media(max-width:600px){.wl-body{padding:60px 5vw}}

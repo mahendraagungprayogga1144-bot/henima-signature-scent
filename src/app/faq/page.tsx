@@ -45,30 +45,30 @@ const FAQS = [
 
 export default function FAQPage() {
   return (
-    <div style={{ minHeight: "100vh", background: "#FAF8F4", fontFamily: "var(--font-jost, sans-serif)", color: "#1C1917" }}>
+    <div style={{ minHeight: "100vh", background: "#FFFFFF", fontFamily: "var(--font-jost, sans-serif)", color: "#111111" }}>
 
       <div style={{ padding: "80px 8vw 60px", borderBottom: "1px solid rgba(28,25,23,0.08)" }}>
-        <p style={{ fontSize: "10px", letterSpacing: "4px", textTransform: "uppercase", color: "#9A8F82", marginBottom: "16px", fontWeight: 300 }}>Help Center</p>
-        <h1 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "clamp(40px,7vw,80px)", fontWeight: 300, color: "#1C1917", lineHeight: 1, fontStyle: "italic", marginBottom: "20px" }}>
+        <p style={{ fontSize: "10px", letterSpacing: "4px", textTransform: "uppercase", color: "#A3A3A3", marginBottom: "16px", fontWeight: 300 }}>Help Center</p>
+        <h1 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "clamp(40px,7vw,80px)", fontWeight: 300, color: "#111111", lineHeight: 1, fontStyle: "italic", marginBottom: "20px" }}>
           Frequently Asked Questions
         </h1>
-        <div style={{ width: "40px", height: "1px", background: "#C8B89A" }} />
+        <div style={{ width: "40px", height: "1px", background: "#A3A3A3" }} />
       </div>
 
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "64px 8vw 100px" }}>
         {FAQS.map((section, si) => (
           <Reveal key={si} direction="up" delay={si * 80}>
             <div style={{ marginBottom: "64px" }}>
-              <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#B5935A", fontWeight: 600, marginBottom: "32px" }}>
+              <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#737373", fontWeight: 600, marginBottom: "32px" }}>
                 {section.category}
               </p>
               {section.items.map((faq, i) => (
                 <details key={i} style={{ borderTop: "1px solid rgba(28,25,23,0.1)" }}>
-                  <summary style={{ padding: "22px 0", fontSize: "15px", fontWeight: 500, color: "#1C1917", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", listStyle: "none" }}>
+                  <summary style={{ padding: "22px 0", fontSize: "15px", fontWeight: 500, color: "#111111", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", listStyle: "none" }}>
                     {faq.q}
-                    <span style={{ fontSize: "20px", color: "#B5935A", fontWeight: 300, flexShrink: 0, marginLeft: "16px" }}>+</span>
+                    <span style={{ fontSize: "20px", color: "#737373", fontWeight: 300, flexShrink: 0, marginLeft: "16px" }}>+</span>
                   </summary>
-                  <p style={{ fontSize: "14px", color: "#6B5E52", lineHeight: 1.9, paddingBottom: "24px", margin: 0 }}>
+                  <p style={{ fontSize: "14px", color: "#737373", lineHeight: 1.9, paddingBottom: "24px", margin: 0 }}>
                     {faq.a}
                   </p>
                 </details>
@@ -80,15 +80,15 @@ export default function FAQPage() {
 
         <Reveal direction="up" delay={200}>
           <div style={{ textAlign: "center", padding: "48px", background: "#fff", border: "1px solid rgba(28,25,23,0.08)", marginTop: "40px" }}>
-            <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#B5935A", marginBottom: "16px" }}>Still have questions?</p>
-            <h3 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "28px", fontWeight: 300, fontStyle: "italic", color: "#1C1917", marginBottom: "24px" }}>
+            <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#737373", marginBottom: "16px" }}>Still have questions?</p>
+            <h3 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "28px", fontWeight: 300, fontStyle: "italic", color: "#111111", marginBottom: "24px" }}>
               We are here to help.
             </h3>
             <Link
               href="https://wa.me/6285190311230"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ display: "inline-block", background: "#1C1917", color: "#FAF8F4", padding: "14px 40px", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", textDecoration: "none", fontWeight: 500 }}
+              style={{ display: "inline-block", background: "#111111", color: "#FFFFFF", padding: "14px 40px", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", textDecoration: "none", fontWeight: 500 }}
             >
               Chat WhatsApp
             </Link>

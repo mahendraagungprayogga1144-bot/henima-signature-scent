@@ -22,17 +22,17 @@ function Countdown({ endAt }: { endAt: string }) {
 
   const box = (val: string, label: string) => (
     <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: "6px", padding: "4px 10px", textAlign: "center", minWidth: "40px" }}>
-      <p style={{ fontSize: "18px", fontWeight: 600, color: "#F0EBE3", margin: 0, fontFamily: "monospace" }}>{val}</p>
-      <p style={{ fontSize: "9px", color: "rgba(200,184,154,0.5)", margin: 0, letterSpacing: "1px", textTransform: "uppercase" }}>{label}</p>
+      <p style={{ fontSize: "18px", fontWeight: 600, color: "#F5F5F4", margin: 0, fontFamily: "monospace" }}>{val}</p>
+      <p style={{ fontSize: "9px", color: "rgba(255,255,255,0.5)", margin: 0, letterSpacing: "1px", textTransform: "uppercase" }}>{label}</p>
     </div>
   );
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
       {box(time.h, "Jam")}
-      <span style={{ color: "rgba(200,184,154,0.4)", fontSize: "18px" }}>:</span>
+      <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "18px" }}>:</span>
       {box(time.m, "Menit")}
-      <span style={{ color: "rgba(200,184,154,0.4)", fontSize: "18px" }}>:</span>
+      <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "18px" }}>:</span>
       {box(time.s, "Detik")}
     </div>
   );
@@ -79,7 +79,7 @@ export default function FlashSaleSection() {
   const endAt = sales[0]?.end_at;
 
   return (
-    <section style={{ background: "#1C1917", padding: "48px 8vw", fontFamily: "var(--font-jost)" }}>
+    <section style={{ background: "#111111", padding: "48px 8vw", fontFamily: "var(--font-jakarta)" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "32px", flexWrap: "wrap", gap: "16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -87,27 +87,27 @@ export default function FlashSaleSection() {
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
           </svg>
           <div>
-            <p style={{ fontSize: "10px", letterSpacing: "3px", color: "#B5935A", margin: 0, textTransform: "uppercase" }}>Flash Sale</p>
-            <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: "28px", fontWeight: 300, fontStyle: "italic", color: "#F0EBE3", margin: 0 }}>
+            <p style={{ fontSize: "10px", letterSpacing: "3px", color: "#737373", margin: 0, textTransform: "uppercase" }}>Flash Sale</p>
+            <h2 style={{ fontFamily: "var(--font-jakarta)", fontSize: "28px", fontWeight: 300, fontStyle: "italic", color: "#F5F5F4", margin: 0 }}>
               {sales[0]?.name || "Flash Sale Spesial"}
             </h2>
           </div>
         </div>
         {endAt && (
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <p style={{ fontSize: "11px", color: "rgba(200,184,154,0.5)", margin: 0 }}>Berakhir dalam</p>
+            <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: 0 }}>Berakhir dalam</p>
             <Countdown endAt={endAt} />
           </div>
         )}
       </div>
 
       {/* Products */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 200px))", gap: "2px", background: "rgba(200,184,154,0.08)", justifyContent: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 200px))", gap: "2px", background: "rgba(255,255,255,0.08)", justifyContent: "start" }}>
         {sales.map(sale => {
           const progress = sale.stock_limit > 0 ? Math.min(100, Math.round(sale.sold_count / sale.stock_limit * 100)) : 0;
           const remaining = sale.stock_limit - sale.sold_count;
           return (
-            <div key={sale.id} onClick={() => buyNow(sale)} style={{ textDecoration: "none", background: "#1C1917", display: "block", transition: "background 0.2s", cursor: "pointer" }}>
+            <div key={sale.id} onClick={() => buyNow(sale)} style={{ textDecoration: "none", background: "#111111", display: "block", transition: "background 0.2s", cursor: "pointer" }}>
               <div style={{ padding: "20px" }}>
                 {/* Foto Produk */}
                 {sale.photo && (
@@ -128,20 +128,20 @@ export default function FlashSaleSection() {
                 </div>
                 )}
 
-                <p style={{ fontSize: "14px", fontWeight: 500, color: "#F0EBE3", margin: "0 0 6px" }}>{sale.product_name}</p>
+                <p style={{ fontSize: "14px", fontWeight: 500, color: "#F5F5F4", margin: "0 0 6px" }}>{sale.product_name}</p>
 
                 <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "12px" }}>
                   <span style={{ fontSize: "18px", fontWeight: 600, color: "#E53935" }}>Rp {sale.flash_price?.toLocaleString("id-ID")}</span>
-                  <span style={{ fontSize: "12px", color: "rgba(200,184,154,0.4)", textDecoration: "line-through" }}>Rp {sale.original_price?.toLocaleString("id-ID")}</span>
+                  <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", textDecoration: "line-through" }}>Rp {sale.original_price?.toLocaleString("id-ID")}</span>
                 </div>
 
                 {/* Progress */}
                 <div style={{ marginBottom: "6px" }}>
                   <div style={{ height: "4px", background: "rgba(255,255,255,0.1)", borderRadius: "2px", overflow: "hidden" }}>
-                    <div style={{ width: progress + "%", height: "100%", background: progress > 70 ? "#E53935" : "#B5935A", borderRadius: "2px", transition: "width 0.5s" }}></div>
+                    <div style={{ width: progress + "%", height: "100%", background: progress > 70 ? "#E53935" : "#737373", borderRadius: "2px", transition: "width 0.5s" }}></div>
                   </div>
                 </div>
-                <p style={{ fontSize: "11px", color: "rgba(200,184,154,0.5)", margin: 0 }}>
+                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
                   {remaining > 0 ? `Sisa ${remaining} lagi` : "Habis"}
                 </p>
               </div>

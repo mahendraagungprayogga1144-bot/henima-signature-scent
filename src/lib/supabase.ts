@@ -4,7 +4,10 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 function makeClient(key: string): SupabaseClient {
-  return createClient(supabaseUrl, key, {
+  // Allow UI preview when local env is incomplete (avoids hard crash on createClient).
+  const url = supabaseUrl || "https://placeholder.supabase.co";
+  const k = key || "public-anon-key";
+  return createClient(url, k, {
     global: {
       fetch: (url: RequestInfo | URL, options?: RequestInit) =>
         fetch(url, { ...options, cache: "no-store" }),
