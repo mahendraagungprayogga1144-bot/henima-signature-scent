@@ -81,6 +81,7 @@ export default function ProductLookbookRail({
             aria-label="Next"
             onClick={() => trackRef.current?.scrollBy({ left: 300, behavior: "smooth" })}
             className="kz-arrow"
+            style={{ top: 100 }}
           >
             ›
           </button>
@@ -113,28 +114,31 @@ export default function ProductLookbookRail({
         }
         .kz-rail::-webkit-scrollbar { display: none; }
         .kz-rail-card {
-          flex: 0 0 200px;
-          width: 200px;
+          flex: 0 0 220px;
+          width: 220px;
           scroll-snap-align: start;
         }
         .kz-rail-media {
           width: 100%;
-          aspect-ratio: 1;
-          background: #E8E8E8;
+          aspect-ratio: 4 / 5;
+          background: #F2F2F2;
           margin-bottom: 14px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
           overflow: hidden;
           position: relative;
           box-sizing: border-box;
         }
         .kz-rail-img {
-          width: 68%;
-          height: 68%;
-          object-fit: contain;
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
           display: block;
-          transition: all 0.4s linear;
+          transition: transform 0.45s ease;
+        }
+        .kz-rail-card:hover .kz-rail-img {
+          transform: scale(1.04);
         }
         .kz-rail-line {
           margin: 0 0 4px;
@@ -207,22 +211,15 @@ export default function ProductLookbookRail({
             text-decoration: underline !important;
           }
           .kz-rail { gap: 12px !important; }
-          /* Kenzo mobile product tile ~291×291 object-fit cover */
           .kz-rail-card {
-            flex: 0 0 min(291px, 78vw) !important;
-            width: min(291px, 78vw) !important;
+            flex: 0 0 min(260px, 72vw) !important;
+            width: min(260px, 72vw) !important;
           }
           .kz-rail-media {
             width: 100% !important;
             height: auto !important;
-            aspect-ratio: 1 !important;
+            aspect-ratio: 4 / 5 !important;
             margin-bottom: 12px !important;
-          }
-          .kz-rail-img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
-            transition: all 0.4s linear !important;
           }
           .kz-arrow { display: none !important; }
         }
