@@ -37,12 +37,11 @@ export default function Navbar({ user }: { user?: any }) {
   const fade = open ? 1 : isHome ? scrollFade : 1;
   const transparent = fade < 0.55;
   const ink = transparent ? "#FFFFFF" : "#000000";
-  const logoLight = isShop ? "/henima-logo-white-tight.png" : "/henima-logo-white.png";
-  const logoDark = isShop ? "/henima-logo-tight.png" : "/henima-logo.png";
-  const logoWidth = isShop ? 230 : fade < 0.2 ? 188 : 168;
-  const logoIntrinsic = isShop
-    ? { width: 720, height: 114 }
-    : { width: 180, height: 127 };
+  /* Always use tight wordmark in header — stacked logo overflows into NEW/SHOP/… */
+  const logoLight = "/henima-logo-white-tight.png";
+  const logoDark = "/henima-logo-tight.png";
+  const logoWidth = isShop ? 230 : fade < 0.2 ? 176 : 156;
+  const logoIntrinsic = { width: 720, height: 114 };
 
   useEffect(() => {
     if (isAuth) return;
@@ -307,9 +306,9 @@ export default function Navbar({ user }: { user?: any }) {
             justifyContent: "center",
             alignItems: "center",
             gap: isShop ? 28 : 22,
-            marginTop: isShop ? 16 : transparent ? 18 : 12,
+            marginTop: isShop ? 16 : transparent ? 14 : 10,
             /* Extra bottom pad so red filter bar never clips menu text */
-            paddingBottom: isShop ? 18 : transparent ? 20 : 14,
+            paddingBottom: isShop ? 18 : transparent ? 18 : 12,
           }}
         >
           {CATEGORIES.map((c) => {
@@ -543,8 +542,9 @@ export default function Navbar({ user }: { user?: any }) {
           }
           .nav-cats { gap: 14px !important; }
           header[data-shop="1"] .nav-cats { margin-top: 14px !important; }
-          header[data-shop="1"] .nav-logo { width: 188px !important; }
-          header:not([data-shop="1"]) .nav-logo { width: 138px !important; }
+          header:not([data-shop="1"]) .nav-cats { margin-top: 12px !important; }
+          header[data-shop="1"] .nav-logo { width: 168px !important; height: auto !important; }
+          header:not([data-shop="1"]) .nav-logo { width: 128px !important; height: auto !important; }
         }
       `}</style>
     </>
