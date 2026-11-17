@@ -42,18 +42,17 @@ const MEDIA = {
   ],
 };
 
-/** Kenzo Discover tile — lifestyle bg + product bottle + white centered copy */
+/** Kenzo Discover tile — lifestyle full-bleed only (no product photo overlay).
+ * Catalog photos are rectangular shots with backgrounds; overlaying them looks broken. */
 function DiscoverTile({
   name,
   image,
   href,
-  product,
   ratio = "100%",
 }: {
   name: string;
   image: string;
   href: string;
-  product?: string;
   ratio?: string;
 }) {
   return (
@@ -71,28 +70,8 @@ function DiscoverTile({
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={image} alt="" aria-hidden style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
-      {product ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={product}
-          alt=""
-          aria-hidden
-          style={{
-            position: "absolute",
-            left: "50%",
-            top: "40%",
-            transform: "translate(-50%, -50%)",
-            width: "34%",
-            maxWidth: 160,
-            height: "auto",
-            objectFit: "contain",
-            filter: "drop-shadow(0 16px 32px rgba(0,0,0,0.4))",
-            zIndex: 1,
-          }}
-        />
-      ) : null}
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 42%)", zIndex: 2 }} />
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "28px 16px 36px", textAlign: "center", color: "#fff", zIndex: 3 }}>
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 42%)", zIndex: 1 }} />
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "28px 16px 36px", textAlign: "center", color: "#fff", zIndex: 2 }}>
         <h2
           style={{
             margin: "0 0 10px",
@@ -230,21 +209,15 @@ export default async function HomePage() {
         };
       });
 
-  const discover = empty
-    ? MEDIA.discover.map((d) => ({ ...d, product: undefined as string | undefined }))
-    : products.slice(0, 4).map((p, i) => {
-        const photo = getProductPhotoList(p)[0] || p.photo || "";
-        return {
-          name: p.name,
-          image: MEDIA.discover[i]?.image || MEDIA.discover[0].image,
-          href: `/shop/${toSlug(p.name)}`,
-          product: isUsablePhoto(photo) ? photo : undefined,
-        };
-      });
-
-  while (discover.length < 4) {
-    discover.push({ ...MEDIA.discover[discover.length], product: undefined });
-  }
+  /* Curated chapter tiles — keep lifestyle art + chapter names; link to matching product if any */
+  const discover = MEDIA.discover.map((d) => {
+    const match = products.find((p) => p.name.toLowerCase() === d.name.toLowerCase());
+    return {
+      name: d.name,
+      image: d.image,
+      href: match ? `/shop/${toSlug(match.name)}` : d.href,
+    };
+  });
 
   return (
     <div style={{ background: "#FFFFFF", color: "#111" }}>
@@ -290,7 +263,7 @@ export default async function HomePage() {
         >
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }} className="kz-grid">
             {discover.map((d) => (
-              <DiscoverTile key={d.name} name={d.name} image={d.image} href={d.href} product={d.product} ratio="100%" />
+              <DiscoverTile key={d.name} name={d.name} image={d.image} href={d.href} ratio="100%" />
             ))}
           </div>
         </div>
