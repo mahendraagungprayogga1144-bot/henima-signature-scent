@@ -47,21 +47,24 @@ export default function AddToCartButton({ productId, productName, productPhoto, 
 
   return (
     <div style={{display:"flex", flexDirection:"column", gap:"16px"}}>
-      {/* Size selector */}
+      {/* Size selector — Kenzo-style ML chips */}
       <div>
-        <p style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#A3A3A3", marginBottom:"12px", fontFamily:"var(--font-jakarta)"}}>Pilih Ukuran</p>
+        <p style={{fontSize:"10px", letterSpacing:"2px", textTransform:"uppercase", color:"#888", marginBottom:"12px", fontFamily:"var(--font-futura-nav), Futura, sans-serif"}}>Size</p>
         <div style={{display:"flex", gap:"8px", flexWrap:"wrap"}}>
           {variants.map((v) => (
             <button key={v.id} onClick={() => setSelectedVariant(v.id)}
               style={{
-                border: selectedVariant === v.id ? "2px solid #111111" : "1px solid rgba(17,17,17,0.2)",
-                padding:"10px 20px", cursor:"pointer",
-                background: selectedVariant === v.id ? "#111111" : "#FFFFFF",
-                color: selectedVariant === v.id ? "#FFFFFF" : "#111111",
-                transition:"all 0.2s", fontFamily:"var(--font-jakarta)",
+                border: selectedVariant === v.id ? "1px solid #212529" : "1px solid rgba(33,37,41,0.25)",
+                padding:"12px 18px", cursor:"pointer",
+                background: selectedVariant === v.id ? "#212529" : "#FFFFFF",
+                color: selectedVariant === v.id ? "#FFFFFF" : "#212529",
+                transition:"all 0.2s",
+                fontFamily:"var(--font-futura-nav), Futura, sans-serif",
+                letterSpacing:"0.08em",
+                textTransform:"uppercase",
               }}>
-              <p style={{fontSize:"12px", fontWeight:400}}>{v.sizeMl}ml</p>
-              <p style={{fontSize:"13px", fontWeight:500, marginTop:"4px"}}>
+              <p style={{fontSize:"12px", fontWeight:500, margin:0}}>{v.sizeMl} ML</p>
+              <p style={{fontSize:"11px", fontWeight:400, marginTop:"6px", opacity:0.85, marginBottom:0}}>
                 Rp {v.originalPrice.toLocaleString("id-ID")}
               </p>
             </button>
