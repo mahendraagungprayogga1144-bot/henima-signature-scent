@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 /**
- * Kenzo PDP: pin buy panel while left image stack scrolls (4 images).
- * Fixed positioning — survives html/body overflow that kills CSS sticky.
+ * Kenzo PDP: pin buy panel while left image stack (4) scrolls past.
+ * Uses position:fixed so it works even when ancestors have overflow that kill CSS sticky.
  */
 export default function KenzoStickyBuy({
   children,
@@ -24,6 +24,7 @@ export default function KenzoStickyBuy({
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768.98px)");
+    let raf = 0;
 
     const update = () => {
       const root = rootRef.current;
@@ -36,32 +37,36 @@ export default function KenzoStickyBuy({
         return;
       }
 
+      /* Track left image column — release when its bottom clears the panel */
+      const left =
+        root.closest(".kz-product-container")?.querySelector(".kz-primary-col") ??
+        root.parentElement;
       const col = root.parentElement;
-      if (!col) return;
+      if (!left || !col) return;
 
-      const panelH = panel.offsetHeight;
+      const panelH = panel.offsetHeight || 1;
+      const leftRect = left.getBoundingClientRect();
       const colRect = col.getBoundingClientRect();
-      const rootTop = root.getBoundingClientRect().top;
       const cs = getComputedStyle(col);
       const padL = parseFloat(cs.paddingLeft) || 0;
       const padR = parseFloat(cs.paddingRight) || 0;
       const width = Math.max(180, Math.min(420, colRect.width - padL - padR));
 
-      /* Before pin zone */
-      if (rootTop > top) {
+      /* Before pin: left column still below pin line */
+      if (leftRect.top > top) {
         setSpacerH(0);
         setPanelStyle({ position: "relative", width: "100%", maxWidth: 420 });
         return;
       }
 
-      /* Release at end of left image stack */
-      if (colRect.bottom - panelH <= top) {
+      /* After all 4 images: dock to bottom of sidebar column */
+      if (leftRect.bottom - panelH <= top) {
         setSpacerH(panelH);
         setPanelStyle({
           position: "absolute",
-          left: 0,
+          left: padL,
           bottom: 0,
-          width: "100%",
+          width,
           maxWidth: 420,
         });
         return;
@@ -79,19 +84,31 @@ export default function KenzoStickyBuy({
       });
     };
 
+    const onScrollOrResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    };
+
     update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    mq.addEventListener("change", update);
+    window.addEventListener("scroll", onScrollOrResize, { passive: true, capture: true });
+    window.addEventListener("resize", onScrollOrResize);
+    document.addEventListener("scroll", onScrollOrResize, { passive: true, capture: true });
+    mq.addEventListener("change", onScrollOrResize);
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-      mq.removeEventListener("change", update);
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScrollOrResize, true);
+      window.removeEventListener("resize", onScrollOrResize);
+      document.removeEventListener("scroll", onScrollOrResize, true);
+      mq.removeEventListener("change", onScrollOrResize);
     };
   }, [top]);
 
   return (
-    <div ref={rootRef} style={{ position: "relative", height: "100%", minHeight: "100%" }}>
+    <div
+      ref={rootRef}
+      data-kz-sticky-buy
+      style={{ position: "relative", height: "100%", minHeight: "100%" }}
+    >
       {spacerH > 0 ? <div aria-hidden style={{ height: spacerH, pointerEvents: "none" }} /> : null}
       <div ref={panelRef} style={panelStyle}>
         {children}

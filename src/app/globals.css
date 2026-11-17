@@ -1,8 +1,15 @@
 @tailwind base;
 
-/* clip (not hidden) — overflow-x:hidden on html/body breaks position:sticky / pin layouts */
-html { overflow-x: clip; }
-body { overflow-x: clip; max-width: 100vw; }
+/* clip + visible y — overflow-x:hidden makes overflow-y compute to auto and kills sticky/pin */
+html {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+body {
+  overflow-x: clip;
+  overflow-y: visible;
+  max-width: 100vw;
+}
 @tailwind components;
 @tailwind utilities;
 
