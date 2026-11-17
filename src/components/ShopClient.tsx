@@ -422,22 +422,22 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
         </div>
       )}
 
-      {/* Results + 4-col grid — Kenzo proportions */}
+      {/* Results + 4-col grid — Kenzo PLP: portrait tiles, fixed card width, generous gaps */}
       <div
         className="shop-catalog-inner"
-        style={{ maxWidth: 1140, margin: "0 auto", padding: "24px 15px 96px", boxSizing: "border-box" }}
+        style={{ maxWidth: 1280, margin: "0 auto", padding: "28px 40px 120px", boxSizing: "border-box" }}
       >
         <h1
           className="shop-results-desktop"
           style={{
             textAlign: "center",
-            fontSize: 14,
+            fontSize: 13,
             fontWeight: 500,
-            lineHeight: "16.8px",
-            letterSpacing: "normal",
+            lineHeight: "16px",
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
             color: "#666666",
-            margin: "0 0 8px",
+            margin: "0 0 20px",
             padding: 0,
           }}
         >
@@ -463,9 +463,10 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-              columnGap: 30,
-              rowGap: 0,
-              marginTop: 16,
+              columnGap: 28,
+              rowGap: 36,
+              marginTop: 0,
+              justifyContent: "start",
             }}
           >
             {displayList.map((product) => {
@@ -475,31 +476,34 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
                 <article
                   key={product.id}
                   className="shop-product"
-                  style={{ display: "flex", flexDirection: "column", textAlign: "center", margin: 0 }}
+                  style={{ display: "flex", flexDirection: "column", textAlign: "center", margin: 0, maxWidth: "100%" }}
                 >
                   <Link href={href} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
-                    {/* Square product image — Kenzo 1:1 */}
+                    {/* Portrait frame like Kenzo (~4:5) — cover so mixed assets fill evenly */}
                     <div
+                      className="shop-prod-frame"
                       style={{
                         position: "relative",
                         width: "100%",
-                        aspectRatio: "1",
-                        background: "#F5F5F5",
+                        aspectRatio: "4 / 5",
+                        background: "#F2F2F2",
                         overflow: "hidden",
                         margin: 0,
                       }}
                     >
-                      <WishlistButton productId={product.id} />
+                      <span className="shop-wish">
+                        <WishlistButton productId={product.id} />
+                      </span>
                       {product.photo ? (
                         product.photo.startsWith("/") ? (
                           <Image
                             src={product.photo}
                             alt={product.name}
                             fill
-                            sizes="(max-width:768px) 50vw, 240px"
+                            sizes="(max-width:767px) 50vw, (max-width:1024px) 33vw, 280px"
                             style={{
-                              objectFit: "contain",
-                              padding: "12%",
+                              objectFit: "cover",
+                              objectPosition: "center",
                               transition: "transform 0.7s cubic-bezier(0.16,1,0.3,1)",
                             }}
                             className="shop-prod-img"
@@ -510,11 +514,12 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
                             src={product.photo}
                             alt={product.name}
                             style={{
-                              width: "76%",
-                              height: "76%",
-                              objectFit: "contain",
-                              margin: "12% auto",
-                              display: "block",
+                              position: "absolute",
+                              inset: 0,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              objectPosition: "center",
                               transition: "transform 0.7s cubic-bezier(0.16,1,0.3,1)",
                             }}
                             className="shop-prod-img"
@@ -547,6 +552,7 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
                             letterSpacing: "0.08em",
                             textTransform: "uppercase",
                             padding: "4px 8px",
+                            zIndex: 2,
                           }}
                         >
                           Coming Soon
@@ -554,37 +560,35 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
                       )}
                     </div>
 
-                    {/* tile-body — Kenzo padding-bottom 30px */}
-                    <div style={{ padding: "0 0 30px", textAlign: "center" }}>
-                      {/* Product name — Kenzo h2.category-name: 20/500/#212121, m 8 0, pb 10 */}
+                    {/* Kenzo tile-body: name + variant, centered */}
+                    <div style={{ padding: "14px 8px 8px", textAlign: "center" }}>
                       <h2
                         style={{
                           fontFamily: "inherit",
-                          fontSize: 20,
-                          fontWeight: 500,
-                          lineHeight: "20px",
-                          letterSpacing: "normal",
+                          fontSize: 18,
+                          fontWeight: 600,
+                          lineHeight: "22px",
+                          letterSpacing: "0.04em",
                           textTransform: "uppercase",
                           textAlign: "center",
                           color: "#212121",
-                          margin: "8px 0",
-                          padding: "0 0 10px",
+                          margin: "0 0 8px",
+                          padding: 0,
                         }}
                       >
                         {product.name}
                       </h2>
 
-                      {/* Variant — Kenzo a.link: 16/400/#BCBCBC, lh 19.2 */}
                       <p
                         style={{
                           fontFamily: "inherit",
-                          fontSize: 16,
+                          fontSize: 13,
                           fontWeight: 400,
-                          lineHeight: "19.2px",
-                          letterSpacing: "normal",
-                          textTransform: "none",
+                          lineHeight: "18px",
+                          letterSpacing: "0.06em",
+                          textTransform: "uppercase",
                           textAlign: "center",
-                          color: "#BCBCBC",
+                          color: "#9A9A9A",
                           margin: 0,
                           padding: 0,
                         }}
@@ -593,17 +597,16 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
                         {product.comingSoon ? " · Coming soon" : ""}
                       </p>
 
-                      {/* Price — Henima commerce (Kenzo PLP often omits price) */}
                       {price > 0 && !product.comingSoon && (
                         <p
                           style={{
                             fontFamily: "inherit",
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: 500,
-                            lineHeight: "24px",
+                            lineHeight: "20px",
                             textAlign: "center",
-                            color: "#212529",
-                            margin: "8px 0 0",
+                            color: "#212121",
+                            margin: "10px 0 0",
                             padding: 0,
                           }}
                         >
@@ -632,14 +635,29 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
 
       <style>{`
         .shop-catalog *, .shop-catalog *::before, .shop-catalog *::after { box-sizing: border-box; }
-        .shop-kenzo-grid a:hover .shop-prod-img { transform: scale(1.03); }
+        .shop-kenzo-grid a:hover .shop-prod-img { transform: scale(1.04); }
+        .shop-wish button {
+          width: 28px !important;
+          height: 28px !important;
+          background: transparent !important;
+          border: none !important;
+          backdrop-filter: none !important;
+          box-shadow: none !important;
+          top: 10px !important;
+          right: 8px !important;
+          opacity: 0.85;
+        }
+        .shop-wish button svg { width: 18px; height: 18px; }
+        .shop-product:hover .shop-wish button { opacity: 1; }
         .shop-red-tab:focus { outline: none; }
         .shop-red-tab:focus-visible { border-bottom-color: #fff !important; }
-        @media (max-width: 1024px) {
+        @media (max-width: 1100px) {
           .shop-kenzo-grid {
             grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            column-gap: 24px !important;
+            column-gap: 22px !important;
+            row-gap: 28px !important;
           }
+          .shop-catalog-inner { padding: 24px 28px 96px !important; }
         }
         @media (max-width: 767px) {
           .shop-red-bar--desktop { display: none !important; }
@@ -648,11 +666,12 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
           .shop-results-desktop { display: none !important; }
           .shop-kenzo-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            column-gap: 16px !important;
-            margin-top: 8px !important;
+            column-gap: 12px !important;
+            row-gap: 24px !important;
           }
-          .shop-catalog-inner { padding: 8px 15px 72px !important; }
-          .shop-product h2 { font-size: 16px !important; line-height: 18px !important; }
+          .shop-catalog-inner { padding: 12px 16px 72px !important; }
+          .shop-product h2 { font-size: 14px !important; line-height: 18px !important; letter-spacing: 0.03em !important; }
+          .shop-product p { font-size: 11px !important; line-height: 15px !important; }
         }
       `}</style>
     </div>
