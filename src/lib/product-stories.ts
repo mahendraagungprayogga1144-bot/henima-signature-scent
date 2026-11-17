@@ -3,18 +3,22 @@
  */
 
 export type ProductStory = {
-  /** Small grey line — e.g. "AFTERNOON EXTRAIT DE PARFUM" */
   variantLabel: string;
-  /** Big title — e.g. AFTERNOON */
   headline: string;
-  /** One short paragraph like Kenzo product-desc */
   description: string;
   topNotes?: string;
   middleNotes?: string;
   baseNotes?: string;
-  /** Primary PDP gallery (bottle shots only — Kenzo style) */
+  /** Left-column scroll stack (Kenzo primary-images) */
   gallery: string[];
-  /** Lifestyle dual band under the PDP */
+  /** Grey commitment band (image + copy) */
+  commitment?: {
+    title: string;
+    body: string;
+    image: string;
+    footnote?: string;
+  };
+  /** OUR STORES-style dual tiles */
   lifestyle: { src: string; title: string; cta: string }[];
   lineTitle: string;
 };
@@ -27,10 +31,20 @@ const AFTERNOON: ProductStory = {
   topNotes: "Citrus, Green Apple",
   middleNotes: "Lavender, Jasmine",
   baseNotes: "Vanilla, Pepper, Patchouli",
+  /* Stack scrolls on the left while buy panel stays sticky */
   gallery: [
     "/products/afternoon/bottle.png",
+    "/products/afternoon/lifestyle-car.jpg",
+    "/products/afternoon/lifestyle-light.jpg",
     "/products/afternoon/bottle-duo.png",
   ],
+  commitment: {
+    title: "THE STORY BEHIND AFTERNOON",
+    body:
+      "Henima created AFTERNOON for the moments between departure and return — the quiet drive, the warm light, the hand that holds what matters. Every bottle carries that hour of belonging.",
+    image: "/products/afternoon/bottle.png",
+    footnote: "Extrait de parfum · lasting intimacy.",
+  },
   lifestyle: [
     {
       src: "/products/afternoon/lifestyle-car.jpg",
@@ -54,7 +68,6 @@ export function getProductStory(slug: string): ProductStory | null {
   return STORIES[slug] || null;
 }
 
-/** When a curated story exists, use its gallery only (ignore broken CMS remote sets). */
 export function mergeProductGallery(
   slug: string,
   photos: string[],

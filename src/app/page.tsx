@@ -42,8 +42,10 @@ const MEDIA = {
   ],
 };
 
-/** Kenzo Discover tile — lifestyle full-bleed only (no product photo overlay).
- * Catalog photos are rectangular shots with backgrounds; overlaying them looks broken. */
+const FUTURA =
+  "var(--font-futura-nav), FuturaBT-Medium, Futura, Century Gothic, sans-serif";
+
+/** Kenzo Discover tile — lifestyle full-bleed; FuturaBT matching PDP after click. */
 function DiscoverTile({
   name,
   image,
@@ -79,12 +81,12 @@ function DiscoverTile({
             fontWeight: 700,
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            fontFamily: "var(--font-futura-nav), FuturaBT-Medium, Futura, Century Gothic, sans-serif",
+            fontFamily: FUTURA,
           }}
         >
           {name}
         </h2>
-        <span style={{ fontSize: 13, fontFamily: "var(--font-futura-nav), Futura, sans-serif", letterSpacing: "0.06em" }}>
+        <span style={{ fontSize: 13, fontFamily: FUTURA, fontWeight: 400, letterSpacing: "0.06em" }}>
           Discover {name} ›
         </span>
       </div>
@@ -133,7 +135,7 @@ function DualTile({
             fontSize: "clamp(80px, 14vw, 160px)",
             fontWeight: 700,
             color: "rgba(0,0,0,0.18)",
-            fontFamily: "var(--font-jakarta)",
+            fontFamily: FUTURA,
             letterSpacing: "-0.04em",
             lineHeight: 1,
             zIndex: 1,
@@ -166,12 +168,12 @@ function DualTile({
             fontWeight: 700,
             letterSpacing: "0.1em",
             textTransform: "uppercase",
-            fontFamily: "var(--font-jakarta)",
+            fontFamily: FUTURA,
           }}
         >
           {name}
         </h2>
-        <span style={{ fontSize: 13 }}>{cta}</span>
+        <span style={{ fontSize: 13, fontFamily: FUTURA }}>{cta}</span>
       </div>
     </Link>
   );

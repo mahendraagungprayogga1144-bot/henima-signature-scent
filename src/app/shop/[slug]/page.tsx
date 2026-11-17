@@ -4,17 +4,24 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
 import StockNotifyButton from "@/components/StockNotifyButton";
-import ProductGallery from "@/components/ProductGallery";
+import KenzoProductImages from "@/components/KenzoProductImages";
 import ProductLookbookRail from "@/components/ProductLookbookRail";
-import { buildProductMedia, getProductPhotoList } from "@/lib/product-media";
+import { getProductPhotoList } from "@/lib/product-media";
 import { getProductStory, mergeProductGallery } from "@/lib/product-stories";
 
 export const dynamic = "force-dynamic";
 
+/** Kenzo FuturaBT stack — matches pasted product-detail CSS */
 const FUTURA =
   "var(--font-futura-nav), FuturaBT-Medium, Futura, Century Gothic, sans-serif";
-const INK = "#212529";
-const MUTED = "#95979D";
+const FUTURA_LIGHT =
+  "var(--font-futura-nav), FuturaBT-Light, Futura, Century Gothic, sans-serif";
+const FUTURA_HEAVY =
+  "var(--font-futura-nav), FuturaBT-Heavy, Futura, Century Gothic, sans-serif";
+const FUTURA_BOOK =
+  "var(--font-futura-nav), FuturaBT-Book, Futura, Century Gothic, sans-serif";
+const INK = "#212121";
+const MUTED = "#95979d";
 
 function toSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -57,9 +64,8 @@ export default async function ProductDetailPage({
 
   const dbPhotos = getProductPhotoList(product);
   const photos = mergeProductGallery(slug, dbPhotos, story);
-  const media = buildProductMedia(photos, product.video);
 
-  /** Kenzo tokens: product-name (grey) + category-name (big) */
+  /** Kenzo: .product-name (grey small) + .category-name (big black) */
   const productNameLine = (
     story?.variantLabel ||
     `${product.name} ${product.isGiftSet ? "Gift Set" : "Extrait de Parfum"}`
@@ -73,6 +79,7 @@ export default async function ProductDetailPage({
     `${product.name} — an extrait de parfum from Henima. Soft, lasting, made for the moments you want to keep close.`;
 
   const lifestyle = story?.lifestyle || [];
+  const commitment = story?.commitment;
   const lineTitle = story?.lineTitle || "THE HENIMA LINE";
 
   const related = products
@@ -88,41 +95,60 @@ export default async function ProductDetailPage({
     }));
 
   return (
-    <div className="kz-pdp" style={{ background: "#FFFFFF", color: INK, fontFamily: FUTURA, minHeight: "100vh" }}>
-      {/* ===== Kenzo product-detail: images | buy ===== */}
-      <div className="kz-pdp-top">
-        <div className="kz-pdp-images">
-          {/* Mobile titles — Kenzo d-md-none order */}
-          <div className="kz-pdp-mobile-titles">
-            <h4 className="kz-pdp-product-name">{productNameLine}</h4>
-            <h1 className="kz-pdp-category-name">{categoryName}</h1>
+    <div className="product-detail kz-pdp">
+      {/*
+        Kenzo product-container:
+        left  = primary-images (tall stack — scrolls first)
+        right = sidebar__inner content-sticky (stays while left moves)
+      */}
+      <div className="kz-product-container">
+        <div className="kz-primary-col">
+          {/* Mobile order: titles → images (Kenzo d-md-none) */}
+          <div className="kz-mobile-titles">
+            <p className="kz-product-name">{productNameLine}</p>
+            <h1 className="kz-category-name">{categoryName}</h1>
           </div>
 
-          <ProductGallery
-            media={media}
-            productName={product.name}
-            comingSoon={Boolean(product.comingSoon)}
-            kenzoFit
-          />
+          <KenzoProductImages images={photos} productName={product.name} />
         </div>
 
-        <div className="kz-pdp-buy">
-          <div className="kz-pdp-sticky">
-            <h1 className="kz-pdp-product-name kz-pdp-product-name--desk">{productNameLine}</h1>
-            <h1 className="kz-pdp-category-name kz-pdp-category-name--desk">{categoryName}</h1>
+        <aside className="kz-sidebar-col">
+          <div className="kz-sidebar__inner">
+            <p className="kz-product-name kz-desk-only">{productNameLine}</p>
+            <h1 className="kz-category-name kz-desk-only">{categoryName}</h1>
 
-            <div className="kz-pdp-desc">
+            <div className="kz-product-desc">
               <p>{description}</p>
             </div>
 
-            <div className="kz-pdp-actions">
+            {(story?.topNotes || story?.middleNotes || story?.baseNotes) && (
+              <div className="kz-notes">
+                {story.topNotes && (
+                  <p>
+                    <span>Top</span> {story.topNotes}
+                  </p>
+                )}
+                {story.middleNotes && (
+                  <p>
+                    <span>Heart</span> {story.middleNotes}
+                  </p>
+                )}
+                {story.baseNotes && (
+                  <p>
+                    <span>Base</span> {story.baseNotes}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="kz-prices-add-to-cart-actions">
               {!product.comingSoon && totalStock === 0 ? (
                 <>
-                  <div className="kz-pdp-outline-btn kz-pdp-outline-btn--muted">Out of stock</div>
+                  <div className="kz-outline-btn kz-outline-btn--muted">Out of stock</div>
                   <StockNotifyButton productId={product.id} productName={product.name} />
                 </>
               ) : product.comingSoon ? (
-                <div className="kz-pdp-outline-btn kz-pdp-outline-btn--muted">Coming Soon</div>
+                <div className="kz-outline-btn kz-outline-btn--muted">Coming Soon</div>
               ) : (
                 <AddToCartButton
                   kenzo
@@ -142,8 +168,8 @@ export default async function ProductDetailPage({
             </div>
 
             {product.isGiftSet && (product.bundleItems?.length ?? 0) > 0 && (
-              <div className="kz-pdp-bundle">
-                <p className="kz-pdp-bundle-title">Gift Set includes</p>
+              <div className="kz-bundle">
+                <p className="kz-bundle-title">Gift Set includes</p>
                 <ul>
                   {(product.bundleItems || []).map((item) => {
                     const linked = products.find((p) => p.id === item.productId);
@@ -162,18 +188,37 @@ export default async function ProductDetailPage({
               </div>
             )}
           </div>
-        </div>
+        </aside>
       </div>
 
-      {/* ===== Lifestyle dual tiles — Kenzo OUR STORES / Happenings pattern ===== */}
+      {/* Kenzo commitment / story band — grey left text, bottle right */}
+      {commitment && (
+        <section className="kz-commitment">
+          <div className="kz-commitment-inner">
+            <div className="kz-commitment-copy">
+              <h2 className="kz-commitment-heading">{commitment.title}</h2>
+              <p className="kz-commitment-body">{commitment.body}</p>
+              {commitment.footnote && (
+                <p className="kz-commitment-foot">*{commitment.footnote}</p>
+              )}
+            </div>
+            <div className="kz-commitment-media">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={commitment.image} alt="" />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Lifestyle dual tiles */}
       {lifestyle.length > 0 && (
-        <section className="kz-pdp-life">
-          <div className="kz-pdp-life-grid">
+        <section className="kz-life">
+          <div className="kz-life-grid">
             {lifestyle.map((tile) => (
-              <div key={tile.src} className="kz-pdp-life-tile">
+              <div key={tile.src} className="kz-life-tile">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={tile.src} alt="" />
-                <div className="kz-pdp-life-copy">
+                <div className="kz-life-copy">
                   <h2>{tile.title}</h2>
                   <span>{tile.cta}</span>
                 </div>
@@ -183,132 +228,228 @@ export default async function ProductDetailPage({
         </section>
       )}
 
-      {/* ===== Line rail — Kenzo red title ===== */}
       {related.length > 0 && (
         <ProductLookbookRail title={lineTitle} products={related} hrefAll="/shop" ctaLabel="Discover" />
       )}
 
       <style>{`
-        .kz-pdp-top {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0;
-          align-items: stretch;
-          max-width: 1400px;
-          margin: 0 auto;
-          min-height: calc(100svh - 120px);
+        .kz-pdp {
+          background: #fff;
+          color: ${INK};
+          font-family: ${FUTURA};
+          min-height: 100vh;
         }
-        .kz-pdp-images {
-          background: #FFFFFF;
-          min-height: calc(100svh - 120px);
-        }
-        .kz-pdp-mobile-titles { display: none; }
 
-        .kz-pdp-buy {
-          padding: 56px 7vw 64px 48px;
+        /* ===== Kenzo .product-container: images scroll, sidebar sticky ===== */
+        .kz-product-container {
           display: flex;
           align-items: flex-start;
-        }
-        .kz-pdp-sticky {
-          position: sticky;
-          top: 110px;
+          justify-content: space-around;
+          max-width: 1400px;
+          margin: 0 auto;
           width: 100%;
-          max-width: 460px;
+        }
+        .kz-primary-col {
+          flex: 0 0 50%;
+          max-width: 50%;
+          width: 50%;
+          background: #fff;
+          padding: 24px 24px 80px;
+        }
+        .kz-sidebar-col {
+          flex: 0 0 50%;
+          max-width: 50%;
+          width: 50%;
+          padding: 40px 7vw 80px 3rem;
         }
 
-        /* Kenzo .product-name — 12px / 900 / #95979D */
-        .kz-pdp-product-name {
-          margin: 0 0 10px;
-          font-family: ${FUTURA};
+        /* Kenzo: .sidebar__inner { position: sticky; top: 150px } */
+        .kz-sidebar__inner {
+          position: sticky;
+          top: 150px;
+          max-width: 420px;
+        }
+
+        .kz-mobile-titles { display: none; }
+        .kz-desk-only { display: block; }
+
+        /* .product-name — FuturaBT-Heavy 12px #95979d */
+        .kz-product-name {
+          margin: 0 0 12px;
+          font-family: ${FUTURA_HEAVY};
           font-size: 12px;
           font-weight: 900;
-          letter-spacing: 0.02em;
-          line-height: 1.35;
+          letter-spacing: 0.04em;
+          line-height: 1.5;
           text-transform: uppercase;
           color: ${MUTED};
         }
-        .kz-pdp-product-name--desk { display: block; }
 
-        /* Kenzo .category-name — 40px / 500 */
-        .kz-pdp-category-name {
-          margin: 0 0 28px;
-          font-family: ${FUTURA};
+        /* .category-name — FuturaBT-Book ~27–40px */
+        .kz-category-name {
+          margin: 0 0 30px;
+          font-family: ${FUTURA_BOOK};
           font-size: 40px;
-          font-weight: 500;
+          font-weight: 400;
           letter-spacing: 0.02em;
-          line-height: 1.1;
+          line-height: 0.93;
           text-transform: uppercase;
-          color: ${INK};
+          color: #000;
         }
-        .kz-pdp-category-name--desk { display: block; }
 
-        /* Kenzo .product-desc — 18px / 300 */
-        .kz-pdp-desc {
-          margin: 0 0 36px;
+        /* .product-desc — FuturaBT-Light 18px */
+        .kz-product-desc {
+          margin: 0 0 28px;
         }
-        .kz-pdp-desc p {
+        .kz-product-desc p {
           margin: 0;
-          font-family: ${FUTURA};
+          font-family: ${FUTURA_LIGHT};
           font-size: 18px;
           font-weight: 300;
           line-height: 1.55;
-          color: #212121;
+          color: ${INK};
+          text-align: justify;
         }
 
-        .kz-pdp-actions { margin-bottom: 8px; max-width: 320px; }
+        .kz-notes {
+          margin: 0 0 28px;
+        }
+        .kz-notes p {
+          margin: 0 0 6px;
+          font-family: ${FUTURA_LIGHT};
+          font-size: 14px;
+          font-weight: 300;
+          color: ${INK};
+        }
+        .kz-notes span {
+          font-family: ${FUTURA};
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          font-size: 11px;
+          color: ${MUTED};
+          margin-right: 8px;
+        }
 
-        .kz-pdp-outline-btn {
+        .kz-prices-add-to-cart-actions {
+          margin-bottom: 8px;
+          max-width: 280px;
+        }
+
+        .kz-outline-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-width: 160px;
-          height: 44px;
-          padding: 0 24px;
-          border: 1px solid ${INK};
+          height: 40px;
+          width: 150px;
+          border: 0.5px solid ${INK};
           background: transparent;
           color: ${INK};
-          font-family: ${FUTURA};
-          font-size: 12px;
-          letter-spacing: 0.1em;
+          font-family: ${FUTURA_BOOK};
+          font-size: 14px;
+          font-weight: 400;
+          letter-spacing: 0.04em;
           text-transform: uppercase;
           margin-bottom: 12px;
         }
-        .kz-pdp-outline-btn--muted {
-          border-color: rgba(33,37,41,0.25);
+        .kz-outline-btn--muted {
+          border-color: rgba(33,33,33,0.25);
           color: #888;
         }
 
-        .kz-pdp-bundle { margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(33,37,41,0.1); }
-        .kz-pdp-bundle-title {
+        .kz-bundle {
+          margin-top: 28px;
+          padding-top: 20px;
+          border-top: 1px solid rgba(33,33,33,0.12);
+        }
+        .kz-bundle-title {
           margin: 0 0 12px;
           font-size: 11px;
           letter-spacing: 0.14em;
           text-transform: uppercase;
           color: #888;
+          font-family: ${FUTURA};
         }
-        .kz-pdp-bundle ul { list-style: none; margin: 0; padding: 0; }
-        .kz-pdp-bundle li { margin: 0 0 8px; font-size: 14px; }
-        .kz-pdp-bundle a { color: ${INK}; text-decoration: none; border-bottom: 1px solid rgba(33,37,41,0.25); }
+        .kz-bundle ul { list-style: none; margin: 0; padding: 0; }
+        .kz-bundle li { margin: 0 0 8px; font-size: 14px; font-family: ${FUTURA_LIGHT}; }
+        .kz-bundle a {
+          color: ${INK};
+          text-decoration: none;
+          border-bottom: 1px solid rgba(33,33,33,0.25);
+        }
 
-        /* Lifestyle dual — Kenzo chapter tiles */
-        .kz-pdp-life {
-          background: #FFFFFF;
-          padding: 8px 0 0;
+        /* Commitment — Kenzo grey band */
+        .kz-commitment {
+          background: #f5f5f5;
+          padding: 60px 0;
+          margin: 40px 0 0;
         }
-        .kz-pdp-life-grid {
+        .kz-commitment-inner {
+          max-width: 1140px;
+          margin: 0 auto;
+          padding: 0 40px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 48px;
+          align-items: center;
+        }
+        .kz-commitment-heading {
+          margin: 0 0 20px;
+          font-family: ${FUTURA_HEAVY};
+          font-size: 26px;
+          font-weight: 900;
+          letter-spacing: 0.04em;
+          line-height: 1.2;
+          text-transform: uppercase;
+          color: #000;
+        }
+        .kz-commitment-body {
+          margin: 0 0 18px;
+          font-family: ${FUTURA_LIGHT};
+          font-size: 18px;
+          font-weight: 300;
+          line-height: 1.67;
+          color: ${INK};
+        }
+        .kz-commitment-foot {
+          margin: 0;
+          font-family: ${FUTURA_LIGHT};
+          font-size: 12px;
+          line-height: 1.5;
+          color: rgba(33,33,33,0.7);
+        }
+        .kz-commitment-media {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .kz-commitment-media img {
+          width: 100%;
+          max-width: 420px;
+          height: auto;
+          object-fit: contain;
+          display: block;
+        }
+
+        /* Lifestyle dual */
+        .kz-life {
+          background: #fff;
+          padding: 2px 0 0;
+        }
+        .kz-life-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 2px;
           max-width: 1400px;
           margin: 0 auto;
         }
-        .kz-pdp-life-tile {
+        .kz-life-tile {
           position: relative;
           overflow: hidden;
           background: #111;
           aspect-ratio: 1;
         }
-        .kz-pdp-life-tile img {
+        .kz-life-tile img {
           position: absolute;
           inset: 0;
           width: 100%;
@@ -316,7 +457,7 @@ export default async function ProductDetailPage({
           object-fit: cover;
           display: block;
         }
-        .kz-pdp-life-copy {
+        .kz-life-copy {
           position: absolute;
           inset: 0;
           display: flex;
@@ -324,12 +465,12 @@ export default async function ProductDetailPage({
           align-items: center;
           justify-content: center;
           text-align: center;
-          color: #FFFFFF;
-          background: linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 45%);
+          color: #fff;
+          background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%);
           padding: 24px;
           z-index: 1;
         }
-        .kz-pdp-life-copy h2 {
+        .kz-life-copy h2 {
           margin: 0 0 10px;
           font-family: ${FUTURA};
           font-size: clamp(18px, 2.2vw, 28px);
@@ -337,29 +478,47 @@ export default async function ProductDetailPage({
           letter-spacing: 0.12em;
           text-transform: uppercase;
         }
-        .kz-pdp-life-copy span {
+        .kz-life-copy span {
           font-family: ${FUTURA};
           font-size: 13px;
           font-weight: 400;
         }
 
-        @media (max-width: 900px) {
-          .kz-pdp-top {
-            grid-template-columns: 1fr;
-            min-height: auto;
+        @media (max-width: 768.98px) {
+          .kz-product-container {
+            flex-direction: column;
           }
-          .kz-pdp-images { min-height: auto; }
-          .kz-pdp-mobile-titles {
+          .kz-primary-col,
+          .kz-sidebar-col {
+            flex: 0 0 100%;
+            max-width: 100%;
+            width: 100%;
+            padding: 0 15px 24px;
+          }
+          .kz-mobile-titles {
             display: block;
-            padding: 20px 20px 8px;
+            padding: 20px 0 8px;
           }
-          .kz-pdp-product-name--desk,
-          .kz-pdp-category-name--desk { display: none; }
-          .kz-pdp-category-name { font-size: 28px; margin-bottom: 8px; }
-          .kz-pdp-buy { padding: 8px 20px 48px; }
-          .kz-pdp-sticky { position: static; max-width: none; }
-          .kz-pdp-desc p { font-size: 16px; }
-          .kz-pdp-life-grid { grid-template-columns: 1fr; }
+          .kz-desk-only { display: none; }
+          .kz-category-name {
+            font-size: 28px;
+            margin-bottom: 15px;
+          }
+          .kz-product-name { font-size: 10px; }
+          .kz-sidebar__inner {
+            position: static;
+            max-width: none;
+            top: auto;
+          }
+          .kz-product-desc p { font-size: 18px; text-align: left; }
+          .kz-commitment { padding: 40px 0; margin-top: 20px; }
+          .kz-commitment-inner {
+            grid-template-columns: 1fr;
+            gap: 28px;
+            padding: 0 20px;
+          }
+          .kz-commitment-heading { font-size: 22px; }
+          .kz-life-grid { grid-template-columns: 1fr; }
         }
       `}</style>
     </div>
