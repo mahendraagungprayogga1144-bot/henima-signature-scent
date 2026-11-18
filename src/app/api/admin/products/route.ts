@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { updateDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { generateId } from "@/lib/auth";
@@ -91,6 +92,13 @@ export async function POST(request: Request) {
       variants,
     });
   });
+
+  try {
+    revalidateTag("products");
+    revalidateTag("settings");
+  } catch {
+    /* ignore */
+  }
 
   return NextResponse.json({ ok: true, id });
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { updateDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import type { ProductVariant } from "@/lib/types";
@@ -128,6 +129,13 @@ export async function POST(
         if (variants) product.variants = variants;
       }
     });
+
+    try {
+      revalidateTag("products");
+      revalidateTag("settings");
+    } catch {
+      /* ignore */
+    }
 
     return NextResponse.json({ ok: true });
   } catch (e) {

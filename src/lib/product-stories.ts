@@ -58,16 +58,36 @@ export function getProductStory(slug: string): ProductStory | null {
   return STORIES[slug] || null;
 }
 
+function isUsableGalleryUrl(url: string) {
+  return (
+    !!url &&
+    !url.includes("placeholder") &&
+    !url.endsWith(".svg") &&
+    (url.startsWith("http") || url.startsWith("/"))
+  );
+}
+
+/**
+ * Prefer admin-uploaded product photos. Fall back to curated story gallery
+ * only when the product has no usable CMS photos yet.
+ */
 export function mergeProductGallery(
-  slug: string,
+  _slug: string,
   photos: string[],
   story: ProductStory | null
 ): string[] {
-  if (story?.gallery?.length) return [...story.gallery];
   const seen = new Set<string>();
-  return photos.filter((url) => {
-    if (!url || seen.has(url)) return false;
+  const fromAdmin = photos.filter((url) => {
+    if (!isUsableGalleryUrl(url) || seen.has(url)) return false;
     seen.add(url);
     return true;
   });
+  if (fromAdmin.length > 0) return fromAdmin;
+
+  const fromStory = (story?.gallery || []).filter((url) => {
+    if (!isUsableGalleryUrl(url) || seen.has(url)) return false;
+    seen.add(url);
+    return true;
+  });
+  return fromStory;
 }
