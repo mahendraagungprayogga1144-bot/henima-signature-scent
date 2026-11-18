@@ -37,8 +37,8 @@ const MEDIA = {
   discover: [
     { name: "Afternoon", image: "/products/afternoon/lifestyle-car.jpg", href: "/shop/afternoon" },
     { name: "The Distance", image: "/layout/discover-2.jpg?v=6", href: "/shop" },
-    { name: "Signature", image: "/layout/discover-3.jpg?v=6", href: "/shop" },
-    { name: "Intimate", image: "/layout/discover-4.jpg?v=6", href: "/shop" },
+    { name: "Signature", image: "/layout/discover-3.jpg?v=7", href: "/shop" },
+    { name: "Intimate", image: "/layout/discover-4.jpg?v=7", href: "/shop" },
   ],
 };
 
