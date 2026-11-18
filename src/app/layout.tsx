@@ -37,10 +37,44 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Henima Signature Scent",
-  description: "Henima Signature Scent — wewangian luxury buatan Indonesia. Lahir dari kisah cinta nyata, setiap tetes menyimpan cerita. Extrait de Parfum.",
-  keywords: ["parfum lokal indonesia", "henima signature scent", "parfum luxury indonesia", "extrait de parfum"],
-  openGraph: { title: "Henima Signature Scent", description: "Wewangian luxury buatan Indonesia, lahir dari kisah cinta nyata.", url: "https://henimaofficial.com" },
+  metadataBase: new URL("https://henimaofficial.com"),
+  title: {
+    default: "Henima | Website Resmi Parfum Lokal Indonesia",
+    template: "%s | Henima Signature Scent",
+  },
+  description:
+    "Website resmi Henima Signature Scent — parfum extrait de parfum lokal Indonesia. Shop Afternoon, The Distance, dan koleksi resmi di henimaofficial.com.",
+  keywords: [
+    "henima",
+    "henimaofficial",
+    "henima signature scent",
+    "parfum lokal indonesia",
+    "parfum henima",
+    "extrait de parfum",
+    "afternoon parfum",
+    "the distance parfum",
+  ],
+  alternates: {
+    canonical: "https://henimaofficial.com",
+  },
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    siteName: "Henima Signature Scent",
+    title: "Henima | Website Resmi Parfum Lokal Indonesia",
+    description: "Website resmi Henima Signature Scent — wewangian luxury buatan Indonesia.",
+    url: "https://henimaofficial.com",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Henima | Website Resmi Parfum Lokal Indonesia",
+    description: "Website resmi Henima Signature Scent — wewangian luxury buatan Indonesia.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
   icons: {
     icon: "/favicon.png",
     shortcut: "/favicon.png",
@@ -68,16 +102,51 @@ export default async function RootLayout({
       <head>
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-SGW9TFDQTX"></script>
         <script dangerouslySetInnerHTML={{__html: `window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date()); gtag("config", "G-SGW9TFDQTX");`}}/>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Organization',
-          name: 'Henima Signature Scent',
-          url: 'https://henimaofficial.com',
-          logo: 'https://henimaofficial.com/favicon.png',
-          description: 'Wewangian luxury buatan Indonesia, lahir dari kisah cinta nyata.',
-          sameAs: ['https://www.instagram.com/henima.id'],
-          contactPoint: { '@type': 'ContactPoint', telephone: '+6285190311230', contactType: 'customer service' }
-        })}}/>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "@id": "https://henimaofficial.com/#organization",
+                name: "Henima Signature Scent",
+                alternateName: ["Henima", "Henima Official", "henimaofficial"],
+                url: "https://henimaofficial.com",
+                logo: "https://henimaofficial.com/favicon.png",
+                image: "https://henimaofficial.com/favicon.png",
+                description:
+                  "Website resmi Henima Signature Scent — wewangian luxury buatan Indonesia, lahir dari kisah cinta nyata.",
+                sameAs: [
+                  "https://www.instagram.com/henima.id",
+                  "https://shopee.co.id/henima",
+                ],
+                contactPoint: {
+                  "@type": "ContactPoint",
+                  telephone: "+6285190311230",
+                  contactType: "customer service",
+                  areaServed: "ID",
+                  availableLanguage: ["Indonesian", "English"],
+                },
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "@id": "https://henimaofficial.com/#website",
+                name: "Henima Signature Scent",
+                alternateName: "Henima Official",
+                url: "https://henimaofficial.com",
+                publisher: { "@id": "https://henimaofficial.com/#organization" },
+                inLanguage: "id-ID",
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: "https://henimaofficial.com/shop?q={search_term_string}",
+                  "query-input": "required name=search_term_string",
+                },
+              },
+            ]),
+          }}
+        />
       </head>
       <body className={`min-h-screen font-sans antialiased ${jakarta.variable} ${futuraNav.variable}`} style={{background:"#FFFFFF", color:"#111111", overflowX:"clip", overflowY:"visible", fontFamily:"var(--font-jakarta), system-ui, sans-serif"}}>
         <SplashScreen />

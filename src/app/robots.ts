@@ -5,10 +5,20 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/shop", "/blog", "/our-story", "/galeri", "/quiz", "/love-letters", "/share-story", "/tracking", "/wishlist"],
-        disallow: ["/admin", "/api", "/profil", "/edit-profil", "/checkout", "/pembayaran", "/cart"],
-      }
+        allow: "/",
+        disallow: [
+          "/admin",
+          "/api",
+          "/profil",
+          "/edit-profil",
+          "/checkout",
+          "/pembayaran",
+          "/cart",
+          "/order",
+        ],
+      },
     ],
+    host: "https://henimaofficial.com",
     sitemap: "https://henimaofficial.com/sitemap.xml",
   };
 }

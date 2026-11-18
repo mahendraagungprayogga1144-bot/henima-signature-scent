@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 import { MetadataRoute } from "next";
-import { getDatabase } from "@/lib/db";
+import { getPublicCatalog } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 
 function toSlug(name: string) {
@@ -8,13 +8,19 @@ function toSlug(name: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const db = await getDatabase();
-  const products = db.products.filter(p => p.active);
+  const { products: allProducts } = await getPublicCatalog();
+  const products = allProducts.filter((p) => p.active);
 
-  const { data: posts } = await supabase
-    .from("blog_posts")
-    .select("slug, updated_at")
-    .eq("published", true);
+  let posts: { slug: string; updated_at?: string }[] = [];
+  try {
+    const { data } = await supabase
+      .from("blog_posts")
+      .select("slug, updated_at")
+      .eq("published", true);
+    posts = data || [];
+  } catch (err) {
+    console.error("[sitemap] blog_posts fetch failed", err);
+  }
 
   const staticPages = [
     { url: "https://henimaofficial.com", priority: 1.0, changeFrequency: "daily" as const },
