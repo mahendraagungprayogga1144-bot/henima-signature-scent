@@ -119,8 +119,8 @@ export default function Navbar({ user }: { user?: any }) {
             : `rgba(255,255,255,${fade})`,
           backdropFilter: fade > 0.08 && !transparent ? `blur(${Math.min(12, fade * 14)}px)` : "none",
           WebkitBackdropFilter: fade > 0.08 && !transparent ? `blur(${Math.min(12, fade * 14)}px)` : "none",
-          boxShadow: fade > 0.85 ? "0 1px 0 rgba(0,0,0,0.06)" : "none",
-          transition: "box-shadow 0.35s ease, padding-top 0.45s ease, background 0.35s ease",
+          boxShadow: "none",
+          transition: "padding-top 0.45s ease, background 0.35s ease",
           paddingTop: isShop ? 8 : fade < 0.35 ? 22 : 8,
         }}
       >
