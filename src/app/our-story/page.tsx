@@ -1009,7 +1009,11 @@ export default function OurStoryPage() {
           display: grid;
           grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
           align-items: center;
-          margin-top: 28px;
+          gap: 0 40px;
+          max-width: 1360px;
+          margin: 28px auto 0;
+          padding: 0 48px;
+          box-sizing: border-box;
           background: #fff;
         }
         .hu-split-media {
@@ -1034,8 +1038,8 @@ export default function OurStoryPage() {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding: 56px clamp(28px, 5vw, 72px);
-          max-width: 560px;
+          padding: 48px 8px 48px 0;
+          max-width: 520px;
         }
 
         .hu-timeline {
@@ -1237,13 +1241,18 @@ export default function OurStoryPage() {
           .hu-dist { flex-wrap: wrap; justify-content: center; gap: 10px; }
           .hu-section, .hu-love, .hu-manifesto, .hu-cta { padding: 64px 20px; }
           .hu-ch1 { grid-template-columns: 1fr; gap: 36px; }
-          .hu-split { grid-template-columns: 1fr; }
+          .hu-split {
+            grid-template-columns: 1fr;
+            gap: 0;
+            padding: 0 16px;
+            margin-top: 20px;
+          }
           .hu-split-media {
             aspect-ratio: 4 / 5;
             max-height: 70vh;
           }
           .hu-split-text {
-            padding: 36px 20px 48px;
+            padding: 36px 4px 48px;
             max-width: none;
           }
           .hu-h2--story, .hu-p--left { text-align: left; }
