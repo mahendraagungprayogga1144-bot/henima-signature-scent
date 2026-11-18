@@ -87,6 +87,13 @@ export default function ProductLookbookRail({
             ›
           </button>
         </div>
+
+        {/* Mobile only — All products under the rail */}
+        <div className="kz-bestsellers-all-mobile-wrap">
+          <Link href={hrefAll} className="kz-bestsellers-all-mobile">
+            All products
+          </Link>
+        </div>
       </div>
 
       <style>{`
@@ -258,12 +265,38 @@ export default function ProductLookbookRail({
           .kz-arrow--prev { left: -8px; }
           .kz-arrow--next { right: -8px; }
         }
+        .kz-bestsellers-all-mobile-wrap {
+          display: none;
+        }
+        .kz-bestsellers-all-mobile {
+          display: inline-block;
+          margin-top: 28px;
+          font-size: 13px;
+          font-weight: 500;
+          line-height: 1.2;
+          color: #111;
+          text-decoration: none;
+          font-family: ${FUTURA};
+          border-bottom: 1px solid #111;
+          padding-bottom: 2px;
+        }
+
         @media (max-width: 767px) {
           .kz-bestsellers { padding: 48px 0 56px !important; }
           .kz-bestsellers > div { padding: 0 16px !important; }
-          .kz-bestsellers-head { margin-bottom: 20px; }
+          .kz-bestsellers-head {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 20px;
+          }
           .kz-bestsellers-title { font-size: 18px !important; }
-          .kz-bestsellers-all { font-size: 12px !important; }
+          /* Header "All products" hidden on phone — shown under rail instead */
+          .kz-bestsellers-all { display: none !important; }
+          .kz-bestsellers-all-mobile-wrap {
+            display: flex !important;
+            justify-content: flex-start;
+          }
           .kz-rail { gap: 14px !important; }
           .kz-rail-card {
             flex: 0 0 min(291px, 78vw) !important;
