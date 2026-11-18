@@ -156,6 +156,12 @@ export interface CompanySettings {
   logo?: string;
   heroImage?: string;
   heroImages?: string[];
+  heroVideo?: string;
+  galleryImages?: string[];
+  marqueeItems?: string[];
+  socialLinks?: Record<string, string>;
+  /** Homepage bands, Love Letters chrome, FAQ, footer — see site-content.ts */
+  siteContent?: import("./site-content").SiteContent;
   team?: TeamMember[];
   advantages?: Advantage[];
 }

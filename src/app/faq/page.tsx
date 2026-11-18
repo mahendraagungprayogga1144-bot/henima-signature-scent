@@ -1,7 +1,11 @@
 import Reveal from "@/components/Reveal";
 import Link from "next/link";
+import { getSettings } from "@/lib/db";
+import { getSiteContent } from "@/lib/site-content";
 
-const FAQS = [
+export const revalidate = 300;
+
+const DEFAULT_FAQS = [
   {
     category: "Orders & Payment",
     items: [
@@ -43,7 +47,18 @@ const FAQS = [
   },
 ];
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const settings = await getSettings();
+  const site = getSiteContent(settings.company as any);
+  const wa =
+    (settings.company.whatsappNumber || "").replace(/\D/g, "") || "6285190311230";
+
+  const cmsItems = site.faq.items.filter((x) => x.q.trim() && x.a.trim());
+  const sections =
+    cmsItems.length > 0
+      ? [{ category: "FAQ", items: cmsItems }]
+      : DEFAULT_FAQS;
+
   return (
     <div style={{ minHeight: "100vh", background: "#FFFFFF", fontFamily: "var(--font-jost, sans-serif)", color: "#111111" }}>
 
@@ -56,7 +71,7 @@ export default function FAQPage() {
       </div>
 
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "64px 8vw 100px" }}>
-        {FAQS.map((section, si) => (
+        {sections.map((section, si) => (
           <Reveal key={si} direction="up" delay={si * 80}>
             <div style={{ marginBottom: "64px" }}>
               <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#737373", fontWeight: 600, marginBottom: "32px" }}>
@@ -82,10 +97,10 @@ export default function FAQPage() {
           <div style={{ textAlign: "center", padding: "48px", background: "#fff", border: "1px solid rgba(28,25,23,0.08)", marginTop: "40px" }}>
             <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#737373", marginBottom: "16px" }}>Still have questions?</p>
             <h3 style={{ fontFamily: "var(--font-cormorant, serif)", fontSize: "28px", fontWeight: 300, fontStyle: "italic", color: "#111111", marginBottom: "24px" }}>
-              We are here to help.
+              {site.faq.waNote || "We are here to help."}
             </h3>
             <Link
-              href="https://wa.me/6285190311230"
+              href={`https://wa.me/${wa}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{ display: "inline-block", background: "#111111", color: "#FFFFFF", padding: "14px 40px", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", textDecoration: "none", fontWeight: 500 }}

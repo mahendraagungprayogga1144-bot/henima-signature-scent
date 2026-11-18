@@ -18,6 +18,7 @@ const MENUS = [
     { href: "/admin/hpp-calculator", icon: "calc", label: "Kalkulator HPP" },
   ]},
   { group: "KONTEN", items: [
+    { href: "/admin/konten", icon: "edit", label: "Konten Situs" },
     { href: "/admin/produk", icon: "box", label: "Produk / Gift Set" },
     { href: "/admin/katalog", icon: "list", label: "Katalog Digital" },
     { href: "/admin/galeri", icon: "image", label: "Galeri" },

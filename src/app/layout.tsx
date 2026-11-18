@@ -8,6 +8,7 @@ import NavbarWrapper from "@/components/NavbarWrapper";
 import FooterSubscribe from "@/components/FooterSubscribe";
 import { getSettings } from "@/lib/db";
 import { assertEnv } from "@/lib/env";
+import { getSiteContent } from "@/lib/site-content";
 import "./globals.css";
 
 /** ISR — allows Googlebot/CDN to cache marketing HTML (was force-dynamic → no-store). */
@@ -114,6 +115,11 @@ export default async function RootLayout({
   }
   const settings = await getSettings();
   const socialLinks = (settings.company as { socialLinks?: Record<string, string> }).socialLinks || {};
+  const siteContent = getSiteContent(settings.company as any);
+  const footerLogo = settings.company.logo || "/henima-logo-white.png";
+  const footerCopyright =
+    siteContent.footer.copyright?.trim() ||
+    `© ${new Date().getFullYear()} HENIMA SIGNATURE SCENT`;
 
   return (
     <html lang="id">
@@ -209,11 +215,11 @@ export default async function RootLayout({
               <div>
                 <a href="/" style={{display:"inline-block", marginBottom:"28px", lineHeight:0}} aria-label="Henima">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/henima-logo-white.png" alt="Henima" style={{width:120, height:"auto", display:"block"}} />
+                  <img src={footerLogo} alt="Henima" style={{width:120, height:"auto", display:"block"}} />
                 </a>
                 <FooterSubscribe />
                 <p style={{margin:"28px 0 0", fontSize:"11px", color:"rgba(255,255,255,0.35)"}}>
-                  © {new Date().getFullYear()} HENIMA SIGNATURE SCENT
+                  {footerCopyright}
                 </p>
               </div>
               <div>

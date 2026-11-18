@@ -4,6 +4,7 @@ import ProductLookbookRail from "@/components/ProductLookbookRail";
 import NewsletterBlock from "@/components/NewsletterBlock";
 import { getPublicCatalog } from "@/lib/db";
 import { getProductPhotoList } from "@/lib/product-media";
+import { getSiteContent } from "@/lib/site-content";
 
 export const revalidate = 300;
 
@@ -207,12 +208,14 @@ export default async function HomePage() {
         };
       });
 
-  /* Curated chapter tiles — keep lifestyle art + chapter names; link to matching product if any */
-  const discover = MEDIA.discover.map((d) => {
+  const site = getSiteContent(company as any);
+
+  /* Curated chapter tiles — CMS first; link to matching product if name matches */
+  const discover = site.discover.map((d) => {
     const match = products.find((p) => p.name.toLowerCase() === d.name.toLowerCase());
     return {
       name: d.name,
-      image: d.image,
+      image: d.image || MEDIA.discover[0].image,
       href: match ? `/shop/${toSlug(match.name)}` : d.href,
     };
   });
@@ -274,7 +277,7 @@ export default async function HomePage() {
       <section style={{ position: "relative", width: "100%", minHeight: "48vw", maxHeight: 640, overflow: "hidden" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={MEDIA.universe}
+          src={site.universe.image || MEDIA.universe}
           alt=""
           style={{
             position: "absolute",
@@ -319,10 +322,10 @@ export default async function HomePage() {
               textShadow: "0 2px 24px rgba(0,0,0,0.35)",
             }}
           >
-            For a more beautiful world
+            {site.universe.title}
           </h2>
           <Link
-            href="/our-story"
+            href={site.universe.ctaHref || "/our-story"}
             style={{
               color: "#fff",
               fontSize: 13,
@@ -331,7 +334,7 @@ export default async function HomePage() {
               textShadow: "0 1px 12px rgba(0,0,0,0.35)",
             }}
           >
-            The world by Henima ›
+            {site.universe.ctaLabel}
           </Link>
         </div>
       </section>
@@ -352,14 +355,27 @@ export default async function HomePage() {
           }}
         >
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }} className="kz-grid">
-            <DualTile name="Our Stores" image={MEDIA.stores} href="/faq" cta="Find our points of sale ›" watermark="H" ratio="72%" />
-            <DualTile name="Henima Happenings" image={MEDIA.happenings} href="/blog" cta="Find out more ›" ratio="72%" />
+            <DualTile
+              name={site.stores.name}
+              image={site.stores.image || MEDIA.stores}
+              href={site.stores.href || "/faq"}
+              cta={site.stores.cta}
+              watermark="H"
+              ratio="72%"
+            />
+            <DualTile
+              name={site.happenings.name}
+              image={site.happenings.image || MEDIA.happenings}
+              href={site.happenings.href || "/blog"}
+              cta={site.happenings.cta}
+              ratio="72%"
+            />
           </div>
         </div>
       </section>
 
       {/* Create a connection — jarak atas & bawah, tidak nyatu/ketiban footer */}
-      <NewsletterBlock />
+      <NewsletterBlock title={site.newsletter.title} body={site.newsletter.body} />
 
       <style>{`
         @media (max-width: 767px) {

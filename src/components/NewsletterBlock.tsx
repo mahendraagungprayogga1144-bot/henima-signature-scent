@@ -7,7 +7,13 @@ import { useState } from "react";
  * Satu strip #222 full-width di belakang card; terlihat hanya kiri & kanan.
  * Mulai ~45% tinggi card, tinggi ~185px desktop, berakhir sebelum bawah card.
  */
-export default function NewsletterBlock() {
+export default function NewsletterBlock({
+  title = "Create a connection",
+  body = "Subscribe to our newsletter, share the good news, and create a more beautiful world together.",
+}: {
+  title?: string;
+  body?: string;
+}) {
   const [email, setEmail] = useState("");
   const [checked, setChecked] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "err">("idle");
@@ -91,7 +97,7 @@ export default function NewsletterBlock() {
               textAlign: "center",
             }}
           >
-            Create a connection
+            {title}
           </h2>
 
           <p
@@ -104,7 +110,7 @@ export default function NewsletterBlock() {
               textAlign: "center",
             }}
           >
-            Subscribe to our newsletter, share the good news, and create a more beautiful world together.
+            {body}
           </p>
 
           {status === "ok" ? (

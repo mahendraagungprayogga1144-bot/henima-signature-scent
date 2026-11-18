@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "@/lib/session";
 import { supabase } from "@/lib/supabase";
 import { updateDatabase } from "@/lib/db";
@@ -124,6 +125,13 @@ export async function POST(request: Request) {
       try { (db.settings.company as any).socialLinks = JSON.parse(socialLinksRaw); } catch {}
     }
   });
+
+  try {
+    revalidateTag("settings");
+    revalidateTag("products");
+  } catch {
+    /* ignore */
+  }
 
   return NextResponse.json({ ok: true });
 }
