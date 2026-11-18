@@ -86,12 +86,6 @@ export default function ProductLookbookRail({
           </button>
         </div>
 
-        {/* Mobile only — All products under the rail */}
-        <div className="kz-bestsellers-all-mobile-wrap">
-          <Link href={hrefAll} className="kz-bestsellers-all-mobile">
-            All products
-          </Link>
-        </div>
       </div>
 
       <style>{`
@@ -274,37 +268,23 @@ export default function ProductLookbookRail({
           .kz-arrow--prev { left: -8px; }
           .kz-arrow--next { right: -8px; }
         }
-        .kz-bestsellers-all-mobile-wrap {
-          display: none;
-        }
-        .kz-bestsellers-all-mobile {
-          display: inline-block;
-          margin-top: 28px;
-          font-size: 13px;
-          font-weight: 500;
-          line-height: 1.2;
-          color: #111;
-          text-decoration: none;
-          font-family: ${FUTURA};
-          border-bottom: 1px solid #111;
-          padding-bottom: 2px;
-        }
-
         @media (max-width: 767px) {
           .kz-bestsellers { padding: 48px 0 56px !important; }
           .kz-bestsellers > div { padding: 0 16px !important; }
+          /* Kenzo mobile: title, then All products under it */
           .kz-bestsellers-head {
             flex-direction: column;
             align-items: flex-start;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 22px;
           }
-          .kz-bestsellers-title { font-size: 18px !important; }
-          /* Header "All products" hidden on phone — shown under rail instead */
-          .kz-bestsellers-all { display: none !important; }
-          .kz-bestsellers-all-mobile-wrap {
-            display: flex !important;
-            justify-content: flex-start;
+          .kz-bestsellers-title { font-size: 20px !important; }
+          .kz-bestsellers-all {
+            display: inline-block !important;
+            font-size: 13px !important;
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 3px;
           }
           .kz-rail { gap: 14px !important; }
           .kz-rail-card {
