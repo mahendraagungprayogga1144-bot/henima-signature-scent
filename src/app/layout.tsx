@@ -116,7 +116,8 @@ export default async function RootLayout({
   const settings = await getSettings();
   const socialLinks = (settings.company as { socialLinks?: Record<string, string> }).socialLinks || {};
   const siteContent = getSiteContent(settings.company as any);
-  const footerLogo = settings.company.logo || "/henima-logo-white.png";
+  /* Footer always uses the white wordmark — never product/marketing photos from settings.logo */
+  const footerLogo = "/henima-logo-white.png";
   const footerCopyright =
     siteContent.footer.copyright?.trim() ||
     `© ${new Date().getFullYear()} HENIMA SIGNATURE SCENT`;
