@@ -449,7 +449,7 @@ export default function OurStoryPage() {
       <section className="hu-split">
         <div className="hu-split-media hu-reveal">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/layout/chapter-distance.jpg?v=2" alt="" />
+          <img src="/layout/chapter-distance.jpg?v=3" alt="A couple walking together" />
         </div>
         <div className="hu-split-text">
           <p className="hu-label hu-reveal">The scents</p>
@@ -1007,16 +1007,18 @@ export default function OurStoryPage() {
 
         .hu-split {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          min-height: 480px;
+          grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+          align-items: center;
           margin-top: 28px;
           background: #fff;
         }
         .hu-split-media {
           position: relative;
-          min-height: 360px;
+          width: 100%;
+          aspect-ratio: 3 / 4;
+          min-height: 0;
           overflow: hidden;
-          background: #eee;
+          background: #1a1a1a;
         }
         .hu-split-media img {
           position: absolute;
@@ -1024,14 +1026,16 @@ export default function OurStoryPage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          object-position: center 42%;
           transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .hu-split-media.is-in img { transform: scale(1.04); }
+        .hu-split-media.is-in img { transform: scale(1.02); }
         .hu-split-text {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding: 64px 48px;
+          padding: 56px clamp(28px, 5vw, 72px);
+          max-width: 560px;
         }
 
         .hu-timeline {
@@ -1234,8 +1238,14 @@ export default function OurStoryPage() {
           .hu-section, .hu-love, .hu-manifesto, .hu-cta { padding: 64px 20px; }
           .hu-ch1 { grid-template-columns: 1fr; gap: 36px; }
           .hu-split { grid-template-columns: 1fr; }
-          .hu-split-media { min-height: 280px; }
-          .hu-split-text { padding: 40px 20px 48px; }
+          .hu-split-media {
+            aspect-ratio: 4 / 5;
+            max-height: 70vh;
+          }
+          .hu-split-text {
+            padding: 36px 20px 48px;
+            max-width: none;
+          }
           .hu-h2--story, .hu-p--left { text-align: left; }
           .hu-numbers { grid-template-columns: 1fr; }
           .hu-num-card { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
