@@ -1,39 +1,401 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-type Story = {id:string;name:string;city:string;story:string;perfume:string;created_at:string;admin_reply?:string;avatar_url?:string}
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+type Story = {
+  id: string
+  name: string
+  city: string
+  story: string
+  perfume: string
+  created_at: string
+  admin_reply?: string
+  avatar_url?: string
+}
+
 export default function LoveWallPage() {
   const [stories, setStories] = useState<Story[]>([])
   const [loading, setLoading] = useState(true)
-  useEffect(()=>{
-    supabase.from('love_stories').select('id,name,city,story,perfume,created_at,admin_reply,avatar_url').eq('status','approved').order('created_at',{ascending:false}).then(({data})=>{setStories(data||[]);setLoading(false)})
-  },[])
-  const fmt=(d:string)=>new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})
-  return(<><style>{`.lw{--bg:#F7F4EF;--bg2:#EFEBE3;--black:#1A1714;--ink:#2E2A25;--muted:#7A736A;--gold:#B5874A;--gold2:#D4A96A;--border:rgba(181,135,74,.18);--serif:var(--font-jakarta),'Plus Jakarta Sans',Helvetica,Arial,sans-serif;--sans:var(--font-jakarta),system-ui,sans-serif;background:var(--bg);min-height:100vh;font-family:var(--sans);font-weight:300;color:var(--ink)}.lw-hero{background:var(--black);padding:120px 6vw 80px;text-align:center;position:relative;overflow:hidden}.lw-hero h1{font-family:var(--serif);font-size:clamp(2.2rem,5vw,4.5rem);font-weight:400;line-height:1.15;color:#F7F4EF;margin-bottom:20px}.lw-hero h1 em{font-style:italic;color:var(--gold)}.lw-hero p{font-size:15px;color:rgba(245,240,232,.55);max-width:480px;margin:0 auto;line-height:1.85}.lw-label{font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2);margin-bottom:20px;display:block}.lw-share{display:inline-block;margin-top:36px;padding:14px 40px;border:1px solid rgba(181,135,74,.4);color:var(--gold);font-size:11px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none;font-family:var(--sans);transition:background .2s,color .2s}.lw-share:hover{background:var(--gold);color:var(--black)}.lw-section{padding:80px 6vw}.lw-inner{max-width:1080px;margin:0 auto}.lw-count{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:40px}.lw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}.lw-card{background:var(--bg);border:1px solid var(--border);padding:32px 28px;transition:background .2s,transform .2s,box-shadow .2s}.lw-card:hover{background:var(--bg2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(181,135,74,.08)}.lw-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}.lw-avatar{width:40px;height:40px;border-radius:50%;background:rgba(181,135,74,.1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:16px;color:var(--gold);flex-shrink:0}.lw-name{font-family:var(--serif);font-size:16px;font-weight:400;color:var(--black);margin-bottom:2px}.lw-meta{font-size:11px;color:var(--muted);letter-spacing:.06em}.lw-story{font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.8;color:var(--ink);margin-bottom:20px}.lw-perf{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);padding:6px 14px;border:1px solid var(--border);display:inline-block}.lw-reply{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}.lw-reply-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}.lw-reply-text{font-size:13px;color:var(--muted);line-height:1.7;font-style:italic}.lw-empty{text-align:center;padding:80px 20px}.lw-loading{text-align:center;padding:80px 20px;color:var(--muted);font-size:14px}@media(max-width:600px){.lw-hero{padding:100px 5vw 60px}.lw-section{padding:60px 5vw}}`}</style>
-  <div className="lw">
-    <div className="lw-hero">
-      <span className="lw-label">Love Letters Wall</span>
-      <h1>Kisah nyata,<br/><em>dari hati ke hati.</em></h1>
-      <p>Setiap cerita di sini adalah bukti bahwa cinta selalu punya cara untuk bertahan.</p>
-      <a href="/share-story" className="lw-share">Bagikan Kisahmu 💛</a>
-    </div>
-    <div className="lw-section"><div className="lw-inner">
-      {loading?(<p className="lw-loading">Memuat kisah-kisah cinta... 💛</p>):stories.length===0?(<div className="lw-empty"><p style={{fontFamily:'var(--serif)',fontSize:20,color:'var(--muted)'}}>Belum ada cerita. Jadilah yang pertama berbagi! 💛</p></div>):(<>
-        <p className="lw-count">{stories.length} kisah cinta telah diabadikan</p>
-        <div className="lw-grid">{stories.map(s=>(
-          <div key={s.id} className="lw-card">
-            {s.avatar_url ? <img src={s.avatar_url} alt="" style={{width:'100%',height:180,objectFit:'cover',display:'block',margin:'-32px -28px 20px',maxWidth:'calc(100% + 56px)'}}/> : null}
-            <div className="lw-head">
-              <div className="lw-avatar">{s.name.charAt(0).toUpperCase()}</div>
-              <div><p className="lw-name">{s.name}</p><p className="lw-meta">{s.city} · {fmt(s.created_at)}</p></div>
-            </div>
-            <p className="lw-story">&ldquo;{s.story}&rdquo;</p>
-            {s.perfume&&s.perfume!=='Belum punya Henima'&&<span className="lw-perf">{s.perfume}</span>}
-            {s.admin_reply&&<div className="lw-reply"><p className="lw-reply-label">Pesan dari Henima 💛</p><p className="lw-reply-text">{s.admin_reply}</p></div>}
+
+  useEffect(() => {
+    supabase
+      .from('love_stories')
+      .select('id,name,city,story,perfume,created_at,admin_reply,avatar_url')
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        setStories(data || [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    if (loading) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-in')
+            io.unobserve(e.target)
+          }
+        })
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    )
+    document.querySelectorAll('.ll-reveal').forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [loading, stories])
+
+  const fmt = (d: string) =>
+    new Date(d).toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+
+  return (
+    <>
+      <style>{`
+        .ll {
+          --ink: #111111;
+          --muted: rgba(17,17,17,0.48);
+          --line: rgba(17,17,17,0.12);
+          --bg: #FFFFFF;
+          --bg-soft: #F5F5F5;
+          background: var(--bg);
+          min-height: 100vh;
+          color: var(--ink);
+          font-family: var(--font-jakarta), system-ui, sans-serif;
+          font-weight: 300;
+        }
+        .ll-hero {
+          min-height: 72vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 140px 6vw 88px;
+          background:
+            linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(245,245,245,0.92) 55%, #FFFFFF 100%),
+            radial-gradient(ellipse 80% 60% at 50% 20%, rgba(17,17,17,0.04), transparent 70%);
+        }
+        .ll-kicker {
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-size: 11px;
+          letter-spacing: 0.32em;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin-bottom: 28px;
+        }
+        .ll-hero h1 {
+          font-family: var(--font-jakarta), system-ui, sans-serif;
+          font-size: clamp(2.8rem, 8vw, 6.5rem);
+          font-weight: 400;
+          letter-spacing: -0.03em;
+          line-height: 0.95;
+          margin: 0 0 28px;
+          color: var(--ink);
+        }
+        .ll-hero h1 em {
+          font-style: italic;
+          font-weight: 300;
+        }
+        .ll-hero p {
+          max-width: 420px;
+          margin: 0 auto;
+          font-size: 15px;
+          line-height: 1.75;
+          color: var(--muted);
+        }
+        .ll-strip {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 24px;
+          padding: 28px 6vw;
+          border-top: 1px solid var(--line);
+          border-bottom: 1px solid var(--line);
+        }
+        .ll-strip span {
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-size: 11px;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--muted);
+        }
+        .ll-strip a {
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-size: 11px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--ink);
+          text-decoration: none;
+          border-bottom: 1px solid var(--ink);
+          padding-bottom: 2px;
+        }
+        .ll-list { padding: 0; }
+        .ll-row {
+          display: grid;
+          grid-template-columns: 1.05fr 0.95fr;
+          min-height: min(78vh, 720px);
+          border-bottom: 1px solid var(--line);
+        }
+        .ll-row.reverse { grid-template-columns: 0.95fr 1.05fr; }
+        .ll-row.reverse .ll-media { order: 2; }
+        .ll-row.reverse .ll-copy { order: 1; }
+        .ll-media {
+          position: relative;
+          background: var(--bg-soft);
+          overflow: hidden;
+          min-height: 360px;
+        }
+        .ll-media img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transform: scale(1.02);
+          transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .ll-row:hover .ll-media img { transform: scale(1.06); }
+        .ll-media-empty {
+          width: 100%;
+          height: 100%;
+          min-height: 360px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background:
+            linear-gradient(135deg, #111 0%, #2a2a2a 100%);
+          color: rgba(255,255,255,0.35);
+          font-family: var(--font-jakarta), system-ui, sans-serif;
+          font-size: clamp(4rem, 12vw, 8rem);
+          font-weight: 300;
+          letter-spacing: -0.04em;
+        }
+        .ll-copy {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: clamp(40px, 6vw, 88px) clamp(28px, 5vw, 72px);
+          background: #FFFFFF;
+        }
+        .ll-meta {
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-size: 10px;
+          letter-spacing: 0.24em;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin-bottom: 28px;
+        }
+        .ll-quote {
+          font-family: var(--font-jakarta), system-ui, sans-serif;
+          font-size: clamp(1.35rem, 2.4vw, 2rem);
+          font-weight: 300;
+          font-style: italic;
+          line-height: 1.45;
+          letter-spacing: -0.02em;
+          color: var(--ink);
+          margin: 0 0 36px;
+        }
+        .ll-name {
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-size: 12px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--ink);
+          margin: 0 0 6px;
+        }
+        .ll-city {
+          font-size: 13px;
+          color: var(--muted);
+          margin: 0;
+        }
+        .ll-perfume {
+          margin-top: 28px;
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-size: 10px;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--muted);
+        }
+        .ll-reply {
+          margin-top: 32px;
+          padding-top: 24px;
+          border-top: 1px solid var(--line);
+        }
+        .ll-reply-label {
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-size: 10px;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--muted);
+          margin-bottom: 10px;
+        }
+        .ll-reply-text {
+          font-size: 14px;
+          line-height: 1.7;
+          color: rgba(17,17,17,0.62);
+          font-style: italic;
+          margin: 0;
+        }
+        .ll-cta {
+          padding: 120px 6vw;
+          text-align: center;
+          background: #111111;
+          color: #FFFFFF;
+        }
+        .ll-cta h2 {
+          font-family: var(--font-jakarta), system-ui, sans-serif;
+          font-size: clamp(2rem, 5vw, 3.6rem);
+          font-weight: 400;
+          letter-spacing: -0.03em;
+          line-height: 1.05;
+          margin: 0 0 20px;
+        }
+        .ll-cta p {
+          max-width: 400px;
+          margin: 0 auto 40px;
+          font-size: 15px;
+          line-height: 1.75;
+          color: rgba(255,255,255,0.5);
+        }
+        .ll-cta a {
+          display: inline-block;
+          padding: 16px 44px;
+          border: 1px solid rgba(255,255,255,0.35);
+          color: #FFFFFF;
+          text-decoration: none;
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-size: 11px;
+          letter-spacing: 0.24em;
+          text-transform: uppercase;
+          transition: background 0.25s, color 0.25s;
+        }
+        .ll-cta a:hover {
+          background: #FFFFFF;
+          color: #111111;
+        }
+        .ll-state {
+          padding: 100px 6vw;
+          text-align: center;
+          color: var(--muted);
+          font-size: 14px;
+        }
+        .ll-reveal {
+          opacity: 0;
+          transform: translateY(28px);
+          transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .ll-reveal.is-in {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .ll-reveal.d1 { transition-delay: 0.08s; }
+        .ll-reveal.d2 { transition-delay: 0.16s; }
+        @media (max-width: 900px) {
+          .ll-hero { min-height: 58vh; padding: 120px 5vw 64px; }
+          .ll-row,
+          .ll-row.reverse { grid-template-columns: 1fr; min-height: 0; }
+          .ll-row.reverse .ll-media,
+          .ll-row .ll-media { order: 1; }
+          .ll-row.reverse .ll-copy,
+          .ll-row .ll-copy { order: 2; }
+          .ll-media, .ll-media-empty { min-height: 280px; height: 52vw; max-height: 420px; }
+          .ll-strip { flex-direction: column; align-items: flex-start; gap: 14px; }
+        }
+      `}</style>
+
+      <div className="ll">
+        <section className="ll-hero">
+          <p className="ll-kicker ll-reveal">Henima Universe</p>
+          <h1 className="ll-reveal d1">
+            Love
+            <br />
+            <em>Letters.</em>
+          </h1>
+          <p className="ll-reveal d2">
+            Kisah nyata dari orang-orang yang memakai Henima — ditulis dari hati, diabadikan di sini.
+          </p>
+        </section>
+
+        <div className="ll-strip">
+          <span>
+            {loading
+              ? 'Memuat…'
+              : `${stories.length} kisah diabadikan`}
+          </span>
+          <a href="/share-story">Bagikan kisahmu</a>
+        </div>
+
+        {loading ? (
+          <p className="ll-state">Memuat kisah…</p>
+        ) : stories.length === 0 ? (
+          <p className="ll-state">Belum ada kisah. Jadilah yang pertama.</p>
+        ) : (
+          <div className="ll-list">
+            {stories.map((s, i) => {
+              const reverse = i % 2 === 1
+              return (
+                <article
+                  key={s.id}
+                  className={`ll-row${reverse ? ' reverse' : ''} ll-reveal`}
+                >
+                  <div className="ll-media">
+                    {s.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={s.avatar_url} alt={s.name} />
+                    ) : (
+                      <div className="ll-media-empty" aria-hidden>
+                        {s.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div className="ll-copy">
+                    <p className="ll-meta">{fmt(s.created_at)}</p>
+                    <blockquote className="ll-quote">
+                      &ldquo;{s.story}&rdquo;
+                    </blockquote>
+                    <p className="ll-name">{s.name}</p>
+                    <p className="ll-city">{s.city}</p>
+                    {s.perfume && s.perfume !== 'Belum punya Henima' ? (
+                      <p className="ll-perfume">{s.perfume}</p>
+                    ) : null}
+                    {s.admin_reply ? (
+                      <div className="ll-reply">
+                        <p className="ll-reply-label">Henima</p>
+                        <p className="ll-reply-text">&ldquo;{s.admin_reply}&rdquo;</p>
+                      </div>
+                    ) : null}
+                  </div>
+                </article>
+              )
+            })}
           </div>
-        ))}</div>
-      </>)}
-    </div></div>
-  </div></>)
+        )}
+
+        <section className="ll-cta">
+          <h2 className="ll-reveal">
+            Kisahmu
+            <br />
+            layak dikenang.
+          </h2>
+          <p className="ll-reveal d1">
+            Bagikan cerita dan fotomu. Tim Henima akan membaca setiap kisah dengan sepenuh hati.
+          </p>
+          <a className="ll-reveal d2" href="/share-story">
+            Bagikan Kisahmu
+          </a>
+        </section>
+      </div>
+    </>
+  )
 }
