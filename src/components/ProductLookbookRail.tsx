@@ -66,7 +66,6 @@ export default function ProductLookbookRail({
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={p.photo} alt={p.name} className="kz-rail-img" />
                     ) : null}
-                    <span className="kz-rail-hover" aria-hidden />
                   </div>
                   <h3 className="kz-rail-line">{p.line || "Henima"}</h3>
                   <p className="kz-rail-sub">{p.subtitle || p.name}</p>
@@ -161,33 +160,6 @@ export default function ProductLookbookRail({
           display: block;
           transition: transform 0.45s ease;
         }
-        .kz-rail-hover {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(0,0,0,0.28);
-          color: #fff;
-          font-family: ${FUTURA};
-          font-size: 11px;
-          font-weight: 500;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          z-index: 1;
-        }
-        .kz-rail-hover::after {
-          content: "Discover";
-          display: inline-block;
-          padding: 10px 22px;
-          border: 1px solid rgba(255,255,255,0.92);
-          line-height: 1;
-          letter-spacing: 0.12em;
-          font-size: 11px;
-        }
-        .kz-rail-card:hover .kz-rail-hover { opacity: 1; }
         .kz-rail-card:hover .kz-rail-img { transform: scale(1.03); }
 
         .kz-rail-line {
@@ -213,20 +185,22 @@ export default function ProductLookbookRail({
           font-family: ${FUTURA};
           text-align: center;
         }
+        /* Kenzo-style outline CTA under the card — compact, not oversized */
         .kz-rail-cta {
           display: flex;
           align-items: center;
           justify-content: center;
-          height: 40px;
+          box-sizing: border-box;
+          height: 36px;
           width: 100%;
-          max-width: 100%;
+          margin: 0 auto;
           border: 1px solid #111;
           background: #fff;
           color: #111;
           font-size: 11px;
           font-weight: 500;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          text-transform: none;
           text-decoration: none;
           font-family: ${FUTURA};
           transition: background 0.2s ease, color 0.2s ease;
@@ -293,14 +267,10 @@ export default function ProductLookbookRail({
             width: min(291px, 78vw) !important;
           }
           .kz-rail-media { margin-bottom: 14px !important; }
-          .kz-rail-hover::after {
-            padding: 9px 18px;
-            font-size: 10px;
-            letter-spacing: 0.1em;
-          }
           .kz-rail-cta {
-            height: 38px !important;
-            font-size: 10px !important;
+            height: 34px !important;
+            font-size: 11px !important;
+            letter-spacing: 0.04em !important;
           }
           .kz-arrow { display: none !important; }
         }
