@@ -22,7 +22,7 @@ function toSlug(name: string) {
  */
 const MEDIA = {
   hero: "/layout/hero.jpg?v=7",
-  universe: "/layout/universe.jpg?v=8",
+  universe: "/layout/universe.jpg?v=9",
   stores: "/layout/stores.jpg?v=7",
   happenings: "/layout/happenings.jpg?v=7",
   products: [
