@@ -60,50 +60,181 @@ export default function AddToCartButton({
 
   if (kenzo) {
     const sorted = [...variants].sort((a, b) => a.sizeMl - b.sizeMl);
+    const unit = flashPrice || variant?.originalPrice || 0;
+    const displayPrice = unit * qty;
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 28, maxWidth: 280 }}>
-        <div
-          role="group"
-          aria-label="Size"
-          style={{
-            fontFamily: FUTURA,
-            fontSize: 14,
-            fontWeight: 700,
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-            color: INK,
-          }}
-        >
-          {sorted.map((v, i) => {
-            const active = selectedVariant === v.id;
-            return (
-              <span key={v.id}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedVariant(v.id)}
+      <div style={{ display: "flex", flexDirection: "column", gap: 22, maxWidth: 320 }}>
+        <div>
+          <p
+            style={{
+              margin: "0 0 12px",
+              fontFamily: FUTURA,
+              fontSize: 11,
+              fontWeight: 500,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "#95979d",
+            }}
+          >
+            Size
+          </p>
+          <div
+            role="group"
+            aria-label="Size"
+            style={{
+              fontFamily: FUTURA,
+              fontSize: 14,
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              color: INK,
+            }}
+          >
+            {sorted.map((v, i) => {
+              const active = selectedVariant === v.id;
+              return (
+                <span key={v.id}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedVariant(v.id)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                      fontFamily: FUTURA,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      letterSpacing: "0.04em",
+                      textTransform: "uppercase",
+                      color: INK,
+                      opacity: active ? 1 : 0.45,
+                      textDecoration: "none",
+                    }}
+                  >
+                    {v.sizeMl} ML
+                  </button>
+                  {i < sorted.length - 1 ? (
+                    <span style={{ color: INK, margin: "0 8px", opacity: 0.45 }}>|</span>
+                  ) : null}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        {variant && displayPrice > 0 ? (
+          <div>
+            {flashPrice ? (
+              <p
+                style={{
+                  margin: "0 0 6px",
+                  fontFamily: FUTURA,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#E53935",
+                }}
+              >
+                Flash sale
+              </p>
+            ) : null}
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontFamily: FUTURA,
+                  fontSize: 26,
+                  fontWeight: 400,
+                  letterSpacing: "0.02em",
+                  color: flashPrice ? "#E53935" : INK,
+                }}
+              >
+                Rp {displayPrice.toLocaleString("id-ID")}
+              </p>
+              {flashPrice ? (
+                <p
                   style={{
-                    background: "none",
-                    border: "none",
-                    padding: 0,
-                    cursor: "pointer",
+                    margin: 0,
                     fontFamily: FUTURA,
                     fontSize: 14,
-                    fontWeight: 700,
-                    letterSpacing: "0.04em",
-                    textTransform: "uppercase",
-                    color: INK,
-                    opacity: active ? 1 : 0.45,
-                    textDecoration: "none",
+                    color: "#95979d",
+                    textDecoration: "line-through",
                   }}
                 >
-                  {v.sizeMl} ML
-                </button>
-                {i < sorted.length - 1 ? (
-                  <span style={{ color: INK, margin: "0 8px", opacity: 0.45 }}>|</span>
-                ) : null}
-              </span>
-            );
-          })}
+                  Rp {(variant.originalPrice * qty).toLocaleString("id-ID")}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+
+        <div>
+          <p
+            style={{
+              margin: "0 0 10px",
+              fontFamily: FUTURA,
+              fontSize: 11,
+              fontWeight: 500,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "#95979d",
+            }}
+          >
+            Qty
+          </p>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              border: `1px solid rgba(33,37,41,0.35)`,
+            }}
+          >
+            <button
+              type="button"
+              aria-label="Kurangi"
+              onClick={() => setQty(Math.max(1, qty - 1))}
+              style={{
+                width: 40,
+                height: 40,
+                border: "none",
+                background: "none",
+                cursor: "pointer",
+                fontSize: 18,
+                color: INK,
+              }}
+            >
+              −
+            </button>
+            <span
+              style={{
+                width: 40,
+                textAlign: "center",
+                fontFamily: FUTURA,
+                fontSize: 14,
+                color: INK,
+              }}
+            >
+              {qty}
+            </span>
+            <button
+              type="button"
+              aria-label="Tambah"
+              onClick={() => setQty(qty + 1)}
+              style={{
+                width: 40,
+                height: 40,
+                border: "none",
+                background: "none",
+                cursor: "pointer",
+                fontSize: 18,
+                color: INK,
+              }}
+            >
+              +
+            </button>
+          </div>
         </div>
 
         <button
@@ -129,7 +260,34 @@ export default function AddToCartButton({
             transition: "background 0.2s, color 0.2s",
           }}
         >
-          {added ? "Added" : "Purchase"}
+          {added ? "Added" : "Add to cart"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            handleAdd();
+            router.push("/cart");
+          }}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            alignSelf: "flex-start",
+            minWidth: 168,
+            height: 44,
+            padding: "0 28px",
+            border: `1px solid rgba(33,37,41,0.35)`,
+            background: "transparent",
+            color: INK,
+            fontFamily: FUTURA,
+            fontSize: 12,
+            fontWeight: 400,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            cursor: "pointer",
+          }}
+        >
+          Buy now
         </button>
       </div>
     );
