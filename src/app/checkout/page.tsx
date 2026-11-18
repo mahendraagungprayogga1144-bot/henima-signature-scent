@@ -19,6 +19,21 @@ type MembershipInfo = {
   phone?: string;
 };
 
+/** Unique per courier+service — service_code alone ("reguler") repeats across JNE/SiCepat/AnterAja. */
+function shippingOptionId(opt: {
+  courier_code?: string;
+  courier_name?: string;
+  courier_service_code?: string;
+  courier_service_name?: string;
+  price?: number;
+}) {
+  return [
+    opt.courier_code || opt.courier_name || "",
+    opt.courier_service_code || opt.courier_service_name || "",
+    String(opt.price ?? ""),
+  ].join("::");
+}
+
 export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [name, setName] = useState("");
@@ -293,22 +308,53 @@ export default function CheckoutPage() {
                   <p style={{fontSize:"13px", color:"#A3A3A3", textAlign:"center"}}>Fill city and postal code, then click Check Shipping</p>
                 </div>
               ) : (
-                <div style={{display:"flex", flexDirection:"column", gap:"8px"}}>
-                  {shippingOptions.map((opt: any) => (
-                    <label key={opt.courier_service_code} onClick={() => setSelectedShipping(opt)}
-                      style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"16px 20px", border: selectedShipping?.courier_service_code === opt.courier_service_code ? "1px solid #111111" : "1px solid rgba(17,17,17,0.12)", cursor:"pointer", background: selectedShipping?.courier_service_code === opt.courier_service_code ? "#F5F5F4" : "#FFFFFF"}}>
-                      <div style={{display:"flex", alignItems:"center", gap:"12px"}}>
-                        <div style={{width:"16px", height:"16px", borderRadius:"50%", border: selectedShipping?.courier_service_code === opt.courier_service_code ? "5px solid #111111" : "1px solid rgba(17,17,17,0.3)", flexShrink:0}} />
-                        <div>
-                          <p style={{fontSize:"14px", color:"#111111", fontWeight:500}}>{opt.courier_service_name?.includes(opt.courier_name) ? opt.courier_service_name : `${opt.courier_name} ${opt.courier_service_name}`}</p>
-                          <p style={{fontSize:"12px", color:"#A3A3A3"}}>{opt.duration || "Estimasi tidak tersedia"}</p>
+                <div style={{display:"flex", flexDirection:"column", gap:"8px"}} role="radiogroup" aria-label="Shipping method">
+                  {shippingOptions.map((opt: any) => {
+                    const id = shippingOptionId(opt);
+                    const selected = shippingOptionId(selectedShipping || {}) === id;
+                    return (
+                      <label
+                        key={id}
+                        onClick={() => setSelectedShipping(opt)}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          padding: "16px 20px",
+                          border: selected ? "1px solid #111111" : "1px solid rgba(17,17,17,0.12)",
+                          cursor: "pointer",
+                          background: selected ? "#F5F5F4" : "#FFFFFF",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                          <div
+                            role="radio"
+                            aria-checked={selected}
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              borderRadius: "50%",
+                              border: selected ? "5px solid #111111" : "1px solid rgba(17,17,17,0.3)",
+                              flexShrink: 0,
+                            }}
+                          />
+                          <div>
+                            <p style={{ fontSize: "14px", color: "#111111", fontWeight: 500 }}>
+                              {opt.courier_service_name?.includes(opt.courier_name)
+                                ? opt.courier_service_name
+                                : `${opt.courier_name} ${opt.courier_service_name}`}
+                            </p>
+                            <p style={{ fontSize: "12px", color: "#A3A3A3" }}>
+                              {opt.duration || "Estimasi tidak tersedia"}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <p style={{fontSize:"14px", fontWeight:600, color:"#111111"}}>
-                        Rp {opt.price?.toLocaleString("id-ID")}
-                      </p>
-                    </label>
-                  ))}
+                        <p style={{ fontSize: "14px", fontWeight: 600, color: "#111111" }}>
+                          Rp {opt.price?.toLocaleString("id-ID")}
+                        </p>
+                      </label>
+                    );
+                  })}
                 </div>
               )}
             </div>
