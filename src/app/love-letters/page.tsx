@@ -76,16 +76,43 @@ export default function LoveWallPage() {
           font-weight: 300;
         }
         .ll-hero {
-          min-height: 72vh;
+          position: relative;
+          min-height: min(88vh, 920px);
+          width: 100%;
+          overflow: hidden;
           display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          padding: 140px 6vw 88px;
+          align-items: flex-end;
+          background: #EDEDED;
+        }
+        .ll-hero-media {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+        }
+        .ll-hero-media img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 42%;
+          display: block;
+          transform: scale(1.02);
+          animation: ll-hero-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .ll-hero-shade {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
           background:
-            linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(245,245,245,0.92) 55%, #FFFFFF 100%),
-            radial-gradient(ellipse 80% 60% at 50% 20%, rgba(17,17,17,0.04), transparent 70%);
+            linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 42%, rgba(255,255,255,0.88) 78%, #FFFFFF 100%);
+          pointer-events: none;
+        }
+        .ll-hero-copy {
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          padding: 0 6vw 56px;
+          text-align: left;
+          max-width: 920px;
         }
         .ll-kicker {
           font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
@@ -93,15 +120,15 @@ export default function LoveWallPage() {
           letter-spacing: 0.32em;
           text-transform: uppercase;
           color: var(--muted);
-          margin-bottom: 28px;
+          margin-bottom: 18px;
         }
         .ll-hero h1 {
           font-family: var(--font-jakarta), system-ui, sans-serif;
-          font-size: clamp(2.8rem, 8vw, 6.5rem);
+          font-size: clamp(2.8rem, 8vw, 6.2rem);
           font-weight: 400;
           letter-spacing: -0.03em;
           line-height: 0.95;
-          margin: 0 0 28px;
+          margin: 0 0 18px;
           color: var(--ink);
         }
         .ll-hero h1 em {
@@ -110,10 +137,14 @@ export default function LoveWallPage() {
         }
         .ll-hero p {
           max-width: 420px;
-          margin: 0 auto;
+          margin: 0;
           font-size: 15px;
           line-height: 1.75;
           color: var(--muted);
+        }
+        @keyframes ll-hero-in {
+          from { opacity: 0; transform: scale(1.06); }
+          to { opacity: 1; transform: scale(1.02); }
         }
         .ll-strip {
           display: flex;
@@ -302,7 +333,8 @@ export default function LoveWallPage() {
         .ll-reveal.d1 { transition-delay: 0.08s; }
         .ll-reveal.d2 { transition-delay: 0.16s; }
         @media (max-width: 900px) {
-          .ll-hero { min-height: 58vh; padding: 120px 5vw 64px; }
+          .ll-hero { min-height: 72vh; }
+          .ll-hero-copy { padding: 0 5vw 40px; }
           .ll-row,
           .ll-row.reverse { grid-template-columns: 1fr; min-height: 0; }
           .ll-row.reverse .ll-media,
@@ -316,15 +348,25 @@ export default function LoveWallPage() {
 
       <div className="ll">
         <section className="ll-hero">
-          <p className="ll-kicker ll-reveal">Henima Universe</p>
-          <h1 className="ll-reveal d1">
-            Love
-            <br />
-            <em>Letters.</em>
-          </h1>
-          <p className="ll-reveal d2">
-            Kisah nyata dari orang-orang yang memakai Henima — ditulis dari hati, diabadikan di sini.
-          </p>
+          <div className="ll-hero-media" aria-hidden>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/layout/love-letters-hero.jpg"
+              alt=""
+            />
+          </div>
+          <div className="ll-hero-shade" aria-hidden />
+          <div className="ll-hero-copy">
+            <p className="ll-kicker ll-reveal">Henima Universe</p>
+            <h1 className="ll-reveal d1">
+              Love
+              <br />
+              <em>Letters.</em>
+            </h1>
+            <p className="ll-reveal d2">
+              Kisah nyata dari orang-orang yang memakai Henima — ditulis dari hati, diabadikan di sini.
+            </p>
+          </div>
         </section>
 
         <div className="ll-strip">
