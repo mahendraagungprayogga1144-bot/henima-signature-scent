@@ -124,17 +124,19 @@ export default function LoveWallPage() {
           margin-bottom: 18px;
         }
         .ll-hero h1 {
-          font-family: var(--font-jakarta), system-ui, sans-serif;
+          font-family: var(--font-futura-display), var(--font-futura-nav), Futura, Century Gothic, sans-serif;
           font-size: clamp(2.8rem, 8vw, 6.2rem);
-          font-weight: 400;
-          letter-spacing: -0.03em;
+          font-weight: 700;
+          letter-spacing: -0.02em;
           line-height: 0.95;
           margin: 0 0 18px;
           color: var(--ink);
+          text-transform: none;
         }
         .ll-hero h1 em {
-          font-style: italic;
-          font-weight: 300;
+          font-style: normal;
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-weight: 400;
         }
         .ll-hero p {
           max-width: 420px;
@@ -229,12 +231,12 @@ export default function LoveWallPage() {
           margin-bottom: 28px;
         }
         .ll-quote {
-          font-family: var(--font-jakarta), system-ui, sans-serif;
-          font-size: clamp(1.35rem, 2.4vw, 2rem);
-          font-weight: 300;
-          font-style: italic;
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-size: clamp(1.25rem, 2.2vw, 1.85rem);
+          font-weight: 400;
+          font-style: normal;
           line-height: 1.45;
-          letter-spacing: -0.02em;
+          letter-spacing: -0.01em;
           color: var(--ink);
           margin: 0 0 36px;
         }
@@ -286,10 +288,10 @@ export default function LoveWallPage() {
           color: #FFFFFF;
         }
         .ll-cta h2 {
-          font-family: var(--font-jakarta), system-ui, sans-serif;
+          font-family: var(--font-futura-display), var(--font-futura-nav), Futura, Century Gothic, sans-serif;
           font-size: clamp(2rem, 5vw, 3.6rem);
-          font-weight: 400;
-          letter-spacing: -0.03em;
+          font-weight: 700;
+          letter-spacing: -0.02em;
           line-height: 1.05;
           margin: 0 0 20px;
         }

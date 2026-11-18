@@ -97,16 +97,17 @@ export default function ShareStoryPage() {
           margin-bottom: 22px;
         }
         .ss-hero h1 {
-          font-family: var(--font-jakarta), system-ui, sans-serif;
+          font-family: var(--font-futura-display), var(--font-futura-nav), Futura, Century Gothic, sans-serif;
           font-size: clamp(2.4rem, 6.5vw, 5rem);
-          font-weight: 400;
-          letter-spacing: -0.03em;
+          font-weight: 700;
+          letter-spacing: -0.02em;
           line-height: 0.98;
           margin: 0 0 20px;
         }
         .ss-hero h1 em {
-          font-style: italic;
-          font-weight: 300;
+          font-style: normal;
+          font-family: var(--font-futura-nav), Futura, Century Gothic, sans-serif;
+          font-weight: 400;
         }
         .ss-hero p {
           max-width: 420px;
@@ -279,9 +280,9 @@ export default function ShareStoryPage() {
           padding: 0 6vw 100px;
         }
         .ss-success h3 {
-          font-family: var(--font-jakarta), system-ui, sans-serif;
+          font-family: var(--font-futura-display), var(--font-futura-nav), Futura, Century Gothic, sans-serif;
           font-size: clamp(1.8rem, 4vw, 2.6rem);
-          font-weight: 400;
+          font-weight: 700;
           letter-spacing: -0.02em;
           margin: 0 0 16px;
         }

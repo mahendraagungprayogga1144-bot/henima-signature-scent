@@ -29,6 +29,15 @@ const futuraNav = localFont({
   fallback: ["Futura", "Futura BT", "Century Gothic", "sans-serif"],
 });
 
+/** Kenzo display headlines — Futura Bold */
+const futuraDisplay = localFont({
+  src: "../fonts/Futura-Bold.ttf",
+  variable: "--font-futura-display",
+  weight: "700",
+  display: "swap",
+  fallback: ["Futura", "Futura BT", "Century Gothic", "sans-serif"],
+});
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -180,7 +189,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={`min-h-screen font-sans antialiased ${jakarta.variable} ${futuraNav.variable}`} style={{background:"#FFFFFF", color:"#111111", overflowX:"clip", overflowY:"visible", fontFamily:"var(--font-jakarta), system-ui, sans-serif"}}>
+      <body className={`min-h-screen font-sans antialiased ${jakarta.variable} ${futuraNav.variable} ${futuraDisplay.variable}`} style={{background:"#FFFFFF", color:"#111111", overflowX:"clip", overflowY:"visible", fontFamily:"var(--font-jakarta), system-ui, sans-serif"}}>
         <SplashScreen />
         <ScrollObserver />
         <NavbarWrapper />
