@@ -12,7 +12,7 @@ const CATEGORIES = [
   { href: "/shop", label: "New" },
   { href: "/shop", label: "Shop", match: "/shop" },
   { href: "/our-story", label: "Story" },
-  { href: "/share-story", label: "Henima Universe", match: "/share-story" },
+  { href: "/love-letters", label: "Henima Universe", match: "/love-letters" },
 ];
 
 export default function Navbar({ user }: { user?: any }) {

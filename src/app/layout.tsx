@@ -177,7 +177,7 @@ export default async function RootLayout({
               <div>
                 <h4 style={{fontSize:"15px", color:"#FFFFFF", fontWeight:600, margin:"0 0 20px"}}>The Brand</h4>
                 <ul style={{listStyle:"none", padding:0, margin:0, display:"flex", flexDirection:"column", gap:"12px"}}>
-                  {[["Henima Universe","/our-story"],["Women's Fragrance","/shop"],["Men's Fragrance","/shop"],["Contact","/faq"],["Journal","/blog"]].map(([label,href]) => (
+                  {[["Henima Universe","/love-letters"],["Women's Fragrance","/shop"],["Men's Fragrance","/shop"],["Contact","/faq"],["Journal","/blog"]].map(([label,href]) => (
                     <li key={label}><a href={href} style={{fontSize:"13px", color:"rgba(255,255,255,0.7)", textDecoration:"none", fontWeight:300}}>{label}</a></li>
                   ))}
                 </ul>
