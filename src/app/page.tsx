@@ -331,7 +331,7 @@ export default async function HomePage() {
       </section>
 
       {/* Create a connection — jarak atas & bawah, tidak nyatu/ketiban footer */}
-      {!user && <NewsletterBlock />}
+      <NewsletterBlock />
 
       <style>{`
         @media (max-width: 767px) {
