@@ -29,22 +29,12 @@ export default function Navbar({ user }: { user?: any }) {
 
   const [open, setOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-  /** 0 = fully transparent (home hero), 1 = solid white — fades with scroll */
+  /** 0 = transparent over hero, 1 = solid white after scroll */
   const [scrollFade, setScrollFade] = useState(0);
-  /** Mobile home hero is bright — transparent white nav disappears; keep solid on phone */
-  const [isNarrow, setIsNarrow] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 768px)");
-    const sync = () => setIsNarrow(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-
-  const fade = open ? 1 : isHome ? (isNarrow ? 1 : scrollFade) : 1;
+  const fade = open ? 1 : isHome ? scrollFade : 1;
   const transparent = fade < 0.55;
   const ink = transparent ? "#FFFFFF" : "#000000";
   /* Always use tight wordmark in header — stacked logo overflows into NEW/SHOP/… */
@@ -123,11 +113,14 @@ export default function Navbar({ user }: { user?: any }) {
           left: 0,
           right: 0,
           zIndex: 80,
-          background: `rgba(255,255,255,${fade})`,
-          backdropFilter: fade > 0.08 ? `blur(${Math.min(12, fade * 14)}px)` : "none",
-          WebkitBackdropFilter: fade > 0.08 ? `blur(${Math.min(12, fade * 14)}px)` : "none",
+          /* Transparent over hero (soft top shade so white logo/icons stay readable), then white on scroll */
+          background: transparent
+            ? `linear-gradient(180deg, rgba(0,0,0,${0.38 * (1 - fade)}) 0%, rgba(0,0,0,${0.12 * (1 - fade)}) 55%, transparent 100%)`
+            : `rgba(255,255,255,${fade})`,
+          backdropFilter: fade > 0.08 && !transparent ? `blur(${Math.min(12, fade * 14)}px)` : "none",
+          WebkitBackdropFilter: fade > 0.08 && !transparent ? `blur(${Math.min(12, fade * 14)}px)` : "none",
           boxShadow: fade > 0.85 ? "0 1px 0 rgba(0,0,0,0.06)" : "none",
-          transition: "box-shadow 0.35s ease, padding-top 0.45s ease",
+          transition: "box-shadow 0.35s ease, padding-top 0.45s ease, background 0.35s ease",
           paddingTop: isShop ? 8 : fade < 0.35 ? 22 : 8,
         }}
       >
