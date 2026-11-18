@@ -14,7 +14,7 @@ export type LookbookProduct = {
 const FUTURA =
   "var(--font-futura-nav), FuturaBT-Medium, Futura, Century Gothic, sans-serif";
 
-/** Kenzo best-sellers shell — wide enough for 4 square tiles */
+/** Kenzo best-sellers shell */
 const SHELL = {
   maxWidth: 1360,
   margin: "0 auto",
@@ -48,7 +48,6 @@ export default function ProductLookbookRail({
   return (
     <section className="kz-bestsellers" style={{ background: "#FFFFFF", padding: "72px 0 64px" }}>
       <div style={SHELL}>
-        {/* Kenzo: title left · All products right, same row */}
         <div className="kz-bestsellers-head">
           <h2 className="kz-bestsellers-title">{title}</h2>
           <Link href={hrefAll} className="kz-bestsellers-all">
@@ -84,7 +83,6 @@ export default function ProductLookbookRail({
             ›
           </button>
         </div>
-
       </div>
 
       <style>{`
@@ -93,7 +91,7 @@ export default function ProductLookbookRail({
           align-items: baseline;
           justify-content: space-between;
           gap: 24px;
-          margin-bottom: 28px;
+          margin-bottom: 32px;
         }
         .kz-bestsellers-title {
           margin: 0;
@@ -117,9 +115,7 @@ export default function ProductLookbookRail({
           text-underline-offset: 3px;
         }
 
-        .kz-rail-wrap {
-          position: relative;
-        }
+        .kz-rail-wrap { position: relative; }
         .kz-rail {
           display: flex;
           gap: 20px;
@@ -130,24 +126,30 @@ export default function ProductLookbookRail({
         }
         .kz-rail::-webkit-scrollbar { display: none; }
 
-        /* ~4 tiles visible on desktop (Kenzo) */
+        /* Kenzo card: square media → title → subtitle → outline CTA */
         .kz-rail-card {
           flex: 0 0 calc((100% - 60px) / 4);
           max-width: calc((100% - 60px) / 4);
           scroll-snap-align: start;
           text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
         }
         .kz-rail-link {
           text-decoration: none;
           color: #000;
-          display: block;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          flex: 1;
         }
         .kz-rail-media {
           position: relative;
           width: 100%;
           aspect-ratio: 1;
-          background: #F3F3F3;
-          margin-bottom: 18px;
+          background: #F5F5F5;
+          margin-bottom: 20px;
           overflow: hidden;
         }
         .kz-rail-img {
@@ -155,55 +157,59 @@ export default function ProductLookbookRail({
           inset: 0;
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
           object-position: center;
           display: block;
+          padding: 6%;
+          box-sizing: border-box;
           transition: transform 0.45s ease;
         }
-        .kz-rail-card:hover .kz-rail-img { transform: scale(1.03); }
+        .kz-rail-card:hover .kz-rail-img { transform: scale(1.02); }
 
         .kz-rail-line {
-          margin: 0 0 6px;
-          font-size: 14px;
+          margin: 0 0 8px;
+          padding: 0 4px;
+          font-size: 13px;
           font-weight: 700;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
           font-family: ${FUTURA};
-          line-height: 1.25;
+          line-height: 1.3;
           color: #111;
           text-align: center;
         }
         .kz-rail-sub {
-          margin: 0 0 16px;
+          margin: 0 0 20px;
+          padding: 0 8px;
           font-size: 12px;
           font-weight: 400;
-          color: #444;
-          line-height: 1.4;
-          min-height: 34px;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
+          color: #222;
+          line-height: 1.45;
+          letter-spacing: 0.02em;
           font-family: ${FUTURA};
           text-align: center;
+          text-transform: none;
         }
-        /* Kenzo-style outline CTA under the card — compact, not oversized */
+
+        /* Match Kenzo Store Locator outline under card */
         .kz-rail-cta {
           display: flex;
           align-items: center;
           justify-content: center;
           box-sizing: border-box;
-          height: 36px;
+          height: 44px;
           width: 100%;
-          margin: 0 auto;
           border: 1px solid #111;
           background: #fff;
           color: #111;
-          font-size: 11px;
+          font-size: 13px;
           font-weight: 500;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.02em;
           text-transform: none;
           text-decoration: none;
           font-family: ${FUTURA};
           transition: background 0.2s ease, color 0.2s ease;
+          margin-top: auto;
         }
         .kz-rail-cta:hover {
           background: #111;
@@ -212,7 +218,6 @@ export default function ProductLookbookRail({
 
         .kz-arrow {
           position: absolute;
-          /* vertically center on the square image */
           top: 22%;
           width: 44px;
           height: 44px;
@@ -243,34 +248,33 @@ export default function ProductLookbookRail({
           .kz-arrow--next { right: -8px; }
         }
         @media (max-width: 767px) {
-          .kz-bestsellers { padding: 48px 0 56px !important; }
+          .kz-bestsellers { padding: 40px 0 48px !important; }
           .kz-bestsellers > div { padding: 0 16px !important; }
-          /* Kenzo mobile: title, then All products under it */
           .kz-bestsellers-head {
             flex-direction: column;
             align-items: flex-start;
             gap: 10px;
-            margin-bottom: 22px;
+            margin-bottom: 24px;
           }
           .kz-bestsellers-title { font-size: 20px !important; }
           .kz-bestsellers-all {
             display: inline-block !important;
             font-size: 13px !important;
-            font-weight: 500;
             text-decoration: underline;
             text-underline-offset: 3px;
           }
-          .kz-rail { gap: 14px !important; }
+          .kz-rail { gap: 16px !important; }
           .kz-rail-card {
-            flex: 0 0 min(291px, 78vw) !important;
-            max-width: min(291px, 78vw) !important;
-            width: min(291px, 78vw) !important;
+            flex: 0 0 min(300px, 80vw) !important;
+            max-width: min(300px, 80vw) !important;
+            width: min(300px, 80vw) !important;
           }
-          .kz-rail-media { margin-bottom: 14px !important; }
+          .kz-rail-media { margin-bottom: 18px !important; }
+          .kz-rail-line { font-size: 12px !important; margin-bottom: 8px !important; }
+          .kz-rail-sub { font-size: 12px !important; margin-bottom: 18px !important; }
           .kz-rail-cta {
-            height: 34px !important;
-            font-size: 11px !important;
-            letter-spacing: 0.04em !important;
+            height: 44px !important;
+            font-size: 13px !important;
           }
           .kz-arrow { display: none !important; }
         }

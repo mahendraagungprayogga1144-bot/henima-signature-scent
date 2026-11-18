@@ -203,8 +203,8 @@ export default async function HomePage() {
           name: p.name,
           photo: isUsablePhoto(photo) ? photo : MEDIA.products[i % MEDIA.products.length].photo,
           slug: toSlug(p.name),
-          line: "Henima",
-          subtitle: `${p.name} ${p.isGiftSet ? "Gift Set" : "Extrait de Parfum"}`,
+          line: p.name,
+          subtitle: p.isGiftSet ? "Gift Set" : "Extrait de Parfum",
         };
       });
 
