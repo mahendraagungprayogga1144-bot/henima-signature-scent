@@ -22,7 +22,7 @@ function toSlug(name: string) {
  */
 const MEDIA = {
   hero: "/layout/hero.jpg?v=7",
-  universe: "/layout/universe.jpg?v=7",
+  universe: "/layout/universe.jpg?v=8",
   stores: "/layout/stores.jpg?v=7",
   happenings: "/layout/happenings.jpg?v=7",
   products: [
@@ -271,22 +271,40 @@ export default async function HomePage() {
       <div style={{ height: 72, background: "#fff" }} aria-hidden />
 
       {/* 4. FOR A MORE BEAUTIFUL WORLD — full photo band */}
-      <section style={{ position: "relative", width: "100%", minHeight: "52vw", maxHeight: 680 }}>
+      <section style={{ position: "relative", width: "100%", minHeight: "48vw", maxHeight: 640, overflow: "hidden" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={MEDIA.universe} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.28)" }} />
+        <img
+          src={MEDIA.universe}
+          alt=""
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center 48%",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.22) 42%, rgba(0,0,0,0.18) 100%)",
+          }}
+        />
         <div
           style={{
             position: "relative",
             zIndex: 1,
-            minHeight: "52vw",
-            maxHeight: 680,
+            minHeight: "48vw",
+            maxHeight: 640,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
-            padding: "64px 24px",
+            padding: "72px 24px",
             color: "#fff",
           }}
         >
@@ -298,11 +316,21 @@ export default async function HomePage() {
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               fontFamily: "var(--font-jakarta)",
+              textShadow: "0 2px 24px rgba(0,0,0,0.35)",
             }}
           >
             For a more beautiful world
           </h2>
-          <Link href="/our-story" style={{ color: "#fff", fontSize: 13, textDecoration: "none" }}>
+          <Link
+            href="/our-story"
+            style={{
+              color: "#fff",
+              fontSize: 13,
+              textDecoration: "none",
+              letterSpacing: "0.04em",
+              textShadow: "0 1px 12px rgba(0,0,0,0.35)",
+            }}
+          >
             The world by Henima ›
           </Link>
         </div>
