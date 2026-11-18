@@ -449,7 +449,7 @@ export default function OurStoryPage() {
       <section className="hu-split">
         <div className="hu-split-media hu-reveal">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/layout/chapter-distance.jpg" alt="" />
+          <img src="/layout/chapter-distance.jpg?v=2" alt="" />
         </div>
         <div className="hu-split-text">
           <p className="hu-label hu-reveal">The scents</p>
