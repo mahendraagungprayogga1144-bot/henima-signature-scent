@@ -18,7 +18,7 @@ function toSlug(name: string) {
  * 3. 2×2 Discover chapters (4 tiles)
  * 4. FOR A MORE BEAUTIFUL WORLD (full photo band)
  * 5. OUR STORES | Happenings
- * 6. Create a connection + Footer → di layout (kotak di atas kolom, tidak ketiban)
+ * 6. Create a connection + Footer → di layout
  */
 const MEDIA = {
   hero: "/layout/hero.jpg?v=7",
