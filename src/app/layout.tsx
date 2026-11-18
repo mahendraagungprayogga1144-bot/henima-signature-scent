@@ -39,11 +39,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://henimaofficial.com"),
   title: {
-    default: "Henima | Website Resmi Parfum Lokal Indonesia",
-    template: "%s | Henima Signature Scent",
+    default: "Henima | Signature Scent",
+    template: "%s | Henima",
   },
   description:
-    "Website resmi Henima Signature Scent — parfum extrait de parfum lokal Indonesia. Shop Afternoon, The Distance, dan koleksi resmi di henimaofficial.com.",
+    "Henima Signature Scent — extrait de parfum. Shop Afternoon, The Distance, dan koleksi resmi di henimaofficial.com.",
   keywords: [
     "henima",
     "henimaofficial",
@@ -61,14 +61,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     siteName: "Henima Signature Scent",
-    title: "Henima | Website Resmi Parfum Lokal Indonesia",
-    description: "Website resmi Henima Signature Scent — wewangian luxury buatan Indonesia.",
+    title: "Henima | Signature Scent",
+    description: "Henima Signature Scent — wewangian luxury buatan Indonesia.",
     url: "https://henimaofficial.com",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Henima | Website Resmi Parfum Lokal Indonesia",
-    description: "Website resmi Henima Signature Scent — wewangian luxury buatan Indonesia.",
+    title: "Henima | Signature Scent",
+    description: "Henima Signature Scent — wewangian luxury buatan Indonesia.",
   },
   robots: {
     index: true,
