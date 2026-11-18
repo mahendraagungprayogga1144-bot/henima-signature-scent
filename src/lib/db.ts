@@ -1,5 +1,6 @@
 import { readFileSync, existsSync } from "fs";
 import path from "path";
+import { unstable_cache } from "next/cache";
 import { supabase } from "./supabase";
 import type { Database, Product, User, Order, Settings } from "./types";
 import { normalizeProductPhotos } from "./product-media";
@@ -205,7 +206,7 @@ const DEFAULT_SETTINGS: Settings = {
 // ---------- Public API ----------
 
 /** Lightweight settings-only fetch (avoids loading users/orders on every layout). */
-export async function getSettings(): Promise<Settings> {
+async function fetchSettings(): Promise<Settings> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return loadLocalDatabase().settings;
   }
@@ -233,11 +234,16 @@ export async function getSettings(): Promise<Settings> {
   }
 }
 
+export const getSettings = unstable_cache(fetchSettings, ["henima-settings"], {
+  revalidate: 300,
+  tags: ["settings"],
+});
+
 /**
  * Public storefront: products + settings only.
- * Avoids loading all users/orders on every homepage/shop hit (was causing intermittent 500s under load).
+ * Cached so marketing pages stay crawlable after the redesign (force-dynamic + no-store hurt Google).
  */
-export async function getPublicCatalog(): Promise<{
+async function fetchPublicCatalog(): Promise<{
   products: Product[];
   settings: Settings;
 }> {
@@ -283,6 +289,11 @@ export async function getPublicCatalog(): Promise<{
     return { products: local.products, settings: local.settings };
   }
 }
+
+export const getPublicCatalog = unstable_cache(fetchPublicCatalog, ["henima-public-catalog"], {
+  revalidate: 300,
+  tags: ["products", "settings"],
+});
 
 export async function getDatabase(): Promise<Database> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {

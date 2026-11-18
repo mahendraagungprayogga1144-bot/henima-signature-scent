@@ -10,7 +10,7 @@ import ProductLookbookRail from "@/components/ProductLookbookRail";
 import { getProductPhotoList } from "@/lib/product-media";
 import { getProductStory, mergeProductGallery } from "@/lib/product-stories";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 /** Kenzo FuturaBT stack — matches pasted product-detail CSS */
 const FUTURA =

@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 import { MetadataRoute } from "next";
 import { getPublicCatalog } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
@@ -32,9 +32,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: "https://henimaofficial.com/love-letters", priority: 0.6, changeFrequency: "weekly" as const },
     { url: "https://henimaofficial.com/share-story", priority: 0.6, changeFrequency: "monthly" as const },
     { url: "https://henimaofficial.com/tracking", priority: 0.5, changeFrequency: "monthly" as const },
+    { url: "https://henimaofficial.com/faq", priority: 0.7, changeFrequency: "monthly" as const },
     { url: "https://henimaofficial.com/wishlist", priority: 0.5, changeFrequency: "monthly" as const },
-    { url: "https://henimaofficial.com/daftar", priority: 0.4, changeFrequency: "yearly" as const },
-    { url: "https://henimaofficial.com/masuk", priority: 0.3, changeFrequency: "yearly" as const },
   ].map(p => ({ ...p, lastModified: new Date() }));
 
   const productPages = products.map(p => ({

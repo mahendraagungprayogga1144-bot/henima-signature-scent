@@ -2,7 +2,7 @@ import { getPublicCatalog } from "@/lib/db";
 import ShopClient from "@/components/ShopClient";
 import localFont from "next/font/local";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 /** Catalog-only Futura (Kenzo FuturaBT-Medium reference). Does not affect other pages. */
 const futuraCatalog = localFont({

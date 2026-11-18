@@ -2,12 +2,10 @@ import Link from "next/link";
 import HeroCarousel from "@/components/HeroCarousel";
 import ProductLookbookRail from "@/components/ProductLookbookRail";
 import NewsletterBlock from "@/components/NewsletterBlock";
-import { getCurrentUserSafe } from "@/lib/session";
-import { redirect } from "next/navigation";
 import { getPublicCatalog } from "@/lib/db";
 import { getProductPhotoList } from "@/lib/product-media";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 function toSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -180,10 +178,6 @@ function DualTile({
 }
 
 export default async function HomePage() {
-  const user = await getCurrentUserSafe();
-  if (user?.role === "admin") redirect("/admin");
-  if (user?.role === "reseller") redirect("/shop");
-
   const { products: allProducts, settings } = await getPublicCatalog();
   const company = settings.company;
   const products = allProducts.filter((p) => p.active);
