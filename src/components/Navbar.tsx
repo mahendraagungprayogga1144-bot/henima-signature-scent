@@ -31,10 +31,20 @@ export default function Navbar({ user }: { user?: any }) {
   const [cartCount, setCartCount] = useState(0);
   /** 0 = fully transparent (home hero), 1 = solid white — fades with scroll */
   const [scrollFade, setScrollFade] = useState(0);
+  /** Mobile home hero is bright — transparent white nav disappears; keep solid on phone */
+  const [isNarrow, setIsNarrow] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
 
-  const fade = open ? 1 : isHome ? scrollFade : 1;
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const sync = () => setIsNarrow(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const fade = open ? 1 : isHome ? (isNarrow ? 1 : scrollFade) : 1;
   const transparent = fade < 0.55;
   const ink = transparent ? "#FFFFFF" : "#000000";
   /* Always use tight wordmark in header — stacked logo overflows into NEW/SHOP/… */
@@ -112,7 +122,7 @@ export default function Navbar({ user }: { user?: any }) {
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 50,
+          zIndex: 80,
           background: `rgba(255,255,255,${fade})`,
           backdropFilter: fade > 0.08 ? `blur(${Math.min(12, fade * 14)}px)` : "none",
           WebkitBackdropFilter: fade > 0.08 ? `blur(${Math.min(12, fade * 14)}px)` : "none",
