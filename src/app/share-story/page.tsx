@@ -20,21 +20,34 @@ export default function ShareStoryPage() {
   const pickFile=(e:React.ChangeEvent<HTMLInputElement>)=>{
     const f=e.target.files?.[0]
     if(!f) return
+    if(f.size > 2 * 1024 * 1024){
+      alert('Ukuran foto maksimal 2MB')
+      return
+    }
     setAvatar(f)
     setAvatarPreview(URL.createObjectURL(f))
+  }
+  const clearPhoto=()=>{
+    setAvatar(null)
+    if(avatarPreview) URL.revokeObjectURL(avatarPreview)
+    setAvatarPreview(null)
+    if(fileRef.current) fileRef.current.value=''
   }
   const submit=async()=>{
     if(!form.name||!form.city||!form.story) return
     setStatus('loading')
     let avatar_url=null
     if(avatar){
-      const ext=avatar.name.split('.').pop()
-      const path=`${Date.now()}.${ext}`
-      const {error:upErr}=await supabase.storage.from('avatars').upload(path,avatar,{contentType:avatar.type})
-      if(!upErr){
-        const {data}=supabase.storage.from('avatars').getPublicUrl(path)
-        avatar_url=data.publicUrl
+      const ext=avatar.name.split('.').pop() || 'jpg'
+      const path=`story-${Date.now()}.${ext}`
+      const {error:upErr}=await supabase.storage.from('avatars').upload(path,avatar,{contentType:avatar.type, upsert:false})
+      if(upErr){
+        console.error('[share-story] upload failed', upErr.message)
+        setStatus('error')
+        return
       }
+      const {data}=supabase.storage.from('avatars').getPublicUrl(path)
+      avatar_url=data.publicUrl
     }
     const {error}=await supabase.from('love_stories').insert([{...form,status:'pending',avatar_url}])
     setStatus(error?'error':'success')
@@ -54,12 +67,13 @@ export default function ShareStoryPage() {
     .ss-textarea{resize:none;height:140px;line-height:1.7}
     .ss-char{text-align:right;font-size:11px;color:rgba(122,115,106,.4);margin-top:6px}
     .ss-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-    .ss-avatar-wrap{display:flex;align-items:center;gap:20px;margin-bottom:28px}
-    .ss-avatar-img{width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--border)}
-    .ss-avatar-placeholder{width:72px;height:72px;border-radius:50%;background:rgba(28,25,23,0.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .ss-avatar-btn{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);border:1px solid rgba(28,25,23,0.2);padding:8px 20px;cursor:pointer;background:transparent;font-family:var(--sans);transition:background .2s,color .2s}
-    .ss-avatar-btn:hover{background:var(--ink);color:var(--bg)}
-    .ss-avatar-note{font-size:11px;color:rgba(122,115,106,.4);margin-top:4px}
+    .ss-photo-drop{width:100%;min-height:200px;border:1px dashed rgba(28,25,23,0.28);background:rgba(28,25,23,0.03);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;padding:28px 20px;transition:border-color .2s,background .2s;text-align:center}
+    .ss-photo-drop:hover{border-color:rgba(28,25,23,0.55);background:rgba(28,25,23,0.05)}
+    .ss-photo-drop.has-file{border-style:solid;padding:0;overflow:hidden;min-height:260px}
+    .ss-photo-preview{width:100%;height:260px;object-fit:cover;display:block}
+    .ss-photo-cta{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);border:1px solid rgba(28,25,23,0.25);padding:10px 22px;background:#fff;font-family:var(--sans)}
+    .ss-photo-note{font-size:12px;color:rgba(122,115,106,.55);line-height:1.5;max-width:280px}
+    .ss-photo-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
     .ss-btn{width:100%;padding:18px;background:var(--black);color:#F0EBE3;font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-family:var(--sans);border:none;cursor:pointer;transition:opacity .2s,transform .2s;margin-top:8px}
     .ss-btn:hover{opacity:.8;transform:translateY(-1px)}
     .ss-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -82,20 +96,36 @@ export default function ShareStoryPage() {
       ):(
         <>
           <div className="ss-field">
-            <label className="ss-flabel">Foto kamu (opsional)</label>
-            <div className="ss-avatar-wrap">
-              {avatarPreview
-                ?<img src={avatarPreview} alt="preview" className="ss-avatar-img"/>
-                :<div className="ss-avatar-placeholder">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{opacity:.3}}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </div>
-              }
-              <div>
-                <button className="ss-avatar-btn" onClick={()=>fileRef.current?.click()}>{avatarPreview?'Ganti Foto':'Upload Foto'}</button>
-                <p className="ss-avatar-note">JPG atau PNG, maks 2MB</p>
-              </div>
+            <label className="ss-flabel">Foto cerita / ulasan</label>
+            <div
+              className={`ss-photo-drop${avatarPreview ? ' has-file' : ''}`}
+              onClick={()=>!avatarPreview && fileRef.current?.click()}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e)=>{ if(e.key==='Enter'||e.key===' ') fileRef.current?.click() }}
+            >
+              {avatarPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={avatarPreview} alt="Preview foto cerita" className="ss-photo-preview"/>
+              ) : (
+                <>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" style={{opacity:.35}}>
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <path d="M21 15l-5-5L5 21"/>
+                  </svg>
+                  <span className="ss-photo-cta">Pilih foto</span>
+                  <p className="ss-photo-note">Upload foto kisahmu (selfie, couple, atau bersama botol Henima). JPG/PNG, maks 2MB.</p>
+                </>
+              )}
             </div>
-            <input ref={fileRef} type="file" accept="image/*" style={{display:'none'}} onChange={pickFile}/>
+            {avatarPreview ? (
+              <div className="ss-photo-actions">
+                <button type="button" className="ss-photo-cta" onClick={()=>fileRef.current?.click()}>Ganti foto</button>
+                <button type="button" className="ss-photo-cta" onClick={clearPhoto}>Hapus</button>
+              </div>
+            ) : null}
+            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" style={{display:'none'}} onChange={pickFile}/>
           </div>
           <div className="ss-grid">
             <div className="ss-field"><label className="ss-flabel">Nama kamu</label><input className="ss-input" placeholder="Siapa namamu?" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></div>
