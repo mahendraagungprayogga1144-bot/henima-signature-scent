@@ -77,12 +77,12 @@ export default function LoveWallPage() {
         }
         .ll-hero {
           position: relative;
-          min-height: min(88vh, 920px);
+          min-height: min(92vh, 980px);
           width: 100%;
           overflow: hidden;
           display: flex;
           align-items: flex-end;
-          background: #EDEDED;
+          background: #D8D8D8;
         }
         .ll-hero-media {
           position: absolute;
@@ -93,9 +93,10 @@ export default function LoveWallPage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center 42%;
+          object-position: center 38%;
           display: block;
-          transform: scale(1.02);
+          filter: contrast(1.08) brightness(0.96);
+          transform: scale(1.03);
           animation: ll-hero-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
         .ll-hero-shade {
@@ -103,14 +104,14 @@ export default function LoveWallPage() {
           inset: 0;
           z-index: 1;
           background:
-            linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 42%, rgba(255,255,255,0.88) 78%, #FFFFFF 100%);
+            linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.02) 35%, rgba(255,255,255,0.35) 68%, rgba(255,255,255,0.92) 88%, #FFFFFF 100%);
           pointer-events: none;
         }
         .ll-hero-copy {
           position: relative;
           z-index: 2;
           width: 100%;
-          padding: 0 6vw 56px;
+          padding: 0 6vw 48px;
           text-align: left;
           max-width: 920px;
         }
@@ -353,6 +354,7 @@ export default function LoveWallPage() {
             <img
               src="/layout/love-letters-hero.jpg"
               alt=""
+              fetchPriority="high"
             />
           </div>
           <div className="ll-hero-shade" aria-hidden />
