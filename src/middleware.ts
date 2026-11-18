@@ -9,6 +9,13 @@ const ADMIN_PREFIXES = ["/admin"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  /* Chrome sometimes reloads with POST → static pages return 405 Method Not Allowed */
+  if (request.method === "POST" && !pathname.startsWith("/api")) {
+    const url = request.nextUrl.clone();
+    return NextResponse.redirect(url, 303);
+  }
+
   const token = request.cookies.get("toko_session")?.value;
   const session = parseSessionToken(token);
 
@@ -27,6 +34,14 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
+    "/shop/:path*",
+    "/our-story",
+    "/blog/:path*",
+    "/faq",
+    "/quiz",
+    "/galeri",
+    "/love-letters",
     "/katalog/:path*",
     "/pesan/:path*",
     "/pembayaran/:path*",
