@@ -159,12 +159,19 @@ export default async function ProductDetailPage({
                     productId={product.id}
                     productName={product.name}
                     productPhoto={photos[0] || product.photo || ""}
-                    variants={variants.map((v) => ({
-                      id: v.id,
-                      sizeMl: v.sizeMl,
-                      originalPrice: Number(v.originalPrice) || 0,
-                      active: Boolean(v.active),
-                    }))}
+                    variants={variants.map((v) => {
+                      const originalPrice =
+                        Number(v.originalPrice) || Number(product.originalPrice) || 0;
+                      const discountPrice =
+                        Number(v.discountPrice) || Number(product.discountPrice) || 0;
+                      return {
+                        id: v.id,
+                        sizeMl: v.sizeMl,
+                        originalPrice,
+                        discountPrice,
+                        active: Boolean(v.active),
+                      };
+                    })}
                   />
                 )}
               </div>

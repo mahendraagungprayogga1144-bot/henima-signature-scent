@@ -7,7 +7,23 @@ interface Variant {
   id: string;
   sizeMl: number;
   originalPrice: number;
+  /** Selling price (admin: Harga Diskon). Falls back to originalPrice. */
+  discountPrice?: number;
   active: boolean;
+}
+
+function variantSellPrice(v: Variant, flashPrice?: number) {
+  if (flashPrice && flashPrice > 0) return flashPrice;
+  const disc = Number(v.discountPrice) || 0;
+  const orig = Number(v.originalPrice) || 0;
+  if (disc > 0) return disc;
+  return orig;
+}
+
+function variantHasStrike(v: Variant, flashPrice?: number) {
+  const sell = variantSellPrice(v, flashPrice);
+  const orig = Number(v.originalPrice) || 0;
+  return orig > 0 && sell > 0 && sell < orig;
 }
 
 interface Props {
@@ -42,14 +58,15 @@ export default function AddToCartButton({
 
   function handleAdd() {
     if (!variant) return;
+    const sell = variantSellPrice(variant, flashPrice);
     addToCart({
       productId,
       productName,
       productPhoto,
       variantId: variant.id,
       sizeMl: variant.sizeMl,
-      price: flashPrice || variant.originalPrice,
-      isFlashSale: !!flashPrice,
+      price: sell,
+      isFlashSale: !!flashPrice || variantHasStrike(variant, flashPrice),
       originalPrice: variant.originalPrice,
       quantity: qty,
     });
@@ -60,8 +77,9 @@ export default function AddToCartButton({
 
   if (kenzo) {
     const sorted = [...variants].sort((a, b) => a.sizeMl - b.sizeMl);
-    const unit = flashPrice || variant?.originalPrice || 0;
+    const unit = variant ? variantSellPrice(variant, flashPrice) : 0;
     const displayPrice = unit * qty;
+    const showStrike = variant ? variantHasStrike(variant, flashPrice) : false;
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 22, maxWidth: 320 }}>
         <div>
@@ -140,7 +158,7 @@ export default function AddToCartButton({
                 Flash sale
               </p>
             ) : null}
-            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
               <p
                 style={{
                   margin: 0,
@@ -148,12 +166,12 @@ export default function AddToCartButton({
                   fontSize: 26,
                   fontWeight: 400,
                   letterSpacing: "0.02em",
-                  color: flashPrice ? "#E53935" : INK,
+                  color: showStrike || flashPrice ? "#E53935" : INK,
                 }}
               >
                 Rp {displayPrice.toLocaleString("id-ID")}
               </p>
-              {flashPrice ? (
+              {showStrike ? (
                 <p
                   style={{
                     margin: 0,
@@ -327,7 +345,7 @@ export default function AddToCartButton({
             >
               <p style={{ fontSize: "12px", fontWeight: 500, margin: 0 }}>{v.sizeMl} ML</p>
               <p style={{ fontSize: "11px", fontWeight: 400, marginTop: "6px", opacity: 0.85, marginBottom: 0 }}>
-                Rp {v.originalPrice.toLocaleString("id-ID")}
+                Rp {variantSellPrice(v, flashPrice).toLocaleString("id-ID")}
               </p>
             </button>
           ))}
@@ -433,12 +451,13 @@ export default function AddToCartButton({
                 fontFamily: "var(--font-jakarta)",
                 fontSize: "28px",
                 fontWeight: 400,
-                color: flashPrice ? "#E53935" : "#111111",
+                color:
+                  flashPrice || variantHasStrike(variant, flashPrice) ? "#E53935" : "#111111",
               }}
             >
-              Rp {((flashPrice || variant.originalPrice) * qty).toLocaleString("id-ID")}
+              Rp {(variantSellPrice(variant, flashPrice) * qty).toLocaleString("id-ID")}
             </p>
-            {flashPrice && (
+            {variantHasStrike(variant, flashPrice) && (
               <p
                 style={{
                   fontFamily: "var(--font-jakarta)",
