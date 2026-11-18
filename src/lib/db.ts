@@ -233,6 +233,57 @@ export async function getSettings(): Promise<Settings> {
   }
 }
 
+/**
+ * Public storefront: products + settings only.
+ * Avoids loading all users/orders on every homepage/shop hit (was causing intermittent 500s under load).
+ */
+export async function getPublicCatalog(): Promise<{
+  products: Product[];
+  settings: Settings;
+}> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const local = loadLocalDatabase();
+    return { products: local.products, settings: local.settings };
+  }
+
+  try {
+    const [{ data: productsData, error: pErr }, { data: settingsData, error: sErr }] =
+      await Promise.all([
+        supabase.from("products").select("*").order("name"),
+        supabase.from("settings").select("*").eq("id", 1).maybeSingle(),
+      ]);
+
+    if (pErr) {
+      console.error("[db] products fetch failed", pErr.message);
+      const local = loadLocalDatabase();
+      return { products: local.products, settings: local.settings };
+    }
+    if (sErr) console.error("[db] settings fetch failed", sErr.message);
+
+    const settings: Settings = settingsData
+      ? {
+          company: {
+            ...(settingsData.company as Settings["company"]),
+            ...((settingsData.marquee_items
+              ? { marqueeItems: settingsData.marquee_items }
+              : {}) as object),
+          } as Settings["company"],
+          payment: settingsData.payment as Settings["payment"],
+          catalog: settingsData.catalog as Settings["catalog"],
+        }
+      : DEFAULT_SETTINGS;
+
+    return {
+      products: (productsData ?? []).map(rowToProduct),
+      settings,
+    };
+  } catch (err) {
+    console.error("[db] getPublicCatalog failed — local fallback", err);
+    const local = loadLocalDatabase();
+    return { products: local.products, settings: local.settings };
+  }
+}
+
 export async function getDatabase(): Promise<Database> {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     console.warn("[db] Supabase env missing — using data/db.json for local preview");

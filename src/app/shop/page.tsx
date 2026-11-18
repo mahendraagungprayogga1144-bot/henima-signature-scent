@@ -1,4 +1,4 @@
-import { getDatabase } from "@/lib/db";
+import { getPublicCatalog } from "@/lib/db";
 import ShopClient from "@/components/ShopClient";
 import localFont from "next/font/local";
 
@@ -17,9 +17,9 @@ const futuraCatalog = localFont({
 });
 
 export default async function ShopPage() {
-  const db = await getDatabase();
-  const company = db.settings.company;
-  const products = db.products.filter((p) => p.active);
+  const { products: allProducts, settings } = await getPublicCatalog();
+  const company = settings.company;
+  const products = allProducts.filter((p) => p.active);
   const waNumber = company.whatsappNumber || "6285190311230";
   return (
     <div className={futuraCatalog.variable} style={{ fontFamily: "var(--font-futura-catalog), Futura, sans-serif" }}>

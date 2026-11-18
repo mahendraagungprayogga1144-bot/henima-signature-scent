@@ -1,10 +1,13 @@
-import { getDatabase } from "@/lib/db";
+import { getSettings } from "@/lib/db";
 import AnnouncementBar from "./AnnouncementBar";
 
 export default async function AnnouncementBarWrapper() {
   try {
-    const db = await getDatabase();
-    const items = (db.settings.company as any).marqueeItems || [];
+    const settings = await getSettings();
+    const items =
+      (settings as { marqueeItems?: string[] }).marqueeItems ||
+      (settings.company as { marqueeItems?: string[] }).marqueeItems ||
+      [];
     return <AnnouncementBar items={items} />;
   } catch {
     return <AnnouncementBar />;

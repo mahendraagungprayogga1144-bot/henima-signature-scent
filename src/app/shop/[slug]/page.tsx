@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { getDatabase } from "@/lib/db";
+import { getPublicCatalog } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import AddToCartButton from "@/components/AddToCartButton";
@@ -34,8 +34,8 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const db = await getDatabase();
-  const products = (db.products || []).filter((p) => p.active);
+  const { products: allProducts } = await getPublicCatalog();
+  const products = (allProducts || []).filter((p) => p.active);
   const product = products.find((p) => toSlug(p.name) === slug);
   if (!product) notFound();
 

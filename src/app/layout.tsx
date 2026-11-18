@@ -56,8 +56,8 @@ export default async function RootLayout({
   try {
     assertEnv();
   } catch (err) {
+    // Never white-screen the whole site for env — log and continue degraded.
     console.error("[layout] env check failed", err);
-    if (process.env.VERCEL_ENV === "production") throw err;
   }
   const settings = await getSettings();
   const socialLinks = (settings.company as { socialLinks?: Record<string, string> }).socialLinks || {};

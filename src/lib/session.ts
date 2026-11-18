@@ -10,8 +10,13 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 export async function getCurrentUserSafe() {
-  const user = await getCurrentUser();
-  return user ? sanitizeUser(user) : null;
+  try {
+    const user = await getCurrentUser();
+    return user ? sanitizeUser(user) : null;
+  } catch (err) {
+    console.error("[session] getCurrentUserSafe failed", err);
+    return null;
+  }
 }
 
 /** Shared admin gate for API routes. */

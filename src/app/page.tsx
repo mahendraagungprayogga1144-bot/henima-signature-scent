@@ -4,7 +4,7 @@ import ProductLookbookRail from "@/components/ProductLookbookRail";
 import NewsletterBlock from "@/components/NewsletterBlock";
 import { getCurrentUserSafe } from "@/lib/session";
 import { redirect } from "next/navigation";
-import { getDatabase } from "@/lib/db";
+import { getPublicCatalog } from "@/lib/db";
 import { getProductPhotoList } from "@/lib/product-media";
 
 export const dynamic = "force-dynamic";
@@ -184,9 +184,9 @@ export default async function HomePage() {
   if (user?.role === "admin") redirect("/admin");
   if (user?.role === "reseller") redirect("/shop");
 
-  const db = await getDatabase();
-  const company = db.settings.company;
-  const products = db.products.filter((p) => p.active);
+  const { products: allProducts, settings } = await getPublicCatalog();
+  const company = settings.company;
+  const products = allProducts.filter((p) => p.active);
   const empty = products.length === 0;
   const isUsablePhoto = (src?: string) =>
     !!src && !src.endsWith(".svg") && !src.includes("placeholder");
