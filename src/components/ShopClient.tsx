@@ -305,39 +305,11 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
         </ul>
       </div>
 
-      {/* Mobile: Kenzo row — Results left + red Filter button right */}
-      <div
-        className="shop-mobile-filter-row"
-        style={{
-          display: "none",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-          maxWidth: 1140,
-          margin: "0 auto",
-          padding: "16px 20px 8px",
-          boxSizing: "border-box",
-          position: "relative",
-          zIndex: 20,
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            fontSize: 14,
-            fontWeight: 500,
-            lineHeight: "16.8px",
-            letterSpacing: "normal",
-            textTransform: "uppercase",
-            color: "#666666",
-            fontFamily: "inherit",
-          }}
-        >
-          {displayList.length} Results
-        </p>
+      {/* Mobile only: Kenzo full-bleed maroon Filter bar + centered results */}
+      <div className="shop-mobile-filter-wrap" style={{ display: "none" }}>
         <button
           type="button"
-          className="shop-mobile-filter-btn"
+          className="shop-mobile-filter-bar"
           onClick={() => {
             setMobileFiltersOpen((v) => !v);
             setOpenFilter(null);
@@ -346,81 +318,114 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
           style={{
             appearance: "none",
             WebkitAppearance: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: 10,
+            width: "100%",
+            margin: 0,
+            padding: "14px 20px",
+            boxSizing: "border-box",
             background: KENZO_RED,
             color: "#FFFFFF",
             border: "none",
-            padding: "12px 20px",
-            fontFamily: "inherit",
-            fontSize: 16,
-            fontWeight: 400,
-            lineHeight: "24px",
+            borderRadius: 0,
             cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          Filter
-          <FilterChevron open={mobileFiltersOpen} />
-        </button>
-      </div>
-
-      {mobileFiltersOpen && (
-        <div
-          className="shop-mobile-filter-panel"
-          style={{
-            display: "none",
-            background: KENZO_RED,
-            padding: "0 12px 16px",
+            fontFamily: "inherit",
+            fontSize: 15,
+            fontWeight: 500,
+            lineHeight: "20px",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
             position: "relative",
             zIndex: 20,
           }}
         >
-          {FILTER_TABS.map((tab) => {
-            const open = openFilter === tab.key;
-            return (
-              <div key={tab.key} style={{ borderBottom: "1px solid rgba(255,255,255,0.35)" }}>
-                <button
-                  type="button"
-                  onClick={() => setOpenFilter(open ? null : tab.key)}
-                  aria-expanded={open}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    appearance: "none",
-                    WebkitAppearance: "none",
-                    background: "transparent",
-                    border: "none",
-                    padding: "12px 8px",
-                    color: "#FFFFFF",
-                    fontFamily: "inherit",
-                    fontSize: 16,
-                    fontWeight: 400,
-                    lineHeight: "24px",
-                    cursor: "pointer",
-                    textAlign: "left",
-                  }}
-                >
-                  {tab.label}
-                  <FilterChevron open={open} />
-                </button>
-                {open && (
-                  <div style={{ background: "#FFFFFF", padding: 16, marginBottom: 8 }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>{panelContent(tab.key)}</div>
-                    {activeCount > 0 && (
-                      <button type="button" onClick={clearAll} style={clearBtn}>
-                        Clear ({activeCount})
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M3 5h18l-7 8.5V19l-4 2v-7.5L3 5z"
+              stroke="#fff"
+              strokeWidth="1.6"
+              strokeLinejoin="round"
+            />
+          </svg>
+          Filter{activeCount > 0 ? ` (${activeCount})` : ""}
+        </button>
+
+        {mobileFiltersOpen && (
+          <div
+            className="shop-mobile-filter-panel"
+            style={{
+              background: KENZO_RED,
+              padding: "0 12px 16px",
+              position: "relative",
+              zIndex: 20,
+            }}
+          >
+            {FILTER_TABS.map((tab) => {
+              const open = openFilter === tab.key;
+              return (
+                <div key={tab.key} style={{ borderBottom: "1px solid rgba(255,255,255,0.35)" }}>
+                  <button
+                    type="button"
+                    onClick={() => setOpenFilter(open ? null : tab.key)}
+                    aria-expanded={open}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      appearance: "none",
+                      WebkitAppearance: "none",
+                      background: "transparent",
+                      border: "none",
+                      padding: "12px 8px",
+                      color: "#FFFFFF",
+                      fontFamily: "inherit",
+                      fontSize: 16,
+                      fontWeight: 400,
+                      lineHeight: "24px",
+                      cursor: "pointer",
+                      textAlign: "left",
+                    }}
+                  >
+                    {tab.label}
+                    <FilterChevron open={open} />
+                  </button>
+                  {open && (
+                    <div style={{ background: "#FFFFFF", padding: 16, marginBottom: 8 }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>{panelContent(tab.key)}</div>
+                      {activeCount > 0 && (
+                        <button type="button" onClick={clearAll} style={clearBtn}>
+                          Clear ({activeCount})
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <p
+          className="shop-mobile-results"
+          style={{
+            margin: 0,
+            padding: "18px 16px 6px",
+            textAlign: "center",
+            fontSize: 12,
+            fontWeight: 500,
+            lineHeight: "16px",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "#666666",
+            fontFamily: "inherit",
+          }}
+        >
+          {displayList.length} Results
+        </p>
+      </div>
 
       {/* Results + 4-col grid — Kenzo PLP: portrait tiles, fixed card width, generous gaps */}
       <div
@@ -661,15 +666,14 @@ export default function ShopClient({ products }: { products: Product[]; waNumber
         }
         @media (max-width: 767px) {
           .shop-red-bar--desktop { display: none !important; }
-          .shop-mobile-filter-row { display: flex !important; }
-          .shop-mobile-filter-panel { display: block !important; }
+          .shop-mobile-filter-wrap { display: block !important; }
           .shop-results-desktop { display: none !important; }
           .shop-kenzo-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             column-gap: 12px !important;
             row-gap: 24px !important;
           }
-          .shop-catalog-inner { padding: 12px 16px 72px !important; }
+          .shop-catalog-inner { padding: 8px 16px 72px !important; }
           .shop-product h2 { font-size: 14px !important; line-height: 18px !important; letter-spacing: 0.03em !important; }
           .shop-product p { font-size: 11px !important; line-height: 15px !important; }
         }
