@@ -39,21 +39,29 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://henimaofficial.com"),
   title: {
-    default: "Henima | Signature Scent",
-    template: "%s | Henima",
+    default: "Henima | Website Resmi Parfum Lokal Indonesia",
+    template: "%s | Henima Signature Scent",
   },
   description:
-    "Henima Signature Scent — extrait de parfum. Shop Afternoon, The Distance, dan koleksi resmi di henimaofficial.com.",
+    "Website resmi Henima Signature Scent — parfum extrait de parfum lokal Indonesia. Shop Afternoon, The Distance, dan koleksi resmi hanya di henimaofficial.com.",
   keywords: [
     "henima",
     "henimaofficial",
+    "henima official",
     "henima signature scent",
+    "website resmi henima",
     "parfum lokal indonesia",
     "parfum henima",
+    "henima parfum",
     "extrait de parfum",
     "afternoon parfum",
     "the distance parfum",
+    "parfum premium indonesia",
   ],
+  authors: [{ name: "Henima Signature Scent", url: "https://henimaofficial.com" }],
+  creator: "Henima Signature Scent",
+  publisher: "Henima Signature Scent",
+  category: "shopping",
   alternates: {
     canonical: "https://henimaofficial.com",
   },
@@ -61,14 +69,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     siteName: "Henima Signature Scent",
-    title: "Henima | Signature Scent",
-    description: "Henima Signature Scent — wewangian luxury buatan Indonesia.",
+    title: "Henima | Website Resmi Parfum Lokal Indonesia",
+    description:
+      "Website resmi Henima Signature Scent — wewangian luxury buatan Indonesia. Belanja koleksi resmi di henimaofficial.com.",
     url: "https://henimaofficial.com",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Henima | Signature Scent",
-    description: "Henima Signature Scent — wewangian luxury buatan Indonesia.",
+    title: "Henima | Website Resmi Parfum Lokal Indonesia",
+    description:
+      "Website resmi Henima Signature Scent — wewangian luxury buatan Indonesia. Belanja koleksi resmi di henimaofficial.com.",
   },
   robots: {
     index: true,
@@ -107,15 +117,32 @@ export default async function RootLayout({
             __html: JSON.stringify([
               {
                 "@context": "https://schema.org",
-                "@type": "Organization",
+                "@type": ["Organization", "Brand"],
                 "@id": "https://henimaofficial.com/#organization",
                 name: "Henima Signature Scent",
-                alternateName: ["Henima", "Henima Official", "henimaofficial"],
+                alternateName: [
+                  "Henima",
+                  "Henima Official",
+                  "henimaofficial",
+                  "Henima Parfum",
+                  "Website Resmi Henima",
+                ],
                 url: "https://henimaofficial.com",
                 logo: "https://henimaofficial.com/favicon.png",
                 image: "https://henimaofficial.com/favicon.png",
                 description:
-                  "Website resmi Henima Signature Scent — wewangian luxury buatan Indonesia, lahir dari kisah cinta nyata.",
+                  "Website resmi Henima Signature Scent — parfum lokal premium Indonesia (extrait de parfum), lahir dari kisah cinta nyata. Tempat belanja resmi Afternoon, The Distance, dan koleksi Henima.",
+                slogan: "Signature Scent",
+                foundingLocation: {
+                  "@type": "Place",
+                  name: "Indonesia",
+                },
+                areaServed: { "@type": "Country", name: "Indonesia" },
+                brand: {
+                  "@type": "Brand",
+                  name: "Henima",
+                  url: "https://henimaofficial.com",
+                },
                 sameAs: [
                   "https://www.instagram.com/henima.id",
                   "https://shopee.co.id/henima",
@@ -132,9 +159,15 @@ export default async function RootLayout({
                 "@context": "https://schema.org",
                 "@type": "WebSite",
                 "@id": "https://henimaofficial.com/#website",
-                name: "Henima Signature Scent",
-                alternateName: "Henima Official",
+                name: "Henima | Website Resmi Parfum Lokal Indonesia",
+                alternateName: [
+                  "Henima Signature Scent",
+                  "Henima Official",
+                  "henimaofficial.com",
+                ],
                 url: "https://henimaofficial.com",
+                description:
+                  "Website resmi Henima Signature Scent — belanja parfum lokal Indonesia secara resmi di henimaofficial.com.",
                 publisher: { "@id": "https://henimaofficial.com/#organization" },
                 inLanguage: "id-ID",
                 potentialAction: {
