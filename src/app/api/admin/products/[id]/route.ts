@@ -78,11 +78,20 @@ export async function POST(
     }
   }
 
+  const isUsablePhotoUrl = (u: string) =>
+    u.startsWith("http://") ||
+    u.startsWith("https://") ||
+    u.startsWith("/uploads/") ||
+    u.startsWith("/products/") ||
+    u.startsWith("/layout/");
+
   let photos: string[] | undefined;
   if (typeof photosRaw === "string" && photosRaw.trim()) {
     try {
       const parsed = JSON.parse(photosRaw);
-      if (Array.isArray(parsed)) photos = parsed.filter((u) => typeof u === "string" && u.startsWith("http"));
+      if (Array.isArray(parsed)) {
+        photos = parsed.filter((u) => typeof u === "string" && isUsablePhotoUrl(u));
+      }
     } catch {
       return new NextResponse("Photos JSON tidak valid", { status: 400 });
     }
@@ -100,7 +109,7 @@ export async function POST(
         if (photos !== undefined) {
           product.photos = photos;
           if (photos.length > 0) product.photo = photos[0];
-        } else if (photoUrl && photoUrl.startsWith("http")) {
+        } else if (photoUrl && isUsablePhotoUrl(photoUrl)) {
           product.photo = photoUrl;
           product.photos = [photoUrl];
         }

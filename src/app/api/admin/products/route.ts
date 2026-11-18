@@ -8,6 +8,16 @@ import path from "path";
 
 export const runtime = "nodejs";
 
+function isUsablePhotoUrl(u: string) {
+  return (
+    u.startsWith("http://") ||
+    u.startsWith("https://") ||
+    u.startsWith("/uploads/") ||
+    u.startsWith("/products/") ||
+    u.startsWith("/layout/")
+  );
+}
+
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user || user.role !== "admin") {
@@ -20,6 +30,8 @@ export async function POST(request: Request) {
   const originalPrice = Number(form.get("originalPrice") || 0);
   const discountPrice = Number(form.get("discountPrice") || 0);
   const photo = form.get("photo") as File | null;
+  const photoUrlField = String(form.get("photoUrl") || "").trim();
+  const photosRaw = form.get("photos");
 
   if (!name) return new NextResponse("Nama produk wajib diisi", { status: 400 });
   if (originalPrice < 0 || discountPrice < 0) {
@@ -28,8 +40,23 @@ export async function POST(request: Request) {
 
   const id = generateId("prod");
 
-  let photoPath = "/products/placeholder.svg";
-  if (photo && photo.size > 0) {
+  let photos: string[] = [];
+  if (typeof photosRaw === "string" && photosRaw.trim()) {
+    try {
+      const parsed = JSON.parse(photosRaw);
+      if (Array.isArray(parsed)) {
+        photos = parsed.filter((u) => typeof u === "string" && isUsablePhotoUrl(u));
+      }
+    } catch {
+      return new NextResponse("Photos JSON tidak valid", { status: 400 });
+    }
+  }
+
+  if (photos.length === 0 && photoUrlField && isUsablePhotoUrl(photoUrlField)) {
+    photos = [photoUrlField];
+  }
+
+  if (photos.length === 0 && photo && photo.size > 0) {
     const bytes = await photo.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const ext = photo.name.split(".").pop() || "jpg";
@@ -37,8 +64,10 @@ export async function POST(request: Request) {
     const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
     await fs.mkdir(uploadDir, { recursive: true });
     await fs.writeFile(path.join(uploadDir, filename), buffer);
-    photoPath = `/uploads/products/${filename}`;
+    photos = [`/uploads/products/${filename}`];
   }
+
+  const photoPath = photos[0] || "/products/placeholder.svg";
 
   const variants: ProductVariant[] = ([30, 50, 100] as const).map((sizeMl) => ({
     id: `${id}-${sizeMl}`,
@@ -55,6 +84,7 @@ export async function POST(request: Request) {
       name,
       description,
       photo: photoPath,
+      photos: photos.length ? photos : [photoPath],
       originalPrice,
       discountPrice,
       active: true,
@@ -64,4 +94,3 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ ok: true, id });
 }
-

@@ -89,6 +89,28 @@ export default function ProductEditor({
     }
   }
 
+  async function replacePhoto(index: number, file: File | null) {
+    if (!file) return;
+    setPhotoUploading(true);
+    setError("");
+    setSuccess("");
+    setUploadMsg("");
+    try {
+      const url = await uploadFile(file, "photo");
+      setPhotos((prev) => prev.map((p, i) => (i === index ? url : p)));
+      setUploadMsg(`Foto ${index + 1} diganti. Klik "Simpan Produk" untuk menyimpan.`);
+    } catch (e: any) {
+      setError("Gagal ganti foto: " + e.message);
+    } finally {
+      setPhotoUploading(false);
+    }
+  }
+
+  function removePhoto(index: number) {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setUploadMsg(`Foto dihapus dari galeri. Klik "Simpan Produk" untuk menyimpan.`);
+  }
+
   async function addVideo(file: File | null) {
     if (!file) return;
     setVideoUploading(true);
@@ -181,10 +203,17 @@ export default function ProductEditor({
     setError("");
     try {
       const res = await fetch(`/api/admin/products/${product.id}/delete`, { method: "POST" });
-      if (!res.ok) { const text = await res.text(); setError(text || "Gagal menghapus produk"); return; }
-      
-    } catch { setError("Terjadi kesalahan jaringan"); }
-    finally { setSaving(false); }
+      if (!res.ok) {
+        const text = await res.text();
+        setError(text || "Gagal menghapus produk");
+        return;
+      }
+      window.location.href = "/admin/produk?deleted=1";
+    } catch {
+      setError("Terjadi kesalahan jaringan");
+    } finally {
+      setSaving(false);
+    }
   }
 
   function upsertVariant(next: VariantDraft) {
@@ -251,17 +280,30 @@ export default function ProductEditor({
               {photos.length > 0 && (
                 <div className="flex flex-wrap gap-3 mb-3">
                   {photos.map((url, idx) => (
-                    <div key={url + idx} className="relative group">
+                    <div key={url + idx} className="w-[7.5rem]">
                       <div className="relative h-20 w-20 overflow-hidden rounded-xl border border-ink-800">
                         <Image src={url} alt={`Foto ${idx + 1}`} fill className="object-cover" />
                         {idx === 0 && (
                           <span className="absolute bottom-0 left-0 right-0 bg-black/60 text-[9px] text-center text-gold-200 py-0.5">Utama</span>
                         )}
                       </div>
-                      <div className="mt-1 flex gap-1 justify-center">
-                        <button type="button" className="text-[10px] text-ink-400 hover:text-ink-100" onClick={() => movePhoto(idx, -1)} disabled={idx === 0}>←</button>
-                        <button type="button" className="text-[10px] text-red-300 hover:text-red-100" onClick={() => setPhotos((p) => p.filter((_, i) => i !== idx))}>×</button>
-                        <button type="button" className="text-[10px] text-ink-400 hover:text-ink-100" onClick={() => movePhoto(idx, 1)} disabled={idx === photos.length - 1}>→</button>
+                      <div className="mt-1 flex flex-wrap gap-1 justify-center">
+                        <button type="button" className="text-[10px] text-ink-400 hover:text-ink-100" onClick={() => movePhoto(idx, -1)} disabled={idx === 0 || photoUploading}>←</button>
+                        <label className="text-[10px] text-gold-300 hover:text-gold-100 cursor-pointer">
+                          Ganti
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            disabled={photoUploading || saving}
+                            onChange={(e) => {
+                              replacePhoto(idx, e.target.files?.[0] ?? null);
+                              e.target.value = "";
+                            }}
+                          />
+                        </label>
+                        <button type="button" className="text-[10px] text-red-300 hover:text-red-100" onClick={() => removePhoto(idx)} disabled={photoUploading || saving}>Hapus</button>
+                        <button type="button" className="text-[10px] text-ink-400 hover:text-ink-100" onClick={() => movePhoto(idx, 1)} disabled={idx === photos.length - 1 || photoUploading}>→</button>
                       </div>
                     </div>
                   ))}
@@ -276,7 +318,9 @@ export default function ProductEditor({
                 onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }}
               />
               <p className="mt-1 text-xs text-ink-400">
-                {photoUploading ? "Mengupload foto..." : "Pilih satu atau banyak foto sekaligus. Foto pertama = thumbnail utama."}
+                {photoUploading
+                  ? "Mengupload foto..."
+                  : "Tambah foto baru di sini. Per foto: Ganti / Hapus / geser ← →. Foto pertama = utama. Lalu klik Simpan Produk."}
               </p>
               {uploadMsg && <p className="mt-2 text-xs text-green-400">{uploadMsg}</p>}
             </div>
