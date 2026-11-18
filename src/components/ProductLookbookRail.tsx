@@ -191,28 +191,31 @@ export default function ProductLookbookRail({
           text-transform: none;
         }
 
-        /* Match Kenzo Store Locator outline under card */
+        /* Exact Kenzo .btn.purchase-button Store Locator */
         .kz-rail-cta {
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          display: block;
           box-sizing: border-box;
-          height: 44px;
-          width: 100%;
-          border: 1px solid #111;
+          width: 150px;
+          height: 40px;
+          margin: auto auto 0;
+          padding: 6px 12px;
+          border: 0.5px solid rgba(33, 33, 33, 0.7);
+          border-radius: 1px;
           background: #fff;
-          color: #111;
-          font-size: 13px;
-          font-weight: 500;
-          letter-spacing: 0.02em;
+          color: rgb(68, 68, 68);
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 24px;
+          letter-spacing: normal;
+          text-align: center;
           text-transform: none;
           text-decoration: none;
           font-family: ${FUTURA};
-          transition: background 0.2s ease, color 0.2s ease;
-          margin-top: auto;
+          transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
         }
         .kz-rail-cta:hover {
-          background: #111;
+          background: rgb(33, 33, 33);
+          border-color: rgb(33, 33, 33);
           color: #fff;
         }
 
@@ -273,8 +276,10 @@ export default function ProductLookbookRail({
           .kz-rail-line { font-size: 12px !important; margin-bottom: 8px !important; }
           .kz-rail-sub { font-size: 12px !important; margin-bottom: 18px !important; }
           .kz-rail-cta {
-            height: 44px !important;
-            font-size: 13px !important;
+            width: 150px !important;
+            height: 40px !important;
+            padding: 6px 12px !important;
+            font-size: 16px !important;
           }
           .kz-arrow { display: none !important; }
         }
